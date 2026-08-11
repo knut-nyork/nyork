@@ -1,0 +1,72 @@
+/* fonts.css må importeres først — den inneholder selv en @import (Google Fonts),
+   og CSS krever at @import-regler kommer før alt annet enn @charset/@layer. */
+@import "../../design-system/tokens/fonts.css";
+@import "tailwindcss";
+
+/* Kilden er design-system/tokens/ (eksportert fra Figma) — ikke rediger den, ikke definer egne verdier her. */
+@import "../../design-system/tokens/fig-tokens.css";
+@import "../../design-system/tokens/typography.css";
+
+/* Kobler Figma-tokens til Tailwinds tema, slik at f.eks. bg-background-surface-1,
+   text-foreground-muted, font-heading og text-large blir generert fra tokens —
+   ikke fra Tailwinds standardverdier. @theme inline fordi tokens bytter verdi med
+   data-theme="dark" og må leses ved bruk, ikke bakes inn ved bygg. */
+@theme inline {
+  /* Farger — kun semantiske tokens, aldri core-primitiver direkte */
+  --color-background-nav: var(--semantic-color-background-nav);
+  --color-background-surface-1: var(--semantic-color-background-surface-1);
+  --color-background-surface-2: var(--semantic-color-background-surface-2);
+  --color-background-surface-3: var(--semantic-color-background-surface-3);
+  --color-background-surface-4: var(--semantic-color-background-surface-4);
+  --color-background-surface-inreverse: var(--semantic-color-background-surface-inreverse);
+  --color-background-surface-neutral: var(--semantic-color-background-surface-neutral);
+  --color-border-default: var(--semantic-color-border-default);
+  --color-border-focus: var(--semantic-color-border-focus);
+  --color-border-inreverse: var(--semantic-color-border-inreverse);
+  --color-border-subtle: var(--semantic-color-border-subtle);
+  --color-card-background: var(--semantic-color-card-background);
+  --color-card-text-lighter: var(--semantic-color-card-text-lighter);
+  --color-card-text: var(--semantic-color-card-text);
+  --color-foreground-brand: var(--semantic-color-foreground-brand);
+  --color-foreground-default: var(--semantic-color-foreground-default);
+  --color-foreground-hover: var(--semantic-color-foreground-hover);
+  --color-foreground-inreverse: var(--semantic-color-foreground-inreverse);
+  --color-foreground-muted: var(--semantic-color-foreground-muted);
+  --color-link-clicked: var(--semantic-color-link-clicked);
+  --color-link-default: var(--semantic-color-link-default);
+  --color-link-hover: var(--semantic-color-link-hover);
+  --color-feedback-error-background: var(--feedback-error-background);
+  --color-feedback-error-foreground: var(--feedback-error-foreground);
+  --color-feedback-info-background: var(--feedback-info-background);
+  --color-feedback-info-foreground: var(--feedback-info-foreground);
+  --color-feedback-success-background: var(--feedback-success-background);
+  --color-feedback-success-foreground: var(--feedback-success-foreground);
+  --color-feedback-warning-background: var(--feedback-warning-background);
+  --color-feedback-warning-foreground: var(--feedback-warning-foreground);
+
+  /* Fontfamilier */
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-detail: var(--font-detail);
+  --font-label: var(--font-label);
+
+  /* Typeskala — størrelse og linjehøyde parvis, samme navn som i Figma */
+  --text-2xsmall: calc(var(--fontsize-2xsmall) * 1px);
+  --text-2xsmall--line-height: calc(var(--lineheight-2xsmall) * 1px);
+  --text-xsmall: calc(var(--fontsize-xsmall) * 1px);
+  --text-xsmall--line-height: calc(var(--lineheight-xsmall) * 1px);
+  --text-small: calc(var(--fontsize-small) * 1px);
+  --text-small--line-height: calc(var(--lineheight-small) * 1px);
+  --text-medium: calc(var(--fontsize-medium) * 1px);
+  --text-medium--line-height: calc(var(--lineheight-medium) * 1px);
+  --text-large: calc(var(--fontsize-large) * 1px);
+  --text-large--line-height: calc(var(--lineheight-large) * 1px);
+  --text-xlarge: calc(var(--fontsize-xlarge) * 1px);
+  --text-xlarge--line-height: calc(var(--lineheight-xlarge) * 1px);
+  --text-2xlarge: calc(var(--fontsize-2xlarge) * 1px);
+  --text-2xlarge--line-height: calc(var(--lineheight-2xlarge) * 1px);
+  --text-3xlarge: calc(var(--fontsize-3xlarge) * 1px);
+  --text-3xlarge--line-height: calc(var(--lineheight-3xlarge) * 1px);
+  --text-4xlarge: calc(var(--fontsize-4xlarge) * 1px);
+  --text-4xlarge--line-height: calc(var(--lineheight-4xlarge) * 1px);
+}

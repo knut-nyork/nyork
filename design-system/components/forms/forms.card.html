@@ -1,0 +1,38 @@
+<!-- @dsCard group="Components" viewport="700x520" name="Buttons &amp; Forms" subtitle="Site button, input, checkbox, switch, toggle" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="padding:20px;background:var(--core-neutral-050);font-family:var(--font-body)"></div>
+<script type="text/babel">
+const { FormsButton, Input, FormsHeckbox, Switch, Toggle, FormControlLabel } = window.DesignSystem_1e8b4a;
+function Row({children}){ return <div style={{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap',marginBottom:16}}>{children}</div>; }
+function App(){
+  return <div style={{display:'flex',flexDirection:'column',gap:8}}>
+    <Row>
+      <FormsButton type="primary" text="Les mer" />
+      <FormsButton type="secondary" text="Les mer om feltet" />
+      <FormsButton type="ghost" text="Avbryt" />
+      <div style={{background:'#0D262E',padding:8,borderRadius:8}}><FormsButton type="inreverse" text="Kontakt oss" /></div>
+      <FormsButton type="primary" state="hover" text="Hover" />
+      <FormsButton type="primary" state="disabled" text="Disabled" />
+    </Row>
+    <Row>
+      <Input placeholder="E-post" style={{width:220}} />
+      <Input placeholder="Fylt ut" state="filled" style={{width:220}} />
+      <Input placeholder="Feil" state="error" style={{width:220}} />
+      <Input placeholder="Deaktivert" state="disabled" style={{width:220}} />
+    </Row>
+    <Row>
+      <FormsHeckbox state="empty" labelText="Meld interesse" />
+      <FormsHeckbox state="checked" labelText="Nyhetsbrev" />
+      <Switch state="on" />
+      <Switch state="off" />
+      <Toggle state="on" />
+      <Toggle state="off" />
+    </Row>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>

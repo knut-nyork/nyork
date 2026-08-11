@@ -1,0 +1,9 @@
+@import './tokens/fonts.css';
+@import './tokens/fig-tokens.css';
+@import './tokens/typography.css';
+@import './components/data-display/fig-assets.css';
+@import './components/data-table/fig-assets.css';
+@import './components/site/fig-assets.css';
+body{margin:0;font-family:var(--font-body)}
+a{color:var(--semantic-color-link-default);text-decoration:none}
+a:hover{color:var(--semantic-color-link-hover);text-decoration:underline}

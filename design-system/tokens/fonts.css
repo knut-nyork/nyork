@@ -1,0 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&family=Inter:wght@400;500&family=Libre+Franklin:wght@400;500;600&display=swap');
+/* ITC Franklin Gothic LT Pro (button/label typeface in the source file) is a licensed face not distributed
+   on Google Fonts. Substituted with Libre Franklin — the closest open-source relative of Franklin Gothic.
+   Swap in the licensed .woff2 files and replace font-family: "Libre Franklin" below if you have them. */
+:root{--font-substitute-note:"ITC Franklin Gothic LT Pro" /* @kind font */;}

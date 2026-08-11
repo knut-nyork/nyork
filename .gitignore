@@ -1,0 +1,39 @@
+# miljøvariabler — inneholder Sanity-token, skal ALDRI committes
+.env
+.env.*
+!.env.example
+
+# avhengigheter og bygg
+node_modules/
+dist/
+.astro/
+.netlify/
+.vercel/
+
+# Sanity
+.sanity/
+
+# Media: fotografier og video er kildefiler i full oppløsning.
+# Produksjonsbilder kommer fra Sanity — se media/README.md.
+media/foto/
+media/video/
+
+# Merkevare og tegninger brukes i kode og skal med
+!media/merkevare/
+!media/tegninger/
+
+# Designsystemets demobilder — kun brukt av ui_kits-skjermene.
+# Disse to er ikke referert noe sted og er til sammen 16 MB.
+design-system/assets/images/hemsedal-2.jpg
+design-system/assets/images/hemsedal-3.jpg
+
+# system
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# editor
+.vscode/
+.idea/
+*.swp

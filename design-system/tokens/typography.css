@@ -1,0 +1,16 @@
+:root{
+  --font-heading: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-detail: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-label: "ITC Franklin Gothic LT Pro", "Libre Franklin", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* @kind font */
+}
+.type-display{font-family:var(--font-heading);font-weight:700;font-size:64px;line-height:100%;letter-spacing:0;color:var(--semantic-color-foreground-default)}
+.type-h1{font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:54px;letter-spacing:0.265px;color:var(--semantic-color-foreground-default)}
+.type-h2{font-family:var(--font-heading);font-weight:600;font-size:36px;line-height:42px;letter-spacing:0.265px;color:var(--semantic-color-foreground-default)}
+.type-h3{font-family:var(--font-heading);font-weight:500;font-size:24px;line-height:28px;letter-spacing:0.265px;color:var(--semantic-color-foreground-default)}
+.type-h4{font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:26px;color:var(--semantic-color-foreground-default)}
+.type-ingress{font-family:var(--font-body);font-weight:400;font-size:20px;line-height:26px;letter-spacing:0.265px;color:var(--semantic-color-foreground-default)}
+.type-body{font-family:var(--font-body);font-weight:400;font-size:16px;line-height:22px;color:var(--semantic-color-foreground-default)}
+.type-detail{font-family:var(--font-detail);font-weight:400;font-size:16px;line-height:22px;color:var(--semantic-color-foreground-muted)}
+.type-label{font-family:var(--font-label);font-weight:500;font-size:16px;line-height:22px}
+.type-caption{font-family:var(--font-body);font-weight:400;font-size:12px;line-height:16px;color:var(--semantic-color-foreground-muted)}

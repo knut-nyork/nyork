@@ -1,0 +1,17 @@
+<!-- @dsCard group="Iconography" viewport="700x360" name="Icon set" subtitle="Lucide-style 24x24 glyphs used across nav, forms and tables" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="padding:20px;background:var(--core-neutral-050)"></div>
+<script type="text/babel">
+const { Icon } = window.DesignSystem_1e8b4a;
+const names = ["Icons24x24Check","Icons24x24ChevronDown","Icons24x24ChevronRight","Icons24x24ChevronUp","Icons24x24ChevronsUpDown","Icons24x24Box","Icons24x24Circle","Icons24x24Cloud","Icons24x24Compass","Icons24x24CreditCard","Icons24x24Github","Icons24x24Chrome","Icons24x24Keyboard","Icons24x24LifeBuoy","Icons24x24Loader","Icons24x24LogOut","Icons24x24Plus","Icons24x24Settings","Icons24x24Underline","Icons24x24User","Icons24x24UserPlus","Icons24x24Users","Icons24x24XCircle","AbstractCheck","AbstractCircle","AbstractDotFilled","AbstractMinus","AbstractReload","ArrowsArrowDown","ArrowsArrowUp","ArrowsChevronRight"];
+function App(){
+  return <div style={{display:'grid',gridTemplateColumns:'repeat(8,1fr)',gap:16,color:'var(--semantic-color-foreground-default)'}}>
+    {names.map(n => <div key={n} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4,fontSize:9,fontFamily:'var(--font-body)'}}><Icon name={n} size={24}/><span style={{opacity:0.6}}>{n.replace('Icons24x24','')}</span></div>)}
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>

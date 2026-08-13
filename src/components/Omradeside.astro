@@ -15,9 +15,9 @@ import type {Omradeseksjon, Side} from '../lib/typer'
  * Sesongveksler for hvorfor. Kort fortalt: hentes den ene først ved klikk,
  * finnes den ikke for Google.
  *
- * Standardsesongen settes etter måned. Mai til september viser sommer, ellers
- * vinter. Hemsedal er primært en vinterdestinasjon, så vinter er fallback ved
- * tvil.
+ * Standardsesongen settes etter måned: mai til november viser sommer,
+ * desember til april vinter. Grensen følger sesongen i Hemsedal, ikke
+ * kalenderens årstider — snøen ligger til langt ut i april.
  */
 interface Props {
   sprak: Sprak
@@ -29,7 +29,7 @@ const {sprak, side, seksjoner} = Astro.props
 const ui = UI[sprak].omradet
 
 const maaned = new Date().getMonth() + 1
-const standardsesong: 'sommer' | 'vinter' = maaned >= 5 && maaned <= 9 ? 'sommer' : 'vinter'
+const standardsesong: 'sommer' | 'vinter' = maaned >= 5 && maaned <= 11 ? 'sommer' : 'vinter'
 
 const SESONGER = [
   {navn: 'sommer' as const, etikett: ui.sommer},

@@ -59,7 +59,7 @@ for (let i = 0; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
 <div class="mx-auto flex max-w-[1100px] flex-col gap-14 px-5 py-12 md:px-10">
   <Brodsmuler sprak={sprak} ledd={[{tekst: ui.alleHytter, sti: '/hytter'}]} naa={enhet.nummer} />
 
-  <header class="flex flex-col items-center gap-4 text-center">
+  <header class="flex flex-col items-center gap-4 py-6 text-center md:py-10">
     <h1 class="m-0 font-heading text-4xlarge font-semibold">{enhet.nummer}</h1>
     <Statusmerke status={enhet.status} sprak={sprak} />
   </header>

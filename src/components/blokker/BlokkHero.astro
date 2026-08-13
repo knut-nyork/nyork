@@ -76,7 +76,7 @@ const harBilde = Boolean(bilde)
       )
     }
 
-    <div class="relative flex min-h-[70vh] items-end p-5 md:p-12">
+    <div class="relative flex min-h-[70vh] items-end p-6 md:p-16">
       <div
         class:list={[
           'max-w-[46ch]',
@@ -84,10 +84,10 @@ const harBilde = Boolean(bilde)
         ]}
       >
         <h1 class="font-heading text-3xlarge font-semibold md:text-4xlarge">{overskrift}</h1>
-        {ingress && <p class="mt-4 font-body text-small">{ingress}</p>}
+        {ingress && <p class="mt-5 font-body text-small">{ingress}</p>}
         {
           blokk.knapper && blokk.knapper.length > 0 && (
-            <div class="mt-6 flex flex-wrap gap-3">
+            <div class="mt-7 flex flex-wrap gap-3">
               {blokk.knapper.map((knapp, i) => (
                 <Blokkknapp
                   knapp={knapp}

@@ -28,7 +28,7 @@ const tittel = tekst(side?.overskrift, sprak) || ui.alleSaker
   <div class="flex flex-col gap-10">
     <Brodsmuler sprak={sprak} naa={tittel} />
 
-    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 py-6 text-center md:py-10">
       <h1 class="m-0 font-heading text-4xlarge font-semibold">{tittel}</h1>
       {side?.ingress && <p class="m-0 font-body text-small">{tekst(side.ingress, sprak)}</p>}
     </header>

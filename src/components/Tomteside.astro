@@ -53,7 +53,7 @@ const ovrige = (side?.seksjoner ?? []).filter((s) => !s.ankerId || !PLASSERTE.ha
   <div class="flex flex-col gap-10">
     <Brodsmuler sprak={sprak} naa={tekst(side?.overskrift, sprak)} />
 
-    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 py-6 text-center md:py-10">
       <h1 class="m-0 font-heading text-4xlarge font-semibold">{tekst(side?.overskrift, sprak)}</h1>
       <p class="m-0 font-body text-small">{tekst(side?.ingress, sprak)}</p>
     </header>

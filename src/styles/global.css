@@ -529,3 +529,34 @@
 :root[data-sesong] .sesong-overskrift {
   display: none;
 }
+
+/*
+  Sideflaten får et sesongskjær på områdesiden: varmt mot beige om sommeren,
+  kjøligere mot blått om vinteren. Det er en toning i toppen som falmer ut i
+  sidens egen farge — ikke en heldekkende flate, for da ville teksten lenger
+  nede stått på en annen bakgrunn enn resten av nettstedet.
+
+  `data-sesong` settes bare av skriptet på områdesiden, så dette treffer aldri
+  de andre sidene. Uten JavaScript settes attributtet aldri, og da står siden
+  med vanlig bakgrunn — den mister et skjær, ikke innhold.
+*/
+:root[data-sesong] body {
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+:root[data-sesong='sommer'] body {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--flate-side) 55%, var(--flate-sand)) 0%,
+    var(--flate-side) 75vh
+  );
+}
+
+:root[data-sesong='vinter'] body {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--flate-side) 45%, var(--semantic-color-background-surface-4)) 0%,
+    var(--flate-side) 75vh
+  );
+}

@@ -54,6 +54,9 @@ export interface Side {
   blokker?: Blokk[]
   /** Kun på tomtesiden: tomtene selges direkte av utbygger, ikke gjennom megler. */
   tomtekontakt?: Tomtekontakt
+  /** Kun på områdesiden: toppbildet bytter sammen med sesongen. */
+  sommerBilde?: Bilde
+  vinterBilde?: Bilde
 }
 
 import type {Aktivitet} from './ikoner'

@@ -37,13 +37,37 @@ const SESONGER = [
 ]
 ---
 
-<Artikkelmal
-  sprak={sprak}
-  tittel={tekst(side?.overskrift, sprak)}
-  ingress={tekst(side?.ingress, sprak)}
-  bilde={side?.situasjonsplan}
->
+<Artikkelmal sprak={sprak} tittel={tekst(side?.overskrift, sprak)} ingress={tekst(side?.ingress, sprak)}>
   <Sesongveksler slot="under-tittel" sprak={sprak} valgt={standardsesong} />
+
+  <!-- Toppbildet bytter med sesongen, som alt annet på siden. Begge ligger i
+       HTML-en; det er `data-sesong` på <html> som avgjør hvem som vises. -->
+  <Fragment slot="bilde">
+    {
+      SESONGER.map((sesong) => {
+        const bilde = sesong.navn === 'sommer' ? side?.sommerBilde : side?.vinterBilde
+
+        return (
+          <figure data-sesong-innhold={sesong.navn} class="m-0 block">
+            {bilde ? (
+              <img
+                src={bildeUrl(bilde.url, 1600)}
+                alt={tekst(bilde.altTekst, sprak)}
+                class="aspect-[16/10] w-full rounded-stor object-cover"
+              />
+            ) : (
+              <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
+            )}
+            {bilde?.fotokreditt && (
+              <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
+                {bilde.fotokreditt}
+              </figcaption>
+            )}
+          </figure>
+        )
+      })
+    }
+  </Fragment>
 
   {
     seksjoner.length === 0 ? (

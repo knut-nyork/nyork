@@ -59,6 +59,20 @@ export const side = defineType({
       validation: (Rule) => Rule.max(160).warning('Lengre tekst kan bli avkuttet i søkeresultater.'),
     }),
     defineField({
+      name: 'sommerBilde',
+      title: 'Toppbilde — sommer',
+      type: 'bildeMedKreditering',
+      description: 'Vises øverst på områdesiden når sommer er valgt. Byttes sammen med teksten.',
+      hidden: ({document}) => document?.sideNavn !== 'omradet',
+    }),
+    defineField({
+      name: 'vinterBilde',
+      title: 'Toppbilde — vinter',
+      type: 'bildeMedKreditering',
+      description: 'Vises øverst på områdesiden når vinter er valgt.',
+      hidden: ({document}) => document?.sideNavn !== 'omradet',
+    }),
+    defineField({
       name: 'tomtekontakt',
       title: 'Kontakt for tomtesalg',
       type: 'object',

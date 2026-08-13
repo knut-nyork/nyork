@@ -40,24 +40,28 @@ const ui = UI[sprak].omradet
     <slot name="under-tittel" />
   </header>
 
-  {
-    bilde ? (
-      <figure class="m-0">
-        <img
-          src={bildeUrl(bilde.url, 1600)}
-          alt={tekst(bilde.altTekst, sprak)}
-          class="aspect-[16/10] w-full rounded-stor object-cover"
-        />
-        {bilde.fotokreditt && (
-          <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
-            {bilde.fotokreditt}
-          </figcaption>
-        )}
-      </figure>
-    ) : (
-      <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
-    )
-  }
+  <!-- Toppbildet. Områdesiden sender inn sitt eget, fordi det skal bytte
+       sammen med sesongen — da holder det ikke med ett bilde. -->
+  <slot name="bilde">
+    {
+      bilde ? (
+        <figure class="m-0">
+          <img
+            src={bildeUrl(bilde.url, 1600)}
+            alt={tekst(bilde.altTekst, sprak)}
+            class="aspect-[16/10] w-full rounded-stor object-cover"
+          />
+          {bilde.fotokreditt && (
+            <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
+              {bilde.fotokreditt}
+            </figcaption>
+          )}
+        </figure>
+      ) : (
+        <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
+      )
+    }
+  </slot>
 
   <div class="mx-auto flex w-full max-w-[800px] flex-col gap-8">
     <!-- Metalinja. Skillelinjen over den markerer at innholdet begynner. -->

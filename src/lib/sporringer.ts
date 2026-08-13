@@ -162,6 +162,8 @@ const SIDE = `*[_type == "side" && sideNavn == $sideNavn][0]{
   tomTilstand,
   hyttetyperIngress,
   situasjonsplan${BILDE},
+  "sommerBilde": sommerBilde${BILDE},
+  "vinterBilde": vinterBilde${BILDE},
   tomtekontakt{navn, telefon, epost, tekst},
   ${BLOKKER}
 }`

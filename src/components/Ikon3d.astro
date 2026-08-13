@@ -1,0 +1,45 @@
+---
+import Ikon from './Ikon.astro'
+import {bildeUrl} from '../lib/hytter'
+import {AKTIVITETER, type Aktivitet} from '../lib/ikoner'
+import {tekst, type Sprak} from '../lib/sprak'
+import type {Bilde} from '../lib/typer'
+
+/**
+ * Ikonet i sin rikeste form: 3D-illustrasjonen når den er lastet opp i Sanity,
+ * ellers strekikonet.
+ *
+ * Poenget med fallbacken er at siden er hel uten illustrasjonene. De kan
+ * lastes opp én etter én, og hvert ikon blir rikere i det øyeblikket filen
+ * finnes — uten at noen må røre koden.
+ */
+interface Props {
+  aktivitet: Aktivitet
+  illustrasjon?: Bilde
+  sprak: Sprak
+  storrelse?: number
+  dekorativ?: boolean
+}
+
+const {aktivitet, illustrasjon, sprak, storrelse = 64, dekorativ = false} = Astro.props
+
+const navn = sprak === 'en' ? AKTIVITETER[aktivitet].en : AKTIVITETER[aktivitet].no
+---
+
+{
+  /* `illustrasjon?.url` og ikke bare `illustrasjon`: et tomt bildeobjekt fra
+     Sanity er fortsatt et objekt. Det er url-en som avgjør om det finnes noe
+     å vise. */
+  illustrasjon?.url ? (
+    <img
+      src={bildeUrl(illustrasjon.url, storrelse * 2)}
+      alt={dekorativ ? '' : tekst(illustrasjon.altTekst, sprak) || navn}
+      loading="lazy"
+      width={storrelse}
+      height={storrelse}
+      class="object-contain"
+    />
+  ) : (
+    <Ikon aktivitet={aktivitet} sprak={sprak} dekorativ={dekorativ} storrelse={Math.round(storrelse * 0.55)} />
+  )
+}

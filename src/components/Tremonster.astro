@@ -1,0 +1,41 @@
+---
+import trearerUrl from '../assets/monster-trearer.svg?url'
+import hoydekurverUrl from '../assets/monster-hoydekurver.svg?url'
+
+/**
+ * Mønster som dekor bak innhold. To varianter:
+ *
+ * - `trearer` er merkevarens eget bjørkemønster fra Figma. Materialet.
+ * - `hoydekurver` er terrenget. Den er ikke tegnet, men generert av
+ *   `verktoy/lag-hoydekurver.py` — et høydefelt kuttet i iso-linjer. Kjør
+ *   skriptet på nytt hvis tettheten skal endres, ikke rediger SVG-en.
+ *
+ * Mønsteret legges på som CSS-maske, ikke som bilde. Grunnen er fargene:
+ * SVG-ene har hardkodede farger, og de ville ligget der uansett hvilket tema
+ * siden står i. Som maske teller bare formen — flaten under males med et
+ * token, og mønsteret følger lys og mørk modus av seg selv.
+ *
+ * Filene lastes én gang og caches på tvers av sider. Å legge dem rett i
+ * HTML-en på hver side ville vært dyrere enn dekoren er verdt.
+ *
+ * Rent pynt: `aria-hidden` og uten pekerhendelser, så det aldri kommer i
+ * veien for tekst eller klikk.
+ */
+interface Props {
+  variant?: 'trearer' | 'hoydekurver'
+  /** Hvor tydelig mønsteret er. Standarden er ment å så vidt anes. */
+  styrke?: number
+  class?: string
+}
+
+const {variant = 'trearer', styrke = 0.09, class: klasse = ''} = Astro.props
+
+const url = variant === 'hoydekurver' ? hoydekurverUrl : trearerUrl
+---
+
+<div
+  aria-hidden="true"
+  class:list={['tremonster pointer-events-none absolute inset-0', klasse]}
+  style={`--tremonster-bilde: url("${url}"); --tremonster-styrke: ${styrke};`}
+>
+</div>

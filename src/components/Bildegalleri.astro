@@ -1,0 +1,50 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import {bildeUrl} from '../lib/hytter'
+import {tekst, type Sprak} from '../lib/sprak'
+import type {Bilde} from '../lib/typer'
+
+/**
+ * En rekke bilder med overskrift. Finnes ingen bilder, rendres plassholdere
+ * med samme sideforhold som de ekte skal ha — layouten skal ikke hoppe den
+ * dagen bildene kommer.
+ */
+interface Props {
+  tittel: string
+  bilder?: Bilde[]
+  sprak: Sprak
+  sideforhold: string
+  /** Hvor mange plassholdere som vises når bildene mangler. */
+  antallPlassholdere: number
+}
+
+const {tittel, bilder, sprak, sideforhold, antallPlassholdere} = Astro.props
+const harBilder = bilder && bilder.length > 0
+---
+
+<section class="flex flex-col gap-6">
+  <h2 class="font-heading text-2xlarge font-semibold">{tittel}</h2>
+  <div class="grid gap-6 sm:grid-cols-2">
+    {
+      harBilder
+        ? bilder.map((bilde) => (
+            <figure class="flex flex-col gap-2">
+              <img
+                src={bildeUrl(bilde.url, 800)}
+                alt={tekst(bilde.altTekst, sprak)}
+                loading="lazy"
+                class="w-full rounded-medium"
+              />
+              {bilde.fotokreditt && (
+                <figcaption class="font-body text-2xsmall text-foreground-muted">
+                  {bilde.fotokreditt}
+                </figcaption>
+              )}
+            </figure>
+          ))
+        : Array.from({length: antallPlassholdere}).map(() => (
+            <Bildeplassholder sideforhold={sideforhold} className="w-full" />
+          ))
+    }
+  </div>
+</section>

@@ -1,0 +1,56 @@
+---
+import Blokkknapp from './Blokkknapp.astro'
+import {bildeUrl} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkFremhevet} from '../../lib/typer'
+
+/**
+ * Bilde i full bredde med tekstpanel oppå. Panelet har egen flate bak seg,
+ * ikke bare skygge — teksten må være lesbar uansett hvor lyst bildet er.
+ */
+interface Props {
+  blokk: BlokkFremhevet
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+
+const brodtekst = tekst(blokk.tekst, sprak)
+const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
+const bilde = blokk.bilde
+---
+
+<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+  <div class="relative min-h-[420px] overflow-hidden rounded-stor bg-background-surface-3">
+    {
+      bilde && (
+        <img
+          src={bildeUrl(bilde.url, 2000)}
+          alt={tekst(bilde.altTekst, sprak)}
+          loading="lazy"
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+      )
+    }
+
+    <div class="relative flex min-h-[420px] items-end p-5 md:p-10">
+      <div class="max-w-[52ch] rounded-medium bg-background-surface-1/90 p-6 backdrop-blur-sm md:p-8">
+        <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>
+        {avsnitt.map((tekstavsnitt) => <p class="mt-3 font-body text-small">{tekstavsnitt}</p>)}
+        {
+          blokk.knapp && (
+            <div class="mt-6">
+              <Blokkknapp knapp={blokk.knapp} sprak={sprak} variant={bilde ? 'lys' : 'primar'} />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  {
+    bilde?.fotokreditt && (
+      <p class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</p>
+    )
+  }
+</section>

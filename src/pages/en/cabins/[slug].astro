@@ -1,0 +1,57 @@
+---
+import Sidemal from '../../../layouts/Sidemal.astro'
+import Modellside from '../../../components/Modellside.astro'
+import Enhetsside from '../../../components/Enhetsside.astro'
+import {forstAvsnitt} from '../../../lib/hytter'
+import {hentHytter, hentModeller} from '../../../lib/sporringer'
+import {tekst} from '../../../lib/sprak'
+import {UI} from '../../../lib/tekster'
+import type {Enhet, Hyttemodell} from '../../../lib/typer'
+
+/** Engelsk motpart til /hytter/[slug]. Slugen er den samme på begge språk. */
+export async function getStaticPaths() {
+  const [modeller, hytter] = await Promise.all([hentModeller(), hentHytter()])
+
+  return [
+    ...modeller.map((modell) => ({
+      params: {slug: modell.slug},
+      props: {
+        modell,
+        enheter: hytter.filter((hytte) => hytte.modell?.slug === modell.slug),
+      },
+    })),
+    ...hytter.map((enhet) => ({
+      params: {slug: enhet.slug},
+      props: {enhet},
+    })),
+  ]
+}
+
+interface Props {
+  modell?: Hyttemodell
+  enheter?: Enhet[]
+  enhet?: Enhet
+}
+
+const {modell, enheter, enhet} = Astro.props
+const ui = UI.en
+
+const navn = modell ? modell.navn : enhet!.nummer
+const slug = modell ? modell.slug : enhet!.slug
+const kilde = modell ? modell.beskrivelse : (enhet!.beskrivelse ?? enhet!.modell?.beskrivelse)
+const brodtekst = tekst(kilde, 'en')
+---
+
+<Sidemal
+  norskSti={`/hytter/${slug}`}
+  tittel={`${navn} · ${ui.tittelSuffiks}`}
+  metaBeskrivelse={brodtekst ? forstAvsnitt(brodtekst) : undefined}
+>
+  {
+    modell ? (
+      <Modellside sprak="en" modell={modell} enheter={enheter ?? []} />
+    ) : (
+      <Enhetsside sprak="en" enhet={enhet!} />
+    )
+  }
+</Sidemal>

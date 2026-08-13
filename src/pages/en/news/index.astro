@@ -1,0 +1,16 @@
+---
+import Sidemal from '../../../layouts/Sidemal.astro'
+import Nyhetsliste from '../../../components/Nyhetsliste.astro'
+import {hentArtikler, hentSide} from '../../../lib/sporringer'
+import {tekst} from '../../../lib/sprak'
+
+const [side, artikler] = await Promise.all([hentSide('siste-nytt'), hentArtikler()])
+---
+
+<Sidemal
+  norskSti="/siste-nytt"
+  tittel={tekst(side?.tittel, 'en')}
+  metaBeskrivelse={tekst(side?.metaBeskrivelse, 'en')}
+>
+  <Nyhetsliste sprak="en" side={side} artikler={artikler} />
+</Sidemal>

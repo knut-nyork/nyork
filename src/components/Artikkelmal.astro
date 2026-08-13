@@ -1,0 +1,108 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import Brodsmuler from './Brodsmuler.astro'
+import {bildeUrl, formaterDato} from '../lib/hytter'
+import {tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Bilde} from '../lib/typer'
+
+/**
+ * Malen for lange lesesider — områdesiden og nyhetssakene.
+ *
+ * De to har ulikt innhold, men samme form: brødsti, midtstilt tittel, stort
+ * bilde, en tynn metalinje med dato og deling, og så teksten i en smal
+ * lesekolonne. Å ha det ett sted betyr at de faktisk *forblir* like.
+ *
+ * Bildet får gå bredere enn teksten. 800 px er behagelig å lese; et bilde
+ * som stopper på samme bredde ser puslete ut.
+ */
+interface Props {
+  sprak: Sprak
+  /** Leddene mellom «Hjem» og denne siden. */
+  brodsmuleledd?: {tekst: string; sti: string}[]
+  tittel: string
+  ingress?: string
+  bilde?: Bilde
+  /** Vises i metalinja. Utelates når siden ikke har en dato. */
+  dato?: string
+}
+
+const {sprak, brodsmuleledd = [], tittel, ingress, bilde, dato} = Astro.props
+const ui = UI[sprak].omradet
+---
+
+<article class="mx-auto flex max-w-[1100px] flex-col gap-10 px-5 py-12 md:px-10">
+  <Brodsmuler sprak={sprak} ledd={brodsmuleledd} naa={tittel} />
+
+  <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+    <h1 class="m-0 font-heading text-4xlarge font-semibold">{tittel}</h1>
+    {ingress && <p class="m-0 font-body text-small">{ingress}</p>}
+    <slot name="under-tittel" />
+  </header>
+
+  {
+    bilde ? (
+      <figure class="m-0">
+        <img
+          src={bildeUrl(bilde.url, 1600)}
+          alt={tekst(bilde.altTekst, sprak)}
+          class="aspect-[16/10] w-full rounded-stor object-cover"
+        />
+        {bilde.fotokreditt && (
+          <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
+            {bilde.fotokreditt}
+          </figcaption>
+        )}
+      </figure>
+    ) : (
+      <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
+    )
+  }
+
+  <div class="mx-auto flex w-full max-w-[800px] flex-col gap-8">
+    <!-- Metalinja. Skillelinjen over den markerer at innholdet begynner. -->
+    <div
+      class="flex flex-wrap items-center justify-between gap-3 border-t border-border-subtle pt-4 font-detail text-2xsmall text-foreground-muted"
+    >
+      <span>{dato ? `${ui.sistOppdatert}: ${formaterDato(dato, sprak)}` : ''}</span>
+      <button type="button" class="deleknapp" data-delknapp data-kopiert={ui.lenkeKopiert}>
+        {ui.del}
+      </button>
+    </div>
+
+    <slot />
+  </div>
+</article>
+
+<script>
+  // Deler med nettleserens egen delefunksjon der den finnes — på mobil gir det
+  // systemarket med Meldinger, e-post og resten. Ellers kopieres lenken, som
+  // er det beste et skrivebord kan tilby uten å åpne noe brukeren ikke ba om.
+  document.querySelectorAll<HTMLButtonElement>('[data-delknapp]').forEach((knapp) => {
+    knapp.addEventListener('click', async () => {
+      const url = window.location.href
+      const tittel = document.title
+
+      if (navigator.share) {
+        try {
+          await navigator.share({title: tittel, url})
+          return
+        } catch {
+          // Brukeren avbrøt. Da skal ingenting skje.
+          return
+        }
+      }
+
+      try {
+        await navigator.clipboard.writeText(url)
+        const gammel = knapp.textContent
+        knapp.textContent = knapp.dataset.kopiert ?? ''
+        setTimeout(() => {
+          knapp.textContent = gammel
+        }, 2000)
+      } catch {
+        // Utklippstavlen kan være sperret. Da lar vi knappen stå i ro.
+      }
+    })
+  })
+</script>

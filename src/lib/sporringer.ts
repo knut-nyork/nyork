@@ -1,0 +1,354 @@
+import {sanity} from './sanity'
+import type {
+  Artikkel,
+  Enhet,
+  Hyttemodell,
+  Omradeseksjon,
+  Innstillinger,
+  Reguleringsregler,
+  Side,
+  SideNavn,
+  Statustall,
+} from './typer'
+
+/**
+ * GROQ-spørringene siden bruker. Feltene listes eksplisitt, aldri `...`, slik
+ * at interne felter ikke kan lekke ut ved et uhell — se `utbyggerIntern` på
+ * hyttemodell, som aldri skal hentes i en spørring frontend bruker.
+ */
+
+const INNSTILLINGER = `*[_type == "innstillinger"][0]{
+  navigasjon[]{tekst, url},
+  footerTekst,
+  interesseskjemaTittel,
+  interesseskjemaIngress,
+  samtykkeDetteProsjektet,
+  samtykkeAndreProsjekter,
+  sendKnappTekst,
+  kvitteringstekst,
+  feiltekst
+}`
+
+/** Bildet flates ut til url + alt-tekst. Bredden settes ved visning, se bildeUrl(). */
+const BILDE = `{"url": bilde.asset->url, altTekst, fotokreditt}`
+
+const KNAPP = `{tekst, sti}`
+
+const ARTIKKEL_KORT = `{tittel, "slug": slug.current, dato, ingress, "bilde": bilde${BILDE}}`
+
+/** Faktafeltene fra modellen som enhetskortene og enhetssiden trenger. */
+const MODELL_KORT = `{
+  navn,
+  "slug": slug.current,
+  bra,
+  prom,
+  antallSoverom,
+  antallBad,
+  antallEtasjer,
+  harBadstue
+}`
+
+const ENHET_FELT = `
+  nummer,
+  "slug": slug.current,
+  enhetstype,
+  status,
+  byggetrinn,
+  delomrade,
+  pris,
+  tomtestorrelse,
+  utsiktsretning,
+  solforhold,
+  beskrivelse,
+  finnAnnonseUrl,
+  "prospekt": prospekt->{tittel, "url": fil.asset->url},
+  bilder[]${BILDE}
+`
+
+/**
+ * Blokkene siden bygges av. `aktiv != false` filtrerer bort blokker redaktøren
+ * har skrudd av — de skal ikke ligge skjult i HTML-en, de skal ikke være der.
+ *
+ * Nyheter og utvalgte hytter henter både det manuelle og det automatiske
+ * utvalget. Hvilket som brukes avgjøres i velgUtvalg() under, ikke i GROQ,
+ * fordi antallet er et felt og ikke kan settes inn i et utsnitt her.
+ */
+const BLOKKER = `blokker[aktiv != false]{
+  _key,
+  _type,
+  _type == "blokkHero" => {
+    overskrift,
+    ingress,
+    "bilde": bilde${BILDE},
+    "videoUrl": video.asset->url,
+    knapper[]${KNAPP}
+  },
+  _type == "blokkBudskap" => {
+    overskrift,
+    tekst,
+    knapp${KNAPP}
+  },
+  _type == "blokkArtikkel" => {
+    overskrift,
+    tekst,
+    "bilde": bilde${BILDE},
+    bildeplassering,
+    knapp${KNAPP}
+  },
+  _type == "blokkStatus" => {
+    overskrift,
+    "bakgrunnsbilde": bakgrunnsbilde${BILDE},
+    rader[]{etikett, kilde, byggetrinn, verdi, ikon, fremhevet}
+  },
+  _type == "blokkUtvalgteHytter" => {
+    overskrift,
+    utvalg,
+    antall,
+    knapp${KNAPP},
+    "valgte": enheter[]->{${ENHET_FELT}, "modell": hyttemodell->${MODELL_KORT}},
+    "automatiske": *[_type == "enhet" && enhetstype == "hytte" && status == "ledig"] | order(nummer asc)[0...9]{
+      ${ENHET_FELT},
+      "modell": hyttemodell->${MODELL_KORT}
+    }
+  },
+  _type == "blokkSitat" => {
+    sitat,
+    navn,
+    oversettelse
+  },
+  _type == "blokkNyheter" => {
+    overskrift,
+    utvalg,
+    antall,
+    knapp${KNAPP},
+    "valgte": artikler[]->${ARTIKKEL_KORT},
+    "automatiske": *[_type == "artikkel"] | order(dato desc)[0...12]${ARTIKKEL_KORT}
+  },
+  _type == "blokkKort" => {
+    overskrift,
+    visning,
+    monster,
+    kort[]{
+      etikett,
+      tittel,
+      "bilde": bilde${BILDE},
+      "ikon": ikon->{
+        aktivitet,
+        navn,
+        // select() og ikke et objekt rett fram: et objektuttrykk bygges alltid,
+        // også når bildet mangler, og da blir feltet sant med url = null.
+        // Kortet ville trodd det hadde en illustrasjon og aldri falt tilbake
+        // til strekikonet.
+        "illustrasjon": select(defined(illustrasjon.asset) => {"url": illustrasjon.asset->url, altTekst})
+      },
+      knapp${KNAPP}
+    }
+  },
+  _type == "blokkFremhevet" => {
+    overskrift,
+    tekst,
+    "bilde": bilde${BILDE},
+    knapp${KNAPP}
+  }
+}`
+
+const SIDE = `*[_type == "side" && sideNavn == $sideNavn][0]{
+  sideNavn,
+  overskrift,
+  ingress,
+  tittel,
+  metaBeskrivelse,
+  seksjoner[]{overskrift, ankerId, tekst},
+  tomTilstand,
+  hyttetyperIngress,
+  situasjonsplan${BILDE},
+  tomtekontakt{navn, telefon, epost, tekst},
+  ${BLOKKER}
+}`
+
+/**
+ * Reguleringsreglene. Ett dokument, felles for alle tomtene — verdiene skal
+ * aldri skrives inn per enhet, og aldri i koden.
+ */
+const REGULERINGSREGLER = `*[_type == "reguleringsregler"][0]{
+  planNavn,
+  planId,
+  bebyggelse,
+  maksByaToEtasjer,
+  maksByaTreEtasjer,
+  maksGesimshoyde,
+  takform,
+  maksBygningsbredde,
+  maksLengdeToEtasjer,
+  maksLengdeTreEtasjer,
+  moneretning,
+  parkeringskrav,
+  levegg,
+  ikkeTillatt,
+  infrastruktur,
+  terrengtilpasning,
+  "planDokument": planDokument->{tittel, "url": fil.asset->url}
+}`
+
+/**
+ * Tomtene. De har ingen hyttemodell — feltet er valgfritt nettopp fordi en
+ * tomtekjøper tar med sin egen utbygger.
+ */
+const TOMTER = `*[_type == "enhet" && enhetstype == "tomt"] | order(nummer asc){
+  ${ENHET_FELT}
+}`
+
+/**
+ * Tallene bak «Status nå», og bak filteret som skjuler tomter-menypunktet.
+ *
+ * `enheter` er den rå lista med status og byggetrinn. Statusblokken lar
+ * redaktøren telle per byggetrinn, og å lage én count() per mulig byggetrinn
+ * her ville krevd at GROQ visste hvilke trinn som finnes. Lista er noen få
+ * rader, så den telles i TypeScript i stedet.
+ */
+const STATUSTALL = `{
+  "hytterTotalt": count(*[_type == "enhet" && enhetstype == "hytte"]),
+  "hytterLedige": count(*[_type == "enhet" && enhetstype == "hytte" && status == "ledig"]),
+  "tomterTotalt": count(*[_type == "enhet" && enhetstype == "tomt"]),
+  "tomterLedige": count(*[_type == "enhet" && enhetstype == "tomt" && status == "ledig"]),
+  "enheter": *[_type == "enhet"]{enhetstype, status, byggetrinn}
+}`
+
+const MODELL_FULL = `{
+  navn,
+  "slug": slug.current,
+  delomrade,
+  bra,
+  prom,
+  antallSoverom,
+  antallBad,
+  harBadstue,
+  harVaskerom,
+  antallBod,
+  harTerrasse,
+  harParkering,
+  antallEtasjer,
+  beskrivelse,
+  materialer,
+  illustrasjonsforbehold,
+  plantegninger[]${BILDE},
+  fasadetegninger[]${BILDE},
+  interiorbilder[]${BILDE}
+}`
+
+const HYTTER = `*[_type == "enhet" && enhetstype == "hytte"] | order(nummer asc){
+  ${ENHET_FELT},
+  "modell": hyttemodell->${MODELL_KORT}
+}`
+
+const MODELLER = `*[_type == "hyttemodell"] | order(navn asc)${MODELL_FULL}`
+
+/** Seksjonene på områdesiden. Hver har sin egen sommer- og vintervariant. */
+const OMRADESEKSJONER = `*[_type == "omradeInnhold"] | order(rekkefolge asc){
+  tittel,
+  seksjonsId,
+  rekkefolge,
+  "sommerBilde": sommerBilde${BILDE},
+  sommerInnhold,
+  "vinterBilde": vinterBilde${BILDE},
+  vinterInnhold
+}`
+
+const ARTIKLER = `*[_type == "artikkel"] | order(dato desc){
+  tittel,
+  "slug": slug.current,
+  dato,
+  ingress,
+  "bilde": bilde${BILDE},
+  forfatter
+}`
+
+const ARTIKKEL = `*[_type == "artikkel" && slug.current == $slug][0]{
+  tittel,
+  "slug": slug.current,
+  dato,
+  ingress,
+  "bilde": bilde${BILDE},
+  brodtekst,
+  forfatter
+}`
+
+export function hentInnstillinger(): Promise<Innstillinger | null> {
+  return sanity.fetch<Innstillinger | null>(INNSTILLINGER)
+}
+
+/**
+ * GROQ henter både det manuelle og det automatiske utvalget for nyheter og
+ * utvalgte hytter. Her avgjøres hvilket som faktisk brukes, og antallet
+ * kuttes ned — det kan ikke gjøres i utsnittet i spørringen, fordi grensen
+ * er et felt redaktøren setter.
+ */
+interface RaattUtvalg {
+  utvalg?: 'manuelt' | 'nyeste' | 'ledige'
+  antall?: number
+  valgte?: unknown[]
+  automatiske?: unknown[]
+}
+
+function velgUtvalg(blokk: RaattUtvalg, standardAntall: number): unknown[] {
+  if (blokk.utvalg === 'manuelt') return blokk.valgte ?? []
+  return (blokk.automatiske ?? []).slice(0, blokk.antall ?? standardAntall)
+}
+
+function normaliserBlokker(side: Side | null): Side | null {
+  if (!side?.blokker) return side
+
+  const blokker = side.blokker.map((blokk) => {
+    if (blokk._type === 'blokkNyheter') {
+      const {valgte, automatiske, utvalg, antall, ...resten} = blokk as typeof blokk & RaattUtvalg
+      return {...resten, artikler: velgUtvalg({utvalg, antall, valgte, automatiske}, 6)}
+    }
+    if (blokk._type === 'blokkUtvalgteHytter') {
+      const {valgte, automatiske, utvalg, antall, ...resten} = blokk as typeof blokk & RaattUtvalg
+      return {...resten, enheter: velgUtvalg({utvalg, antall, valgte, automatiske}, 3)}
+    }
+    return blokk
+  })
+
+  return {...side, blokker: blokker as Side['blokker']}
+}
+
+export async function hentSide(sideNavn: SideNavn): Promise<Side | null> {
+  const side = await sanity.fetch<Side | null>(SIDE, {sideNavn})
+  return normaliserBlokker(side)
+}
+
+/** Tallene bak «Status nå». Telles opp i Sanity, aldri skrevet i koden. */
+export function hentStatustall(): Promise<Statustall> {
+  return sanity.fetch<Statustall>(STATUSTALL)
+}
+
+/** Alle hytteenheter, også solgte — de vises nedtonet som sosialt bevis. */
+export function hentHytter(): Promise<Enhet[]> {
+  return sanity.fetch<Enhet[]>(HYTTER)
+}
+
+/** Alle tomter, også solgte. Solgte vises nedtonet, som hyttene. */
+export function hentTomter(): Promise<Enhet[]> {
+  return sanity.fetch<Enhet[]>(TOMTER)
+}
+
+export function hentReguleringsregler(): Promise<Reguleringsregler | null> {
+  return sanity.fetch<Reguleringsregler | null>(REGULERINGSREGLER)
+}
+
+export function hentOmradeseksjoner(): Promise<Omradeseksjon[]> {
+  return sanity.fetch<Omradeseksjon[]>(OMRADESEKSJONER)
+}
+
+export function hentArtikler(): Promise<Artikkel[]> {
+  return sanity.fetch<Artikkel[]>(ARTIKLER)
+}
+
+export function hentArtikkel(slug: string): Promise<Artikkel | null> {
+  return sanity.fetch<Artikkel | null>(ARTIKKEL, {slug})
+}
+
+export function hentModeller(): Promise<Hyttemodell[]> {
+  return sanity.fetch<Hyttemodell[]>(MODELLER)
+}

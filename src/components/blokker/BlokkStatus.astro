@@ -1,0 +1,91 @@
+---
+import {bildeUrl} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkStatus, Statusrad, Statustall} from '../../lib/typer'
+
+/**
+ * Noen få nøkkeltall om salget, som hvite kort oppå et bilde.
+ *
+ * Tall som *kan* telles, telles — ledige og solgte hytter hentes fra enhetene
+ * i Sanity og kan derfor aldri bli utdaterte. Tall som ikke finnes i Sanity,
+ * som salg fra tidligere byggetrinn eller en status som «Kommer», skrives inn
+ * av redaktøren. Hvilken av delene hver rad er, velges i Studio.
+ *
+ * Den røde prikken ved overskriften er en levende-markør: tallene er hentet
+ * ved siste publisering, ikke skrevet inn for hånd. Den er det eneste røde på
+ * hele siden, og skal forbli det — rødt betyr «dette er ferskt», ikke pynt.
+ *
+ * Blokken har ingen mønsterbakgrunn. Treårene brukes én gang per side, og på
+ * forsiden er det budskapsblokka som har dem.
+ */
+interface Props {
+  blokk: BlokkStatus
+  sprak: Sprak
+  statustall: Statustall
+}
+
+const {blokk, sprak, statustall} = Astro.props
+
+/** Teller enheter for en rad. Uten byggetrinn telles hele Nyørk. */
+function tell(rad: Statusrad): number {
+  const ettersokt = rad.kilde === 'solgte' ? 'solgt' : 'ledig'
+  return statustall.enheter.filter(
+    (e) =>
+      e.enhetstype === 'hytte' &&
+      e.status === ettersokt &&
+      (rad.byggetrinn === undefined || rad.byggetrinn === null || e.byggetrinn === rad.byggetrinn),
+  ).length
+}
+
+const rader = (blokk.rader ?? []).map((rad) => ({
+  etikett: tekst(rad.etikett, sprak),
+  verdi: rad.kilde === 'manuelt' ? tekst(rad.verdi, sprak) : String(tell(rad)),
+}))
+
+const overskrift = tekst(blokk.overskrift, sprak)
+const bilde = blokk.bakgrunnsbilde
+---
+
+{
+  rader.length > 0 && (
+    <section class="mx-auto max-w-[800px] px-5 py-12 md:px-10">
+      <div class="relative overflow-hidden rounded-stor bg-flate-vekslende">
+        {bilde && (
+          <img
+            src={bildeUrl(bilde.url, 1600)}
+            alt={tekst(bilde.altTekst, sprak)}
+            loading="lazy"
+            class="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+
+        {/* Lyst slør. Bildet skal anes, ikke konkurrere med tallene. */}
+        {bilde && <div class="absolute inset-0 bg-white/45" aria-hidden="true" />}
+
+        <div class="relative p-6 md:p-8">
+          {overskrift && (
+            <h2 class="mb-6 mt-0 flex items-center gap-2.5 font-heading text-xlarge font-semibold">
+              <span class="prikk-levende" aria-hidden="true" />
+              {overskrift}
+            </h2>
+          )}
+
+          <dl class="m-0 grid grid-cols-2 gap-3 md:grid-cols-4">
+            {rader.map((rad) => (
+              <div class="flex flex-col gap-2 rounded-stor bg-white p-4 shadow-[0_1px_2px_rgb(0_0_0_/_0.05)]">
+                <dd class="m-0 font-heading text-2xlarge font-semibold leading-none text-foreground-default">
+                  {rad.verdi}
+                </dd>
+                <dt class="font-body text-xsmall leading-snug text-foreground-muted">{rad.etikett}</dt>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+
+      {bilde?.fotokreditt && (
+        <p class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</p>
+      )}
+    </section>
+  )
+}

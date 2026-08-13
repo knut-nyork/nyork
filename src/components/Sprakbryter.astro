@@ -1,0 +1,44 @@
+---
+import {stiForSprak, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+
+/**
+ * Språkvelgeren, som to valg i samme ramme.
+ *
+ * Begge valgene er ekte lenker til hver sin URL, ikke en knapp som bytter
+ * innhold. Det er poenget: norsk og engelsk er to sider med hver sin adresse
+ * som Google skal kunne finne hver for seg, og hreflang i Sidemal peker på
+ * dem. En JavaScript-bryter ville gjort den ene usynlig for søk.
+ *
+ * NO og EN oversettes ikke — språkkoder skrives likt på alle språk.
+ */
+interface Props {
+  sprak: Sprak
+  /** Den norske stien til siden vi står på, så vi bytter språk uten å bytte side. */
+  norskSti: string
+}
+
+const {sprak, norskSti} = Astro.props
+const ui = UI[sprak]
+
+const valg = [
+  {kode: 'no' as Sprak, etikett: 'NO'},
+  {kode: 'en' as Sprak, etikett: 'EN'},
+]
+---
+
+<div class="bryter" role="group" aria-label={ui.velgSprak}>
+  {
+    valg.map((v) => (
+      <a
+        href={stiForSprak(norskSti, v.kode)}
+        hreflang={v.kode}
+        lang={v.kode}
+        aria-current={v.kode === sprak ? 'true' : undefined}
+        class="bryter__valg"
+      >
+        {v.etikett}
+      </a>
+    ))
+  }
+</div>

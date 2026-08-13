@@ -1,0 +1,103 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import Brodsmuler from './Brodsmuler.astro'
+import Enhetsliste from './Enhetsliste.tsx'
+import Hyttevelger from './Hyttevelger.tsx'
+import Modellkort from './Modellkort.astro'
+import Seksjoner from './Seksjoner.astro'
+import {antallLedige, bildeUrl, skalViseFilter} from '../lib/hytter'
+import {tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Enhet, Hyttemodell, Side} from '../lib/typer'
+
+/**
+ * Innholdet på /hytter. Hyttevelgeren med filter vises bare når det er nok
+ * ledige enheter — under terskelen rendres kortene rett fram, uten React-øy
+ * i det hele tatt.
+ *
+ * Bredden er delt i to: teksten holder seg på 800 px, som er behagelig å lese,
+ * mens situasjonsplanen og kortrutenettet får gå bredere. Derfor sitter
+ * `max-w` på hver seksjon og ikke på én felles ramme.
+ */
+interface Props {
+  sprak: Sprak
+  side: Side | null
+  modeller: Hyttemodell[]
+  enheter: Enhet[]
+}
+
+const {sprak, side, modeller, enheter} = Astro.props
+const ui = UI[sprak].hytter
+
+const visFilter = skalViseFilter(enheter)
+const ingenLedige = antallLedige(enheter) === 0
+const tomTilstand = tekst(side?.tomTilstand, sprak)
+const hyttetyperIngress = tekst(side?.hyttetyperIngress, sprak)
+const situasjonsplan = side?.situasjonsplan
+---
+
+<div class="mx-auto flex max-w-[1100px] flex-col gap-20 px-5 py-12 md:px-10">
+  <div class="flex flex-col gap-10">
+    <Brodsmuler sprak={sprak} naa={tekst(side?.overskrift, sprak)} />
+
+    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+      <h1 class="m-0 font-heading text-4xlarge font-semibold">{tekst(side?.overskrift, sprak)}</h1>
+      <p class="m-0 font-body text-small">{tekst(side?.ingress, sprak)}</p>
+    </header>
+  </div>
+
+  <section class="flex flex-col gap-6">
+    <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{ui.situasjonsplan}</h2>
+    {
+      situasjonsplan ? (
+        <img
+          src={bildeUrl(situasjonsplan.url, 1600)}
+          alt={tekst(situasjonsplan.altTekst, sprak)}
+          class="w-full rounded-stor"
+        />
+      ) : (
+        <Bildeplassholder sideforhold="16 / 9" className="w-full rounded-stor" />
+      )
+    }
+  </section>
+
+  <!-- Hva som er ledig kommer før hyttetypene: kjøperen velger først tomt,
+       og deretter hvilken hyttetype som skal stå på den. -->
+  <section class="flex flex-col gap-6">
+    <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{ui.ledigeHytter}</h2>
+
+    {
+      ingenLedige && tomTilstand && (
+        <p class="max-w-[800px] font-body text-small text-foreground-muted">{tomTilstand}</p>
+      )
+    }
+
+    {
+      visFilter ? (
+        <Hyttevelger client:visible enheter={enheter} sprak={sprak} />
+      ) : (
+        <Enhetsliste enheter={enheter} sprak={sprak} />
+      )
+    }
+  </section>
+
+  <section class="flex flex-col gap-6">
+    <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{ui.hyttetypene}</h2>
+    {
+      hyttetyperIngress && (
+        <p class="max-w-[800px] font-body text-small">{hyttetyperIngress}</p>
+      )
+    }
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {modeller.map((modell) => <Modellkort modell={modell} sprak={sprak} />)}
+    </div>
+  </section>
+
+  {
+    side?.seksjoner && (
+      <div class="mx-auto flex w-full max-w-[800px] flex-col gap-16">
+        <Seksjoner seksjoner={side.seksjoner} sprak={sprak} />
+      </div>
+    )
+  }
+</div>

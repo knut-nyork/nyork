@@ -1,0 +1,104 @@
+---
+import '../styles/global.css'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import Interesseskjema from '../components/Interesseskjema.tsx'
+import {hentInnstillinger, hentStatustall} from '../lib/sporringer'
+import {synligNavigasjon} from '../lib/hytter'
+import {sprakFraSti, stiForSprak, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+
+/**
+ * Rammen rundt alle sider: språk, hreflang, toppmeny, interesseskjema og
+ * footer. `norskSti` er nøkkelen som binder de to språkversjonene sammen —
+ * den engelske stien slås opp i rutekartet i lib/sprak.ts.
+ */
+interface Props {
+  norskSti: string
+  tittel: string
+  metaBeskrivelse?: string
+}
+
+const {norskSti, tittel, metaBeskrivelse} = Astro.props
+
+const sprak: Sprak = sprakFraSti(Astro.url.pathname)
+
+/**
+ * Statustallene hentes her, ikke bare på forsiden, fordi menyen er avhengig av
+ * dem: `/tomter` skal skjules når ingen tomter er ledige. Det er en telling i
+ * GROQ og kjøres bare under bygget, så den koster ikke noe å ha med overalt.
+ */
+const [raaInnstillinger, statustall] = await Promise.all([hentInnstillinger(), hentStatustall()])
+
+const innstillinger = raaInnstillinger && {
+  ...raaInnstillinger,
+  navigasjon: synligNavigasjon(raaInnstillinger.navigasjon ?? [], statustall.tomterLedige),
+}
+
+const norskUrl = new URL(norskSti, Astro.site)
+const engelskUrl = new URL(stiForSprak(norskSti, 'en'), Astro.site)
+const kanonisk = sprak === 'no' ? norskUrl : engelskUrl
+---
+
+<!doctype html>
+<html lang={sprak}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{tittel}</title>
+    {metaBeskrivelse && <meta name="description" content={metaBeskrivelse} />}
+
+    <link rel="canonical" href={kanonisk} />
+    <link rel="alternate" hreflang="no" href={norskUrl} />
+    <link rel="alternate" hreflang="en" href={engelskUrl} />
+    <link rel="alternate" hreflang="x-default" href={norskUrl} />
+
+    {/*
+      Må stå her, inne i <head>, og kjøre med én gang — ikke som modul og ikke
+      utsatt. Setter siden temaet først etter at kroppen er tegnet, rekker
+      brukeren å se et lyst glimt før det blir mørkt.
+
+      `is:inline` gjør at Astro lar skriptet stå som det er i stedet for å
+      samle det i en bunt som lastes senere.
+
+      Nøkkelen er den samme som Temabryter.astro skriver til.
+    */}
+    <script is:inline>
+      ;(() => {
+        try {
+          const lagret = localStorage.getItem('nyork-tema')
+          const morkt = lagret ? lagret === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.dataset.theme = morkt ? 'dark' : 'light'
+        } catch {
+          // Privat modus kan nekte oss localStorage. Da blir det lyst, og
+          // bryteren virker fortsatt ut økta.
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+
+  <body>
+    <a
+      href="#innhold"
+      class="knapp knapp--primar sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60]"
+    >
+      {UI[sprak].hoppTilInnhold}
+    </a>
+
+    <Header sprak={sprak} norskSti={norskSti} innstillinger={innstillinger} />
+
+    <!-- Luft under den flytende topplinja, på alle sider. Uten den ligger
+         innholdet — og på forsiden hero-bildet — klistret opp mot pilla. -->
+    <main id="innhold" class="pt-4 md:pt-6">
+      <slot />
+      <Interesseskjema client:visible sprak={sprak} innstillinger={innstillinger} />
+    </main>
+
+    <Footer sprak={sprak} innstillinger={innstillinger} />
+  </body>
+</html>

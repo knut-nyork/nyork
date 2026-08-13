@@ -54,11 +54,14 @@ docs/               # byggeinstruks og innhold
 src/
   pages/            # én fil per side. /en/ for engelsk
   components/       # .astro for statisk, .tsx for interaktivt
+    blokker/        # én komponent per blokktype på forsiden
   layouts/
   lib/              # Sanity-klient, spørringer, hjelpefunksjoner
   styles/
 sanity/
-  schemas/          # innholdstyper
+  schemas/
+    documents/      # innholdstyper
+    objects/        # gjenbrukbare felter, blant annet blokker.ts
 ```
 
 ## Designsystemet
@@ -87,6 +90,31 @@ Interaktive komponenter hydreres med `client:visible` med mindre de er synlige v
 shadcn/ui-komponenter må kalles fra en `.tsx`-fil, aldri direkte i `.astro`. React-kontekst deles ikke mellom øyer.
 
 **Navngiving:** komponenter i koden har samme navn som i Figma. Norske navn er greit og foretrukket — teamet snakker norsk om komponentene.
+
+## Forsiden bygges av blokker
+
+Forsiden har ingen fast rekkefølge i koden. Den er en liste med blokker på `side`-dokumentet, og redaktøren bestemmer selv hvilke som er med, i hvilken rekkefølge, og om en blokk er synlig akkurat nå.
+
+**Blokktypene** er objekter i `sanity/schemas/objects/blokker.ts`, og hver har en Astro-komponent med samme navn i `src/components/blokker/`:
+
+| Blokk | Hva den er |
+|---|---|
+| `blokkHero` | Toppbilde med overskrift oppå. Kan ha bakgrunnsvideo |
+| `blokkBudskap` | Kort budskap på farget flate |
+| `blokkArtikkel` | Bilde på den ene siden, tekst på den andre. Redaktøren velger side |
+| `blokkStatus` | Antall hytter og tomter. **Tallene telles opp i Sanity, aldri skrevet inn** |
+| `blokkUtvalgteHytter` | Hyttekort, enten de ledige automatisk eller håndplukkede |
+| `blokkSitat` | Sitat fra familien. Dialekt urørt, engelsk oversettelse *under* |
+| `blokkNyheter` | Nyhetssaker, enten de nyeste automatisk eller håndplukkede |
+| `blokkFremhevet` | Bilde i full bredde med tekstpanel oppå |
+
+**Legger du til en ny blokktype**, er det fire steder: skjemaet i `blokker.ts`, navnet i `BLOKKTYPER` nederst i samme fil, en projeksjon i `BLOKKER` i `src/lib/sporringer.ts`, en type i `src/lib/typer.ts`, og en komponent som `Blokker.astro` fordeler til. Glemmer du projeksjonen, kommer blokken tom ut uten at noe feiler.
+
+**Av/på:** hver blokk har `aktiv`. Blokker som er skrudd av filtreres bort i GROQ (`blokker[aktiv != false]`) — de skal ikke ligge skjult i HTML-en. `!= false` og ikke `== true`, så blokker laget før feltet fantes fortsatt vises.
+
+**Automatisk eller håndplukket:** `blokkNyheter` og `blokkUtvalgteHytter` henter begge utvalgene i GROQ, og `velgUtvalg()` i `sporringer.ts` avgjør hvilket som brukes. Grensen for hvor mange kan ikke settes inn i et GROQ-utsnitt, fordi den er et felt redaktøren styrer — derfor kuttes lista i TypeScript.
+
+**Knapper** skrives med norsk sti (`/hytter`). Den engelske slås opp i rutekartet, så `/en/cabins` finner seg selv. Adresser som begynner med `https://` står som de er og åpnes i ny fane. Ikke pek en knapp på en side som ikke finnes ennå.
 
 ## Språk — les dette nøye
 
@@ -137,6 +165,7 @@ Varm, jordnær og stedegen. Nyørk selger ikke luksus — det selger tilhørighe
 
 - Ikke legg til nye avhengigheter uten å spørre
 - Ikke bruk `client:load` som standard — det er hele poenget med Astro
+- **Ikke skru på `useCdn` i `src/lib/sanity.ts`.** Siden bygges statisk, så spørringene kjøres bare under bygget — det er ingenting å spare. Med CDN-en på leverer Sanity et hurtiglagret svar i opptil et minutt, og Netlify starter bygget i samme øyeblikk som noen trykker «publiser». Da rekker bygget å hente det gamle innholdet, og redaktøren ser ikke endringen sin slå gjennom
 - Ikke endre URL-strukturen på eksisterende sider uten 301-redirect. Siden har rangering på Google siden 2021
 - Ikke rediger i `design-system/`
 - Ikke commit API-nøkler
@@ -150,24 +179,29 @@ Varm, jordnær og stedegen. Nyørk selger ikke luksus — det selger tilhørighe
 | Sanity dataset | `production` (aclMode: **public**) |
 | Sanity org | `knut-nyork` (`owIQZK6pU`) |
 | Netlify team | «Nyørk» (`knut-sfsxcuk`) — Free-plan |
+| Netlify-prosjekt | `nyork-hemsedal` |
+| URL | https://nyork-hemsedal.netlify.app |
 
-CORS er åpnet for `http://localhost:4321` og `http://localhost:3333`.
-Produksjons-URL legges til med `npx sanity cors add` når Netlify-siden finnes.
+CORS er åpnet for `http://localhost:4321`, `http://localhost:3333`, `https://nyork-hemsedal.netlify.app` og `https://*.netlify.app`.
 
-**Miljøvariabler** (`.env` lokalt — gitignorert — og i Netlify):
+**Miljøvariabler** — `PUBLIC_SANITY_PROJECT_ID`, `PUBLIC_SANITY_DATASET` og `NODE_VERSION=22` er allerede satt i Netlify. Lokalt:
 
 ```
 PUBLIC_SANITY_PROJECT_ID=kh2746mt
 PUBLIC_SANITY_DATASET=production
-SANITY_READ_TOKEN=<hentes i Sanity-dashbord → API → Tokens>
 ```
+
+**`SANITY_READ_TOKEN` trengs ikke ennå.** Datasettet er `public`, så publisert innhold kan leses uten autentisering. Token er kun nødvendig for utkast/forhåndsvisning eller skriving — da hentes den i Sanity-dashbordet under API → Tokens.
 
 ## Åpne punkter
 
 - Domenet nyørk.no overføres **først når siden er helt ferdig**. Fram til da kjører vi på Netlify-URL
+- **Netlify-teamet krever SSO-innlogging på alle prosjekter.** Siden er derfor usynlig for andre enn teamet. Greit nå, må av før lansering
+- **Netlify Forms er ikke aktivert.** Må skrus på før interesseskjemaet virker
 - Netlify Free bruker kredittmodell og stopper trafikk ved ca. 15 GB. **Må oppgraderes før lansering**
 - Datasettet er offentlig lesbart på gratisplanen. Avklar om utkast med priser er greit
 - Bilderettigheter fra salgsoppgaven må avklares før publisering
 - Tomtesiden er ikke designet i Figma — bygges som variant av hyttelista
+- **Hovedmenyen lenker til `/tomter`, `/omradet` og `/siste-nytt`, som ikke finnes ennå og gir 404.** Samme grunn til at nyhetskortene på forsiden ikke er klikkbare — se kommentaren i `BlokkNyheter.astro` for hvor lenken skal inn når sidene bygges
 - ITC Franklin Gothic LT Pro: webfont-lisens mangler
 - Alle kontoer står på `knut@nyork.no`. Vurder å legge til Gaute som medlem i Sanity-org og Netlify-team, så prosjektet ikke er avhengig av én person

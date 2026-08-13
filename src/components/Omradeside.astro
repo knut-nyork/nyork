@@ -1,0 +1,102 @@
+---
+import Artikkelmal from './Artikkelmal.astro'
+import Bildeplassholder from './Bildeplassholder.tsx'
+import Riktekst from './Riktekst.astro'
+import Sesongveksler from './Sesongveksler.astro'
+import {bildeUrl} from '../lib/hytter'
+import {tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Omradeseksjon, Side} from '../lib/typer'
+
+/**
+ * Områdesiden. Sommer og vinter i hver sin fane.
+ *
+ * Begge sesongene rendres alltid — se `.sesong-*` i global.css og skriptet i
+ * Sesongveksler for hvorfor. Kort fortalt: hentes den ene først ved klikk,
+ * finnes den ikke for Google.
+ *
+ * Standardsesongen settes etter måned. Mai til september viser sommer, ellers
+ * vinter. Hemsedal er primært en vinterdestinasjon, så vinter er fallback ved
+ * tvil.
+ */
+interface Props {
+  sprak: Sprak
+  side: Side | null
+  seksjoner: Omradeseksjon[]
+}
+
+const {sprak, side, seksjoner} = Astro.props
+const ui = UI[sprak].omradet
+
+const maaned = new Date().getMonth() + 1
+const standardsesong: 'sommer' | 'vinter' = maaned >= 5 && maaned <= 9 ? 'sommer' : 'vinter'
+
+const SESONGER = [
+  {navn: 'sommer' as const, etikett: ui.sommer},
+  {navn: 'vinter' as const, etikett: ui.vinter},
+]
+---
+
+<Artikkelmal
+  sprak={sprak}
+  tittel={tekst(side?.overskrift, sprak)}
+  ingress={tekst(side?.ingress, sprak)}
+  bilde={side?.situasjonsplan}
+>
+  <Sesongveksler slot="under-tittel" sprak={sprak} valgt={standardsesong} />
+
+  {
+    seksjoner.length === 0 ? (
+      <p class="m-0 font-body text-small text-foreground-muted">{UI[sprak].hytter.innholdKommer}</p>
+    ) : (
+      SESONGER.map((sesong) => (
+        <div data-sesong-innhold={sesong.navn} class="flex flex-col gap-14">
+          {/* Vises bare uten JavaScript, når begge sesongene står stablet. */}
+          <h2 class="sesong-overskrift m-0 font-heading text-2xlarge font-semibold">{sesong.etikett}</h2>
+
+          {seksjoner.map((seksjon) => {
+            const bilde = sesong.navn === 'sommer' ? seksjon.sommerBilde : seksjon.vinterBilde
+            const innhold = sesong.navn === 'sommer' ? seksjon.sommerInnhold : seksjon.vinterInnhold
+            const blokker = innhold?.[sprak] ?? innhold?.no ?? []
+
+            return (
+              <section id={seksjon.seksjonsId || undefined} class="flex scroll-mt-24 flex-col gap-6">
+                <h2 class="m-0 font-heading text-xlarge font-semibold md:text-2xlarge">
+                  {tekst(seksjon.tittel, sprak)}
+                </h2>
+
+                <Riktekst blokker={blokker} sprak={sprak} />
+
+                {bilde ? (
+                  <figure class="m-0">
+                    <img
+                      src={bildeUrl(bilde.url, 1400)}
+                      alt={tekst(bilde.altTekst, sprak)}
+                      loading="lazy"
+                      class="aspect-[16/10] w-full rounded-stor object-cover"
+                    />
+                    {bilde.fotokreditt && (
+                      <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
+                        {bilde.fotokreditt}
+                      </figcaption>
+                    )}
+                  </figure>
+                ) : (
+                  <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
+                )}
+              </section>
+            )
+          })}
+        </div>
+      ))
+    )
+  }
+</Artikkelmal>
+
+<script define:vars={{standardsesong}}>
+  // Settes før siden tegnes, slik at riktig fane er synlig med én gang.
+  // URL-en vinner over standardvalget etter måned, så delte lenker treffer.
+  const fraUrl = new URL(window.location.href).searchParams.get('sesong')
+  document.documentElement.dataset.sesong =
+    fraUrl === 'sommer' || fraUrl === 'vinter' ? fraUrl : standardsesong
+</script>

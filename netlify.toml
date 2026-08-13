@@ -1,0 +1,41 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Redirect-kart, se docs/01-byggeinstruks.md.
+# Seks URL-er med Google-rangering siden 2021 forsvinner i den nye sidestrukturen.
+# /tomter, /omradet, /siste-nytt og /personvern beholder egen URL og trenger ingen redirect.
+#
+# TODO: samme redirects må settes opp for engelske varianter av disse URL-ene,
+# hvis de finnes på dagens Webflow-side. Ingen engelsk URL-liste er bekreftet ennå —
+# ikke gjett path-navn, sjekk mot den live siden før de legges til her.
+
+[[redirects]]
+  from = "/om-prosjektet"
+  to = "/hytter"
+  status = 301
+
+[[redirects]]
+  from = "/hyttevelger"
+  to = "/hytter"
+  status = 301
+
+[[redirects]]
+  from = "/galleri"
+  to = "/hytter"
+  status = 301
+
+[[redirects]]
+  from = "/finansiering"
+  to = "/hytter#finansiering"
+  status = 301
+
+[[redirects]]
+  from = "/megler"
+  to = "/hytter#megler"
+  status = 301
+
+[[redirects]]
+  from = "/utbygger"
+  to = "/omradet#historia"
+  status = 301

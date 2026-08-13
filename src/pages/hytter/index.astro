@@ -1,0 +1,16 @@
+---
+import Sidemal from '../../layouts/Sidemal.astro'
+import Hytterside from '../../components/Hytterside.astro'
+import {hentHytter, hentModeller, hentSide} from '../../lib/sporringer'
+import {tekst} from '../../lib/sprak'
+
+const [side, modeller, enheter] = await Promise.all([hentSide('hytter'), hentModeller(), hentHytter()])
+---
+
+<Sidemal
+  norskSti="/hytter"
+  tittel={tekst(side?.tittel, 'no')}
+  metaBeskrivelse={tekst(side?.metaBeskrivelse, 'no')}
+>
+  <Hytterside sprak="no" side={side} modeller={modeller} enheter={enheter} />
+</Sidemal>

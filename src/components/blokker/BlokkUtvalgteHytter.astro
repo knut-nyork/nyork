@@ -1,0 +1,40 @@
+---
+import Blokkknapp from './Blokkknapp.astro'
+import Hyttekort from '../Hyttekort'
+import {tekst, type Sprak} from '../../lib/sprak'
+import {UI} from '../../lib/tekster'
+import type {BlokkUtvalgteHytter} from '../../lib/typer'
+
+/**
+ * Noen få hyttekort på forsiden, med lenke videre til hyttesiden. Bruker
+ * samme Hyttekort som hyttelista, så et kort ser likt ut overalt.
+ *
+ * Utvalget er allerede avgjort i sporringer.ts — enten de ledige automatisk
+ * eller hytter redaktøren har pekt ut.
+ */
+interface Props {
+  blokk: BlokkUtvalgteHytter
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+const ui = UI[sprak].forside
+---
+
+<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+  <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>
+
+  {
+    blokk.enheter.length === 0 ? (
+      <p class="mt-6 font-body text-small text-foreground-muted">{ui.ingenHytter}</p>
+    ) : (
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        {blokk.enheter.map((enhet) => (
+          <Hyttekort enhet={enhet} sprak={sprak} />
+        ))}
+      </div>
+    )
+  }
+
+  {blokk.knapp && <div class="mt-8"><Blokkknapp knapp={blokk.knapp} sprak={sprak} variant="sekundar" /></div>}
+</section>

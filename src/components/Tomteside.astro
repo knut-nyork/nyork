@@ -1,0 +1,137 @@
+---
+import Brodsmuler from './Brodsmuler.astro'
+import Reguleringstabell from './Reguleringstabell.astro'
+import Tekstblokk from './Tekstblokk.astro'
+import Tomtekort from './Tomtekort.astro'
+import Tremonster from './Tremonster.astro'
+import {antallLedige} from '../lib/hytter'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Enhet, Reguleringsregler, Side} from '../lib/typer'
+
+/**
+ * Innholdet på /tomter.
+ *
+ * Rekkefølgen er ikke den samme som på hyttesiden, og det er poenget. En
+ * tomtekjøper har med sin egen utbygger, så bilder og planløsninger selger
+ * ikke. To spørsmål avgjør kjøpet: hva får jeg lov til å bygge, og er det
+ * framført vann og strøm. Derfor kommer infrastrukturen høyt, og
+ * reguleringsreglene rett etter tomtelista.
+ *
+ * Seksjonene hentes på anker-ID og ikke på rekkefølge, nettopp fordi
+ * infrastrukturen skal stå før lista og beliggenheten etter tabellen.
+ * Redaktøren kan sortere som hen vil i Sanity uten at siden bytter form.
+ */
+interface Props {
+  sprak: Sprak
+  side: Side | null
+  tomter: Enhet[]
+  regler: Reguleringsregler | null
+}
+
+const {sprak, side, tomter, regler} = Astro.props
+const ui = UI[sprak]
+
+const ledige = antallLedige(tomter)
+const tomTilstand = tekst(side?.tomTilstand, sprak)
+const kontakt = side?.tomtekontakt
+
+function seksjon(ankerId: string) {
+  return side?.seksjoner?.find((s) => s.ankerId === ankerId)
+}
+
+const infrastruktur = seksjon('infrastruktur')
+const beliggenhet = seksjon('beliggenhet')
+const avstander = seksjon('avstander')
+
+/** Seksjoner redaktøren har lagt til utover de tre siden plasserer selv. */
+const PLASSERTE = new Set(['infrastruktur', 'beliggenhet', 'avstander'])
+const ovrige = (side?.seksjoner ?? []).filter((s) => !s.ankerId || !PLASSERTE.has(s.ankerId))
+---
+
+<div class="mx-auto flex max-w-[1100px] flex-col gap-20 px-5 py-12 md:px-10">
+  <div class="flex flex-col gap-10">
+    <Brodsmuler sprak={sprak} naa={tekst(side?.overskrift, sprak)} />
+
+    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+      <h1 class="m-0 font-heading text-4xlarge font-semibold">{tekst(side?.overskrift, sprak)}</h1>
+      <p class="m-0 font-body text-small">{tekst(side?.ingress, sprak)}</p>
+    </header>
+  </div>
+
+  <!-- Infrastrukturen står høyt med vilje: uten vei, vann og strøm til
+       tomtegrensen er resten av siden uinteressant. -->
+  {
+    infrastruktur && (
+      <div class="hevet relative overflow-hidden rounded-stor p-8 md:p-12">
+        <Tremonster variant="hoydekurver" styrke={0.1} />
+        <div class="relative">
+          <Tekstblokk seksjon={infrastruktur} sprak={sprak} />
+        </div>
+      </div>
+    )
+  }
+
+  <section class="flex flex-col gap-6">
+    <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{ui.tomter.ledigeTomter}</h2>
+
+    {
+      tomter.length === 0 ? (
+        <div class="flex max-w-[62ch] flex-col items-start gap-5">
+          <p class="m-0 font-body text-small text-foreground-muted">{tomTilstand}</p>
+          <a href={`${stiForSprak('/tomter', sprak)}#meld-interesse`} class="knapp knapp--primar">
+            {ui.send}
+          </a>
+        </div>
+      ) : (
+        <>
+          {ledige === 0 && tomTilstand && (
+            <p class="m-0 max-w-[62ch] font-body text-small text-foreground-muted">{tomTilstand}</p>
+          )}
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {tomter.map((enhet) => (
+              <Tomtekort enhet={enhet} sprak={sprak} />
+            ))}
+          </div>
+        </>
+      )
+    }
+  </section>
+
+  {
+    regler && (
+      <section class="flex flex-col gap-6">
+        <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{ui.tomter.hvaDuKanBygge}</h2>
+        <Reguleringstabell regler={regler} sprak={sprak} />
+      </section>
+    )
+  }
+
+  {beliggenhet && <Tekstblokk seksjon={beliggenhet} sprak={sprak} />}
+  {avstander && <Tekstblokk seksjon={avstander} sprak={sprak} />}
+  {ovrige.map((s) => <Tekstblokk seksjon={s} sprak={sprak} />)}
+
+  <!-- Tomtene selges direkte av utbygger. Derfor ikke meglerkortet fra
+       /hytter her — det ville sagt noe feil om hvem du snakker med. -->
+  {
+    kontakt && (
+      <section class="hevet flex flex-col items-start gap-4 rounded-stor p-8 md:p-12">
+        {kontakt.tekst && <p class="m-0 max-w-[62ch] font-body text-small">{tekst(kontakt.tekst, sprak)}</p>}
+        <p class="m-0 font-heading text-large font-semibold">{kontakt.navn}</p>
+
+        <div class="flex flex-wrap gap-3">
+          {kontakt.telefon && (
+            <a href={`tel:${kontakt.telefon.replace(/\s/g, '')}`} class="knapp knapp--primar">
+              {kontakt.telefon}
+            </a>
+          )}
+          {kontakt.epost && (
+            <a href={`mailto:${kontakt.epost}`} class="knapp knapp--sekundar">
+              {kontakt.epost}
+            </a>
+          )}
+        </div>
+      </section>
+    )
+  }
+</div>

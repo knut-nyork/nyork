@@ -1,0 +1,47 @@
+---
+import Logo from './Logo.astro'
+import {UI} from '../lib/tekster'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import type {Innstillinger} from '../lib/typer'
+
+interface Props {
+  sprak: Sprak
+  innstillinger: Innstillinger | null
+}
+
+const {sprak, innstillinger} = Astro.props
+const ui = UI[sprak]
+
+const menypunkter = (innstillinger?.navigasjon ?? []).map((punkt) => ({
+  tekst: tekst(punkt.tekst, sprak),
+  href: stiForSprak(punkt.url, sprak),
+}))
+
+const footerTekst = tekst(innstillinger?.footerTekst, sprak)
+const personvern = stiForSprak('/personvern', sprak)
+---
+
+<footer class="bg-flate-footer text-tekst-footer">
+  <div class="mx-auto flex max-w-[1600px] flex-col gap-10 px-5 py-16 md:px-10">
+    <Logo tittel="Nyørk" class="h-[26px] w-auto self-start" />
+
+    {
+      footerTekst && (
+        <p class="max-w-[46ch] font-body text-xsmall whitespace-pre-line">{footerTekst}</p>
+      )
+    }
+
+    <nav aria-label={ui.hovedmeny} class="flex flex-wrap gap-x-8 gap-y-3">
+      {
+        menypunkter.map((punkt) => (
+          <a href={punkt.href} class="font-heading font-medium text-xsmall hover:underline">
+            {punkt.tekst}
+          </a>
+        ))
+      }
+      <a href={personvern} class="font-heading font-medium text-xsmall hover:underline">
+        {ui.personvern}
+      </a>
+    </nav>
+  </div>
+</footer>

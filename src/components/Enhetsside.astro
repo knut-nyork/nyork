@@ -1,0 +1,175 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import Brodsmuler from './Brodsmuler.astro'
+import Statusmerke from './Statusmerke.tsx'
+import Tremonster from './Tremonster.astro'
+import {bildeUrl, formaterPris} from '../lib/hytter'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Enhet} from '../lib/typer'
+
+/**
+ * Enhetssiden — den konkrete hytta. Pris, status og byggetrinn hører hjemme
+ * her; arkitekturen står på modellsiden det lenkes til, så tallene om
+ * planløsning skrives bare ett sted.
+ *
+ * Lenken til Finn går ut herfra, aldri motsatt vei: detaljsiden skal ligge
+ * hos oss. Se docs/01-byggeinstruks.md.
+ *
+ * Faktaene står i et eget panel med tre kolonner og skillelinjer mellom
+ * radene. Det er det første en kjøper leter etter, og et panel leses raskere
+ * enn en løpende liste. Radene deles opp i koden og ikke med CSS, fordi
+ * skillelinjen skal ligge mellom radene og ikke under den siste.
+ */
+interface Props {
+  sprak: Sprak
+  enhet: Enhet
+}
+
+const {sprak, enhet} = Astro.props
+const ui = UI[sprak].hytter
+const modell = enhet.modell
+
+const beskrivelse = tekst(enhet.beskrivelse, sprak)
+const avsnitt = beskrivelse ? beskrivelse.split(/\n\s*\n/) : []
+const hovedbilde = enhet.bilder?.[0]
+const flerebilder = enhet.bilder?.slice(1) ?? []
+
+const fakta = [
+  {etikett: ui.pris, verdi: enhet.pris ? formaterPris(enhet.pris) : ui.prisPaForesporsel},
+  modell ? {etikett: ui.hyttetype, verdi: modell.navn} : null,
+  enhet.byggetrinn ? {etikett: ui.byggetrinn, verdi: String(enhet.byggetrinn)} : null,
+  modell?.bra ? {etikett: ui.bra, verdi: `${modell.bra} m²`} : null,
+  modell?.prom ? {etikett: ui.prom, verdi: `${modell.prom} m²`} : null,
+  modell?.antallEtasjer ? {etikett: ui.etasjer, verdi: String(modell.antallEtasjer)} : null,
+  modell?.antallSoverom ? {etikett: ui.soverom, verdi: String(modell.antallSoverom)} : null,
+  modell?.antallBad ? {etikett: ui.bad, verdi: String(modell.antallBad)} : null,
+  enhet.tomtestorrelse ? {etikett: ui.tomt, verdi: `${enhet.tomtestorrelse} m²`} : null,
+  enhet.delomrade ? {etikett: ui.delomrade, verdi: enhet.delomrade} : null,
+  tekst(enhet.utsiktsretning, sprak) ? {etikett: ui.utsikt, verdi: tekst(enhet.utsiktsretning, sprak)} : null,
+  modell?.harBadstue ? {etikett: ui.badstue, verdi: ui.ja} : null,
+].filter((rad) => rad !== null)
+
+/** Tre per rad, slik at skillelinjene faller mellom rader og ikke under den siste. */
+const faktarader: (typeof fakta)[] = []
+for (let i = 0; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
+
+---
+
+<div class="mx-auto flex max-w-[1100px] flex-col gap-14 px-5 py-12 md:px-10">
+  <Brodsmuler sprak={sprak} ledd={[{tekst: ui.alleHytter, sti: '/hytter'}]} naa={enhet.nummer} />
+
+  <header class="flex flex-col items-center gap-4 text-center">
+    <h1 class="m-0 font-heading text-4xlarge font-semibold">{enhet.nummer}</h1>
+    <Statusmerke status={enhet.status} sprak={sprak} />
+  </header>
+
+  {
+    hovedbilde ? (
+      <img
+        src={bildeUrl(hovedbilde.url, 1400)}
+        alt={tekst(hovedbilde.altTekst, sprak)}
+        class="aspect-[16/10] w-full rounded-stor object-cover"
+      />
+    ) : (
+      <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
+    )
+  }
+
+  <!-- Faktapanelet. Mønsteret bak gir det litt tyngde uten å ta oppmerksomhet
+       fra tallene, som er det folk faktisk kom for. -->
+  <div class="hevet relative overflow-hidden rounded-stor">
+    <Tremonster variant="hoydekurver" styrke={0.06} />
+
+    <dl class="relative m-0 flex flex-col">
+      {
+        faktarader.map((rad, i) => (
+          <div
+            class:list={[
+              'grid grid-cols-2 gap-x-6 gap-y-5 px-6 py-5 sm:grid-cols-3 md:px-8',
+              i < faktarader.length - 1 && 'border-b border-border-subtle',
+            ]}
+          >
+            {rad.map((celle) => (
+              <div class="flex flex-col gap-1">
+                <dt class="font-heading text-xsmall font-semibold">{celle.etikett}</dt>
+                <dd class="m-0 font-body text-xsmall text-foreground-muted">{celle.verdi}</dd>
+              </div>
+            ))}
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+
+  {
+    avsnitt.length > 0 && (
+      <section class="flex flex-col gap-5">
+        <h2 class="m-0 font-heading text-xlarge font-semibold">{ui.seHytta}</h2>
+        {avsnitt.map((tekstavsnitt) => (
+          <p class="m-0 max-w-[62ch] font-body text-small">{tekstavsnitt}</p>
+        ))}
+      </section>
+    )
+  }
+
+  <!-- Bilderad. Uten bilder står to plassholdere med riktig sideforhold, slik
+       at layouten ikke hopper den dagen bildene kommer. -->
+  <div class="grid gap-5 sm:grid-cols-2">
+    {
+      flerebilder.length > 0 ? (
+        flerebilder.map((bilde) => (
+          <figure class="m-0">
+            <img
+              src={bildeUrl(bilde.url, 900)}
+              alt={tekst(bilde.altTekst, sprak)}
+              loading="lazy"
+              class="aspect-[4/3] w-full rounded-stor object-cover"
+            />
+            {bilde.fotokreditt && (
+              <figcaption class="mt-2 font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</figcaption>
+            )}
+          </figure>
+        ))
+      ) : (
+        <>
+          <Bildeplassholder sideforhold="4 / 3" className="rounded-stor" />
+          <Bildeplassholder sideforhold="4 / 3" className="rounded-stor" />
+        </>
+      )
+    }
+  </div>
+
+  {
+    tekst(enhet.solforhold, sprak) && (
+      <section class="flex flex-col gap-3">
+        <h2 class="m-0 font-heading text-xlarge font-semibold">{ui.solforhold}</h2>
+        <p class="m-0 max-w-[62ch] font-body text-small">{tekst(enhet.solforhold, sprak)}</p>
+      </section>
+    )
+  }
+
+  <div class="flex flex-wrap gap-4">
+    {
+      modell && (
+        <a href={stiForSprak(`/hytter/${modell.slug}`, sprak)} class="knapp knapp--primar">
+          {ui.seHyttetypen}
+        </a>
+      )
+    }
+    {
+      enhet.prospekt?.url && (
+        <a href={enhet.prospekt.url} class="knapp knapp--sekundar">
+          {ui.prospekt}
+        </a>
+      )
+    }
+    {
+      enhet.finnAnnonseUrl && (
+        <a href={enhet.finnAnnonseUrl} rel="noopener" target="_blank" class="knapp knapp--sekundar">
+          {ui.finn}
+        </a>
+      )
+    }
+  </div>
+</div>

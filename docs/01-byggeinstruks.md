@@ -186,6 +186,16 @@ React-komponent, `client:visible`. Navnet i koden er `SesongVelger`.
 
 ---
 
+## Bilder som ikke finnes ennå
+
+Bilderettighetene er ikke avklart, så de fleste bildefeltene står tomme en stund. Håndter det slik:
+
+**Legg aldri placeholder-bilder inn i Sanity.** La feltet stå tomt, og la komponenten rendre designsystemets `Pattern`/`Placeholder` når det ikke finnes noe bilde. Da kan «hva mangler bilder?» besvares med én GROQ-spørring, ingen forveksler en placeholder med ekte innhold, og redaktøren slipper å rydde før opplasting.
+
+Placeholderen må ha **samme sideforhold som det ekte bildet skal ha** — bruk `AspectRatio`. Ellers hopper layouten den dagen bildene kommer.
+
+Demobildene i `design-system/assets/images/` kan brukes lokalt under utvikling for å se hvordan noe ser ut. De skal **aldri** til produksjon.
+
 ## Sanity-innholdstyper
 
 Bruk `sanity-innholdstype`-skillen. Prosjekt `kh2746mt`, dataset `production`.

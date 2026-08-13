@@ -11,8 +11,91 @@
    text-foreground-muted, font-heading og text-large blir generert fra tokens —
    ikke fra Tailwinds standardverdier. @theme inline fordi tokens bytter verdi med
    data-theme="dark" og må leses ved bruk, ikke bakes inn ved bygg. */
+/*
+  Tre flater som ikke finnes som ett token i Figma, fordi hvilket token som er
+  riktig avhenger av tema.
+
+  «Sideflaten» skal være hvit i lys modus, men ikke klinisk hvit — den skal
+  helle kjølig, ikke varmt. surface-1 er rgb(247,248,248), en gråblå off-white.
+  Den erstattet en beigeblanding som gjorde hele siden for sandfarget.
+
+  «Hevet flate» er kort og paneler som skal løfte seg fra siden. Løftet er ren
+  farge, ikke skygge: i lys modus er kortet helt hvitt mot den lett beige
+  siden, i mørk er det lysere enn bakgrunnen. Se `.hevet` lenger nede.
+
+  Alle er satt sammen av semantiske tokens.
+*/
+:root {
+  --flate-side: var(--semantic-color-background-surface-1);
+  --flate-hevet: var(--semantic-color-background-surface-neutral);
+
+  /*
+    Båndet som legges bak annenhver seksjon, så siden får rytme i stedet for
+    å være ett langt ark. Det skal så vidt merkes — ser du at det er der,
+    er det for sterkt.
+
+    Blandingen må holde seg klart svakere enn `--flate-hevet`, ellers
+    forsvinner kortene som ligger oppå båndet.
+  */
+  --flate-vekslende: color-mix(in srgb, var(--flate-side) 72%, var(--semantic-color-background-surface-4));
+
+  /*
+    Sandflaten. Den varme motvekten til en ellers kjølig palett, brukt på
+    enkeltflater som skal kjennes myke — ikke på hele siden.
+
+    I mørk modus blir den ikke beige. En sandfarget plate på en dyp teal side
+    ser ut som en feil, ikke som varme, så der brukes den lyse teal-flaten i
+    samme familie.
+  */
+  --flate-sand: var(--semantic-color-background-surface-2);
+
+  /*
+    Rolig gradient fra kjølig til varmt — den lyseblå surface-4 over i sanden.
+    Begge er tokens som allerede finnes; gradienten er bare veien mellom dem.
+  */
+  --gradient-rolig: linear-gradient(
+    135deg,
+    var(--semantic-color-background-surface-4) 0%,
+    var(--flate-sand) 55%,
+    var(--flate-hevet) 100%
+  );
+
+  /*
+    Footeren skal være en mørk, tung fot på siden i begge moduser.
+
+    `surface-inreverse` gjør nettopp det den heter: den snur. I lys modus gir
+    den en mørk footer, som er riktig — men i mørk modus blir den hvit, og en
+    hvit plate nederst på en mørk side leser som at noe er ødelagt.
+
+    Her låses den derfor til den mørke varianten uansett tema. Det er et
+    bevisst avvik fra tokenet, ikke en forglemmelse.
+  */
+  --flate-footer: var(--semantic-color-background-surface-inreverse);
+  --tekst-footer: var(--semantic-color-foreground-inreverse);
+}
+
+:root[data-theme='dark'] {
+  --flate-side: var(--semantic-color-background-surface-neutral);
+  /* surface-3 og ikke surface-2: den siste er nøytralt grå, og et grått kort
+     på en teal side ser ut som en feil. surface-3 er lysere enn sideflaten og
+     ligger i samme fargefamilie. */
+  --flate-hevet: var(--semantic-color-background-surface-3);
+  /* Bare et hint lysere enn sideflaten. surface-3 rett fram ville kollidert
+     med kortene, som bruker nettopp den. */
+  --flate-vekslende: color-mix(in srgb, var(--flate-side) 82%, var(--semantic-color-background-surface-3));
+  --flate-footer: var(--semantic-color-background-surface-1);
+  --tekst-footer: var(--semantic-color-foreground-default);
+  --flate-sand: var(--semantic-color-background-surface-3);
+}
+
 @theme inline {
   /* Farger — kun semantiske tokens, aldri core-primitiver direkte */
+  --color-flate-side: var(--flate-side);
+  --color-flate-hevet: var(--flate-hevet);
+  --color-flate-vekslende: var(--flate-vekslende);
+  --color-flate-sand: var(--flate-sand);
+  --color-flate-footer: var(--flate-footer);
+  --color-tekst-footer: var(--tekst-footer);
   --color-background-nav: var(--semantic-color-background-nav);
   --color-background-surface-1: var(--semantic-color-background-surface-1);
   --color-background-surface-2: var(--semantic-color-background-surface-2);
@@ -69,4 +152,380 @@
   --text-3xlarge--line-height: calc(var(--lineheight-3xlarge) * 1px);
   --text-4xlarge: calc(var(--fontsize-4xlarge) * 1px);
   --text-4xlarge--line-height: calc(var(--lineheight-4xlarge) * 1px);
+
+  /* Hjørneradier fra Figma. Tokenet er et tall uten enhet, derfor calc(). */
+  --radius-liten: calc(var(--borderradius-small) * 1px);
+  --radius-medium: calc(var(--borderradius-medium) * 1px);
+  --radius-pill: calc(var(--borderradius-pill) * 1px);
+  /* Store flater — hero, paneler, kort. Figma har ingen egen radius for dette,
+     så den bygges av medium ganger to i stedet for å finne på en ny verdi. */
+  --radius-stor: calc(var(--borderradius-medium) * 2px);
+}
+
+@layer base {
+  /* Mørk modus er allerede definert i fig-tokens.css, scopet til
+     :root[data-theme="dark"]. Attributtet settes av skriptet i Sidemal før
+     siden tegnes, så vi trenger ikke definere en eneste farge her — bare
+     skru på de som finnes.
+
+     `color-scheme` sier fra til nettleseren, slik at rullefelt, skjemafelt
+     og innebygde kontroller følger med. Uten den blir de stående lyse. */
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--flate-side);
+    color: var(--semantic-color-foreground-default);
+    font-family: var(--font-body);
+  }
+
+  /* Én synlig fokusmarkering for hele siden, i stedet for én per komponent. */
+  :focus-visible {
+    outline: 2px solid var(--semantic-color-border-focus);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Knappen fra designsystemet (Figma: «button»). Som CSS-klasse framfor
+     komponent, slik at den kan brukes på både <a> og <button> uten omvei.
+
+     Formen er hentet fra sanna.no: rundere hjørner, litt luftigere, og en
+     mørkere kant langs bunnen som gjør at knappen ser ut som en tast som kan
+     trykkes ned. Trykker du, synker den sammen. Det er den kanten som gjør
+     forskjellen — uten den er en knapp bare et farget rektangel.
+
+     Kanten er svart med gjennomsiktighet, ikke et fargetoken. Den skal være
+     «litt mørkere enn knappen selv», og knappen er mørk i lys modus og lys i
+     mørk modus. Et token ville vært riktig i én av dem og feil i den andre.
+     Samme vurdering som sløret i BlokkHero.astro. */
+  .knapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 48px;
+    padding-inline: 20px;
+    border-radius: var(--radius-medium);
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      box-shadow 150ms ease,
+      transform 150ms ease;
+  }
+
+  .knapp--primar {
+    /* Teksten løftes 4px opp, så den står midt i flaten over bunnkanten. */
+    padding-bottom: 4px;
+    background-color: var(--semantic-color-foreground-default);
+    color: var(--semantic-color-foreground-inreverse);
+    box-shadow:
+      inset 0 -4px 0 rgb(0 0 0 / 0.28),
+      inset 0 1px 1px rgb(255 255 255 / 0.12);
+  }
+
+  .knapp--primar:hover {
+    background-color: var(--semantic-color-foreground-hover);
+  }
+
+  .knapp--primar:active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 -2px 0 rgb(0 0 0 / 0.28),
+      inset 0 1px 1px rgb(255 255 255 / 0.12);
+  }
+
+  .knapp--sekundar {
+    padding-bottom: 3px;
+    border: 1px solid var(--semantic-color-border-inreverse);
+    color: var(--semantic-color-foreground-default);
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.08);
+  }
+
+  /* Knapper som ligger oppå et bilde. Fotografiet er like lyst i mørk modus
+     som i lys, så disse to variantene bruker faste farger og ikke tokens som
+     snur — ellers ville knappen blitt mørk mot mørkt slør i mørk modus.
+     `--core-brand-800` er et primitivt token, som ellers ikke skal brukes,
+     men det er det eneste som gir riktig mørk tekst i begge moduser. */
+  .knapp--lys {
+    padding-bottom: 4px;
+    background-color: rgb(255 255 255 / 0.95);
+    color: var(--core-brand-800);
+    box-shadow:
+      inset 0 -4px 0 rgb(0 0 0 / 0.16),
+      inset 0 1px 1px rgb(255 255 255 / 0.6);
+  }
+
+  .knapp--lys:hover {
+    background-color: rgb(255 255 255);
+  }
+
+  .knapp--lys:active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 -2px 0 rgb(0 0 0 / 0.16),
+      inset 0 1px 1px rgb(255 255 255 / 0.6);
+  }
+
+  .knapp--lys-omriss {
+    padding-bottom: 3px;
+    border: 1px solid rgb(255 255 255 / 0.7);
+    color: rgb(255 255 255);
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.12);
+  }
+
+  .knapp--lys-omriss:hover {
+    background-color: rgb(255 255 255 / 0.14);
+  }
+
+  .knapp--lys-omriss:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.12);
+  }
+
+  .knapp--sekundar:hover {
+    background-color: var(--semantic-color-background-surface-4);
+  }
+
+  .knapp--sekundar:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.08);
+  }
+
+  .knapp:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+  }
+
+  /* Kort og paneler som skal løfte seg fra sideflaten.
+     Løftet er farge, ikke skygge: flaten er lysere enn siden, og en hårfin
+     kant tegner grensen. Skygger er forbeholdt topplinja, som faktisk ligger
+     oppå og blar forbi innholdet — resten av siden ligger flatt. */
+  .hevet {
+    background-color: var(--flate-hevet);
+    border: 1px solid var(--semantic-color-border-subtle);
+  }
+
+  /* Treårene som dekor. Se Tremonster.astro — bildet kommer inn som maske,
+     så flaten under kan males med et token og følge tema. `cover` fyller
+     flaten uten å strekke mønsteret, og `no-repeat` hindrer at skjøtene
+     mellom gjentakelser blir synlige. */
+  .tremonster {
+    background-color: var(--semantic-color-foreground-default);
+    opacity: var(--tremonster-styrke, 0.09);
+    -webkit-mask-image: var(--tremonster-bilde);
+    mask-image: var(--tremonster-bilde);
+    -webkit-mask-size: cover;
+    mask-size: cover;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  /* Deleknappen i metalinja. Ser ut som tekst, oppfører seg som knapp. */
+  .deleknapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .deleknapp:hover {
+    color: var(--semantic-color-foreground-default);
+  }
+
+  /* Levende-markøren ved «Status». Sier at tallene er hentet fra Sanity ved
+     siste publisering, ikke skrevet inn for hånd.
+
+     Rødt er ikke i den semantiske paletten som noe annet enn feilmeldinger,
+     og det er med vilje at dette er det eneste røde på siden. Blir det brukt
+     som pynt andre steder, slutter det å bety «ferskt».
+
+     Pulsen står stille for dem som har skrudd av bevegelse. */
+  .prikk-levende {
+    position: relative;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-pill);
+    background-color: var(--core-red-500);
+    flex-shrink: 0;
+  }
+
+  .prikk-levende::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-pill);
+    background-color: var(--core-red-500);
+    animation: prikk-puls 2.4s ease-out infinite;
+  }
+
+  @keyframes prikk-puls {
+    0% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prikk-levende::after {
+      animation: none;
+    }
+  }
+
+  /* Menypunkt i topplinja. Ser ut som ren tekst til du peker på det, og får
+     da en flate under seg. Samme høyde og radius som knappene, så linja i
+     toppen henger sammen visuelt. */
+  .navlenke {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding-inline: 12px;
+    border-radius: var(--radius-liten);
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .navlenke:hover {
+    background-color: var(--semantic-color-background-surface-4);
+    color: var(--semantic-color-foreground-hover);
+  }
+
+  .navlenke[aria-current='page'] {
+    color: var(--semantic-color-foreground-brand);
+  }
+
+  /* Bryterne for språk og tema. To valg i samme ramme, der det aktive har
+     flate under seg. Samme form som et menypunkt, bare gruppert. */
+  .bryter {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--semantic-color-border-subtle);
+    border-radius: var(--radius-medium);
+  }
+
+  .bryter__valg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    min-width: 32px;
+    padding-inline: 8px;
+    border-radius: var(--radius-liten);
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--semantic-color-foreground-muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .bryter__valg:hover {
+    color: var(--semantic-color-foreground-default);
+  }
+
+  .bryter__valg[aria-current='true'],
+  .bryter__valg[aria-pressed='true'] {
+    background-color: var(--semantic-color-background-surface-4);
+    color: var(--semantic-color-foreground-default);
+  }
+
+  /* Noen kjører med redusert bevegelse i systeminnstillingene. Da skal
+     knappen fortsatt svare på trykk, bare uten at den flytter på seg. */
+  @media (prefers-reduced-motion: reduce) {
+    .knapp {
+      transition: background-color 150ms ease;
+    }
+
+    .knapp--primar:active,
+    .knapp--sekundar:active,
+    .knapp--lys:active,
+    .knapp--lys-omriss:active {
+      transform: none;
+    }
+
+    /* Teksten skal fortsatt stå stille, ikke bare bevege seg saktere. */
+    .knapp__rulle > span {
+      transition: none;
+    }
+
+    .knapp:hover .knapp__rulle > span,
+    .knapp:focus-visible .knapp__rulle > span {
+      transform: none;
+    }
+  }
+
+  /* Skjemafelt. Hårfin ramme, aldri slagskygge — se designsystemets readme. */
+  .felt {
+    width: 100%;
+    border-radius: var(--radius-liten);
+    border: 1px solid var(--semantic-color-border-default);
+    background-color: var(--semantic-color-background-surface-neutral);
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--semantic-color-foreground-default);
+  }
+}
+
+/*
+  Sesongene på områdesiden. Begge ligger alltid i HTML-en for Googles skyld —
+  det er `data-sesong` på <html> som styrer hvem som vises.
+
+  Uten JavaScript settes attributtet aldri, og da vises begge etter hverandre.
+  Derfor er standarden «synlig», og skjuling skjer bare når et valg faktisk er
+  tatt. Motsatt vei ville en bruker uten JS fått en tom side.
+
+  Reglene står bevisst UTENFOR @layer. Bolkene har Tailwind-klassen `flex`, og
+  utilities-laget slår components-laget uansett spesifisitet — lå dette i et
+  lag, ville `display: flex` vunnet og begge sesongene blitt stående.
+*/
+:root[data-sesong='sommer'] [data-sesong-innhold='vinter'],
+:root[data-sesong='vinter'] [data-sesong-innhold='sommer'] {
+  display: none;
+}
+
+/* Overskriften «Sommer»/«Vinter» over hver bolk trengs bare når begge vises
+   samtidig, altså uten JavaScript. Med JS sier bryteren hvor du er. */
+:root[data-sesong] .sesong-overskrift {
+  display: none;
 }

@@ -1,0 +1,91 @@
+---
+import {Icon} from 'astro-icon/components'
+
+import {UI} from '../lib/tekster'
+import type {Sprak} from '../lib/sprak'
+
+/**
+ * Bryteren mellom sommer og vinter på områdesiden.
+ *
+ * Tre krav fra byggeinstruksen, alle lette å bomme på:
+ *
+ * 1. **Begge sesongene ligger i HTML-en.** Bryteren skjuler og viser, den
+ *    henter ikke data. Hentet vi sommerinnholdet først ved klikk, ville Google
+ *    aldri sett det, og halve siden vært usynlig for søk.
+ *
+ * 2. **Tilstanden ligger i URL-en** som `?sesong=sommer`, så en lenke kan deles
+ *    og åpne riktig fane.
+ *
+ * 3. **Siden virker uten JavaScript.** Da vises begge sesongene etter
+ *    hverandre, hver med sin egen overskrift. Dårligere, men ikke ødelagt.
+ *    Bryteren er derfor to ekte lenker og ikke knapper — uten JS navigerer de,
+ *    med JS fanger skriptet klikket og bytter uten sidelast.
+ *
+ * Selve visningen styres av `data-sesong` på <html>, satt av skriptet i
+ * Omradeside før siden tegnes.
+ */
+interface Props {
+  sprak: Sprak
+  /** Sesongen som er valgt når siden lastes. Brukes bare til første tegning. */
+  valgt: 'sommer' | 'vinter'
+}
+
+const {sprak, valgt} = Astro.props
+const ui = UI[sprak].omradet
+
+const valg = [
+  {verdi: 'sommer' as const, etikett: ui.sommer, ikon: 'mdi:white-balance-sunny'},
+  {verdi: 'vinter' as const, etikett: ui.vinter, ikon: 'mdi:snowflake'},
+]
+---
+
+<div class="bryter mx-auto" role="group" aria-label={ui.velgSesong} data-sesongveksler>
+  {
+    valg.map((v) => (
+      <a
+        href={`?sesong=${v.verdi}`}
+        data-sesongvalg={v.verdi}
+        aria-current={v.verdi === valgt ? 'true' : undefined}
+        class="bryter__valg gap-1.5"
+      >
+        <Icon name={v.ikon} size={15} aria-hidden="true" />
+        {v.etikett}
+      </a>
+    ))
+  }
+</div>
+
+<script>
+  // Uten dette skriptet navigerer lenkene som vanlig og siden virker likevel.
+  // Med det byttes fane uten sidelast, og URL-en holdes i takt.
+  const NOKKEL = 'sesong'
+
+  function settSesong(sesong: string, oppdaterHistorikk: boolean) {
+    document.documentElement.dataset.sesong = sesong
+
+    document.querySelectorAll<HTMLAnchorElement>('[data-sesongvalg]').forEach((lenke) => {
+      const aktiv = lenke.dataset.sesongvalg === sesong
+      if (aktiv) lenke.setAttribute('aria-current', 'true')
+      else lenke.removeAttribute('aria-current')
+    })
+
+    if (oppdaterHistorikk) {
+      const url = new URL(window.location.href)
+      url.searchParams.set(NOKKEL, sesong)
+      history.pushState({sesong}, '', url)
+    }
+  }
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-sesongvalg]').forEach((lenke) => {
+    lenke.addEventListener('click', (hendelse) => {
+      hendelse.preventDefault()
+      settSesong(lenke.dataset.sesongvalg ?? 'vinter', true)
+    })
+  })
+
+  // Fram- og tilbakeknappen i nettleseren skal virke på fanene også.
+  window.addEventListener('popstate', () => {
+    const fraUrl = new URL(window.location.href).searchParams.get(NOKKEL)
+    if (fraUrl === 'sommer' || fraUrl === 'vinter') settSesong(fraUrl, false)
+  })
+</script>

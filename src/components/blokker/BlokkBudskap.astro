@@ -1,0 +1,41 @@
+---
+import Blokkknapp from './Blokkknapp.astro'
+import Tremonster from '../Tremonster.astro'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkBudskap} from '../../lib/typer'
+
+/**
+ * Kort budskap på farget flate — overskrift til venstre, tekst til høyre.
+ * Kolonnene legger seg under hverandre på mobil.
+ */
+interface Props {
+  blokk: BlokkBudskap
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+
+const brodtekst = tekst(blokk.tekst, sprak)
+const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
+---
+
+<section class="mx-auto max-w-[1600px] px-5 py-10 md:px-10">
+  <!-- Sandflaten er den varme motvekten til en ellers kjølig side, og det
+       ene stedet på forsiden mønsteret brukes. `overflow-hidden` klipper
+       treårene etter hjørnene, og innholdet må ligge `relative` for å havne
+       over dekoren. -->
+  <div
+    class="relative grid gap-6 overflow-hidden rounded-stor bg-flate-sand p-8 md:grid-cols-2 md:items-center md:gap-12 md:p-12"
+  >
+    <Tremonster styrke={0.05} />
+
+    <h2 class="relative font-heading text-xlarge font-semibold md:text-2xlarge">
+      {tekst(blokk.overskrift, sprak)}
+    </h2>
+
+    <div class="relative flex flex-col gap-4">
+      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-small">{tekstavsnitt}</p>)}
+      {blokk.knapp && <div class="mt-2"><Blokkknapp knapp={blokk.knapp} sprak={sprak} variant="sekundar" /></div>}
+    </div>
+  </div>
+</section>

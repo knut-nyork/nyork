@@ -1,0 +1,51 @@
+---
+import {tekst, type Sprak} from '../lib/sprak'
+import type {Sideseksjon} from '../lib/typer'
+
+/**
+ * Én tekstseksjon: overskrift og brødtekst fra Sanity.
+ *
+ * Linjer som begynner med «- » blir en liste. Avstander og lignende skrives
+ * naturlig som punkter av redaktøren, og skal da også bli punkter på siden —
+ * ikke ett avsnitt med bindestreker midt i.
+ */
+interface Props {
+  seksjon: Sideseksjon
+  sprak: Sprak
+}
+
+const {seksjon, sprak} = Astro.props
+
+const brodtekst = tekst(seksjon.tekst, sprak)
+
+/** Deler teksten i blokker, og merker hvilke som er lister. */
+const deler = brodtekst
+  .split(/\n\s*\n/)
+  .map((del) => del.trim())
+  .filter(Boolean)
+  .map((del) => {
+    const linjer = del.split('\n').map((l) => l.trim())
+    const erListe = linjer.length > 1 && linjer.every((l) => l.startsWith('- '))
+    return erListe ? {type: 'liste' as const, linjer: linjer.map((l) => l.slice(2))} : {type: 'avsnitt' as const, del}
+  })
+---
+
+<section id={seksjon.ankerId || undefined} class="flex scroll-mt-24 flex-col gap-5">
+  <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(seksjon.overskrift, sprak)}</h2>
+
+  {
+    deler.map((d) =>
+      d.type === 'liste' ? (
+        <ul class="m-0 flex list-none flex-col gap-2 p-0">
+          {d.linjer.map((linje) => (
+            <li class="flex gap-3 border-b border-border-subtle pb-2 font-body text-small last:border-0">
+              <span>{linje}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="m-0 max-w-[62ch] font-body text-small">{d.del}</p>
+      ),
+    )
+  }
+</section>

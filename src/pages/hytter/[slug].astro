@@ -1,0 +1,62 @@
+---
+import Sidemal from '../../layouts/Sidemal.astro'
+import Modellside from '../../components/Modellside.astro'
+import Enhetsside from '../../components/Enhetsside.astro'
+import {forstAvsnitt} from '../../lib/hytter'
+import {hentHytter, hentModeller} from '../../lib/sporringer'
+import {tekst} from '../../lib/sprak'
+import {UI} from '../../lib/tekster'
+import type {Enhet, Hyttemodell} from '../../lib/typer'
+
+/**
+ * Modellsider og enhetssider deler samme URL-nivå — /hytter/a1 og
+ * /hytter/hytte-5 — fordi enhets-URL-ene skal være flate og lesbare. Astro kan
+ * bare ha én dynamisk rute per nivå, så begge genereres her og siden velger
+ * visning ut fra hvilken av de to props-ene som er satt.
+ */
+export async function getStaticPaths() {
+  const [modeller, hytter] = await Promise.all([hentModeller(), hentHytter()])
+
+  return [
+    ...modeller.map((modell) => ({
+      params: {slug: modell.slug},
+      props: {
+        modell,
+        enheter: hytter.filter((hytte) => hytte.modell?.slug === modell.slug),
+      },
+    })),
+    ...hytter.map((enhet) => ({
+      params: {slug: enhet.slug},
+      props: {enhet},
+    })),
+  ]
+}
+
+interface Props {
+  modell?: Hyttemodell
+  enheter?: Enhet[]
+  enhet?: Enhet
+}
+
+const {modell, enheter, enhet} = Astro.props
+const ui = UI.no
+
+const navn = modell ? modell.navn : enhet!.nummer
+const slug = modell ? modell.slug : enhet!.slug
+const kilde = modell ? modell.beskrivelse : (enhet!.beskrivelse ?? enhet!.modell?.beskrivelse)
+const brodtekst = tekst(kilde, 'no')
+---
+
+<Sidemal
+  norskSti={`/hytter/${slug}`}
+  tittel={`${navn} · ${ui.tittelSuffiks}`}
+  metaBeskrivelse={brodtekst ? forstAvsnitt(brodtekst) : undefined}
+>
+  {
+    modell ? (
+      <Modellside sprak="no" modell={modell} enheter={enheter ?? []} />
+    ) : (
+      <Enhetsside sprak="no" enhet={enhet!} />
+    )
+  }
+</Sidemal>

@@ -1,0 +1,16 @@
+---
+import Sidemal from '../../layouts/Sidemal.astro'
+import Forside from '../../components/Forside.astro'
+import {hentSide, hentStatustall} from '../../lib/sporringer'
+import {tekst} from '../../lib/sprak'
+
+const [side, statustall] = await Promise.all([hentSide('forside'), hentStatustall()])
+---
+
+<Sidemal
+  norskSti="/"
+  tittel={tekst(side?.tittel, 'en')}
+  metaBeskrivelse={tekst(side?.metaBeskrivelse, 'en')}
+>
+  <Forside sprak="en" side={side} statustall={statustall} />
+</Sidemal>

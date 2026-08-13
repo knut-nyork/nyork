@@ -1,0 +1,55 @@
+---
+import Blokkknapp from './Blokkknapp.astro'
+import {bildeUrl, formaterDato} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
+import {UI} from '../../lib/tekster'
+import type {BlokkNyheter} from '../../lib/typer'
+
+/**
+ * Rad med nyhetssaker, to i bredden. Redaktøren velger i Sanity om det skal
+ * være de nyeste automatisk eller saker de peker ut selv — valget er allerede
+ * gjort når blokken kommer hit, se velgUtvalg() i sporringer.ts.
+ *
+ * Kortene er foreløpig ikke lenket. Nyhetssidene under /siste-nytt finnes
+ * ennå ikke, og en lenke dit ville gitt 404. Når sidene bygges, pakkes
+ * <article> inn i en <a href={stiForSprak(`/siste-nytt/${sak.slug}`, sprak)}>.
+ */
+interface Props {
+  blokk: BlokkNyheter
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+const ui = UI[sprak].forside
+---
+
+<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+  <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>
+
+  {
+    blokk.artikler.length === 0 ? (
+      <p class="mt-6 font-body text-small text-foreground-muted">{ui.ingenSaker}</p>
+    ) : (
+      <div class="mt-8 grid gap-6 md:grid-cols-2 md:gap-x-12">
+        {blokk.artikler.map((sak) => (
+          <article class="flex gap-4">
+            {sak.bilde && (
+              <img
+                src={bildeUrl(sak.bilde.url, 240)}
+                alt={tekst(sak.bilde.altTekst, sprak)}
+                loading="lazy"
+                class="h-20 w-20 flex-none rounded-medium object-cover md:h-24 md:w-24"
+              />
+            )}
+            <div class="flex flex-col gap-1">
+              <h3 class="font-heading text-medium font-semibold">{tekst(sak.tittel, sprak)}</h3>
+              <p class="m-0 font-detail text-xsmall text-foreground-muted">{formaterDato(sak.dato, sprak)}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    )
+  }
+
+  {blokk.knapp && <div class="mt-8"><Blokkknapp knapp={blokk.knapp} sprak={sprak} variant="sekundar" /></div>}
+</section>

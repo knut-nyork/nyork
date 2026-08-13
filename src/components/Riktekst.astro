@@ -1,0 +1,137 @@
+---
+import Riktekstbit from './Riktekstbit.astro'
+import type {Sprak} from '../lib/sprak'
+
+/**
+ * Riktekst fra Sanity (Portable Text) til HTML.
+ *
+ * Skrevet for hånd framfor å hente inn `@portabletext/to-html`. Feltet er satt
+ * opp med rene blokker uten egne innholdstyper, så det som må støttes er
+ * avsnitt, mellomtitler, lister, sitat og merkene fet, kursiv og lenke. Det er
+ * lite nok til at en pakke koster mer i vedlikehold enn den sparer.
+ *
+ * Legger noen en ny blokktype i skjemaet — for eksempel bilde midt i teksten —
+ * må den håndteres her. Ukjente typer hoppes over i stillhet framfor å velte
+ * siden.
+ */
+interface Barn {
+  _key: string
+  _type: string
+  text?: string
+  marks?: string[]
+}
+
+interface Blokk {
+  _key: string
+  _type: string
+  style?: string
+  listItem?: string
+  children?: Barn[]
+  markDefs?: {_key: string; _type: string; href?: string}[]
+}
+
+interface Props {
+  blokker?: Blokk[]
+  sprak: Sprak
+}
+
+const {blokker = [], sprak} = Astro.props
+
+/**
+ * Grupperer påfølgende listepunkter, så de havner i samme <ul>. Sanity gir
+ * hvert punkt som en egen blokk med `listItem` satt — uten dette ville hvert
+ * punkt blitt sin egen liste med ett element.
+ */
+type Gruppe = {type: 'liste'; punkter: Blokk[]} | {type: 'blokk'; blokk: Blokk}
+
+const grupper: Gruppe[] = []
+for (const blokk of blokker) {
+  if (blokk._type !== 'block') continue
+
+  if (blokk.listItem) {
+    const forrige = grupper.at(-1)
+    if (forrige?.type === 'liste') forrige.punkter.push(blokk)
+    else grupper.push({type: 'liste', punkter: [blokk]})
+  } else {
+    grupper.push({type: 'blokk', blokk})
+  }
+}
+---
+
+<div class="flex flex-col gap-5">
+  {
+    grupper.map((gruppe) =>
+      gruppe.type === 'liste' ? (
+        <ul class="m-0 flex list-disc flex-col gap-2 pl-5">
+          {gruppe.punkter.map((punkt) => (
+            <li class="font-body text-small">
+              {punkt.children?.map((barn) => (
+                <Riktekstbit
+                  tekst={barn.text ?? ''}
+                  merker={barn.marks ?? []}
+                  markDefs={punkt.markDefs ?? []}
+                  sprak={sprak}
+                />
+              ))}
+            </li>
+          ))}
+        </ul>
+      ) : gruppe.blokk.style === 'h2' ? (
+        <h2 class="mt-4 font-heading text-xlarge font-semibold md:text-2xlarge">
+          {gruppe.blokk.children?.map((barn) => (
+            <Riktekstbit
+              tekst={barn.text ?? ''}
+              merker={barn.marks ?? []}
+              markDefs={gruppe.blokk.markDefs ?? []}
+              sprak={sprak}
+            />
+          ))}
+        </h2>
+      ) : gruppe.blokk.style === 'h3' ? (
+        <h3 class="mt-3 font-heading text-large font-semibold">
+          {gruppe.blokk.children?.map((barn) => (
+            <Riktekstbit
+              tekst={barn.text ?? ''}
+              merker={barn.marks ?? []}
+              markDefs={gruppe.blokk.markDefs ?? []}
+              sprak={sprak}
+            />
+          ))}
+        </h3>
+      ) : gruppe.blokk.style === 'h4' ? (
+        <h4 class="mt-2 font-heading text-medium font-semibold">
+          {gruppe.blokk.children?.map((barn) => (
+            <Riktekstbit
+              tekst={barn.text ?? ''}
+              merker={barn.marks ?? []}
+              markDefs={gruppe.blokk.markDefs ?? []}
+              sprak={sprak}
+            />
+          ))}
+        </h4>
+      ) : gruppe.blokk.style === 'blockquote' ? (
+        <blockquote class="m-0 border-l-2 border-border-inreverse pl-5 font-heading text-large font-medium">
+          {gruppe.blokk.children?.map((barn) => (
+            <Riktekstbit
+              tekst={barn.text ?? ''}
+              merker={barn.marks ?? []}
+              markDefs={gruppe.blokk.markDefs ?? []}
+              sprak={sprak}
+            />
+          ))}
+        </blockquote>
+      ) : (
+        <p class="m-0 font-body text-small">
+          {gruppe.blokk.children?.map((barn) => (
+            <Riktekstbit
+              tekst={barn.text ?? ''}
+              merker={barn.marks ?? []}
+              markDefs={gruppe.blokk.markDefs ?? []}
+              sprak={sprak}
+            />
+          ))}
+        </p>
+      ),
+    )
+  }
+</div>

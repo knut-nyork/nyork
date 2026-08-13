@@ -1,0 +1,32 @@
+---
+import {stiForSprak, tekst, type Sprak} from '../../lib/sprak'
+import type {Knapp} from '../../lib/typer'
+
+/**
+ * Knapp i en blokk. Interne stier skrives på norsk i Sanity og oversettes her
+ * gjennom rutekartet, så «/hytter» blir «/en/cabins» av seg selv. Adresser
+ * som peker ut av nettstedet står som de er, og åpnes i ny fane.
+ *
+ * `lys` og `lys-omriss` brukes i blokkene som ligger oppå et bilde. Der ville
+ * en mørk knapp forsvunnet i sløret.
+ */
+interface Props {
+  knapp: Knapp
+  sprak: Sprak
+  variant?: 'primar' | 'sekundar' | 'lys' | 'lys-omriss'
+}
+
+const {knapp, sprak, variant = 'primar'} = Astro.props
+
+const ekstern = !knapp.sti.startsWith('/')
+const href = ekstern ? knapp.sti : stiForSprak(knapp.sti, sprak)
+---
+
+<a
+  href={href}
+  class:list={['knapp', `knapp--${variant}`]}
+  rel={ekstern ? 'noopener' : undefined}
+  target={ekstern ? '_blank' : undefined}
+>
+  {tekst(knapp.tekst, sprak)}
+</a>

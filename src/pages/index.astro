@@ -1,17 +1,16 @@
 ---
-import "../styles/global.css";
+import Sidemal from '../layouts/Sidemal.astro'
+import Forside from '../components/Forside.astro'
+import {hentSide, hentStatustall} from '../lib/sporringer'
+import {tekst} from '../lib/sprak'
+
+const [side, statustall] = await Promise.all([hentSide('forside'), hentStatustall()])
 ---
 
-<html lang="no">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Nyørk</title>
-	</head>
-	<body>
-		<h1 class="type-h1">Nyørk</h1>
-	</body>
-</html>
+<Sidemal
+  norskSti="/"
+  tittel={tekst(side?.tittel, 'no')}
+  metaBeskrivelse={tekst(side?.metaBeskrivelse, 'no')}
+>
+  <Forside sprak="no" side={side} statustall={statustall} />
+</Sidemal>

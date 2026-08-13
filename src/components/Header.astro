@@ -1,0 +1,104 @@
+---
+import Logo from './Logo.astro'
+import Sprakbryter from './Sprakbryter.astro'
+import Temabryter from './Temabryter.astro'
+import {UI} from '../lib/tekster'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import type {Innstillinger} from '../lib/typer'
+
+/**
+ * Topplinja. Menypunktene er ren tekst til du peker på dem, og får da en
+ * flate under seg — se `.navlenke` i global.css.
+ *
+ * Språk og tema ligger som to like brytere ytterst til høyre, atskilt fra
+ * menyen med en skillelinje. Interesseskjemaet har ingen knapp her lenger;
+ * det ligger nederst på hver side, og fanges opp av knappene i innholdet.
+ */
+interface Props {
+  sprak: Sprak
+  /** Den norske stien til siden vi står på — brukes til å markere aktivt menypunkt. */
+  norskSti: string
+  innstillinger: Innstillinger | null
+}
+
+const {sprak, norskSti, innstillinger} = Astro.props
+const ui = UI[sprak]
+
+const menypunkter = (innstillinger?.navigasjon ?? []).map((punkt) => ({
+  tekst: tekst(punkt.tekst, sprak),
+  href: stiForSprak(punkt.url, sprak),
+  aktiv: punkt.url === norskSti,
+}))
+---
+
+<!--
+  Flytende topplinje: `sticky` med luft rundt, så den ligger som en egen flate
+  oppå siden i stedet for å være limt til kanten. I ro står den over innholdet,
+  og når du blar legger den seg oppå — begge deler uten at innholdet må
+  kompensere med toppmarg, slik `fixed` ville krevd.
+
+  Bakgrunnen er halvgjennomsiktig fra `background-nav`, så sideflaten skinner
+  svakt igjennom når noe blar forbi under.
+-->
+<header class="sticky top-2 z-50 px-2 md:top-3 md:px-3">
+  <div
+    class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 rounded-medium border border-border-subtle bg-background-nav px-4 py-2.5 text-foreground-default shadow-[0_1px_2px_rgb(0_0_0_/_0.02),0_4px_12px_-10px_rgb(0_0_0_/_0.1)] backdrop-blur-[11.1px] md:px-6"
+  >
+    <a href={stiForSprak('/', sprak)} class="flex shrink-0 items-center">
+      <Logo tittel="Nyørk" class="h-[22px] w-auto" />
+    </a>
+
+    <!-- Skrivebord -->
+    <nav aria-label={ui.hovedmeny} class="hidden items-center gap-1 md:flex">
+      {
+        menypunkter.map((punkt) => (
+          <a href={punkt.href} aria-current={punkt.aktiv ? 'page' : undefined} class="navlenke">
+            {punkt.tekst}
+          </a>
+        ))
+      }
+
+      <span class="mx-3 h-5 w-px bg-border-subtle" aria-hidden="true"></span>
+
+      <div class="flex items-center gap-2">
+        <Sprakbryter sprak={sprak} norskSti={norskSti} />
+        <Temabryter sprak={sprak} />
+      </div>
+    </nav>
+
+    <!-- Mobil. <details> gjør menyen brukbar uten JavaScript. -->
+    <details class="md:hidden [&[open]_.lukk-ikon]:block [&[open]_.apne-ikon]:hidden">
+      <summary
+        aria-label={ui.apneMeny}
+        class="flex h-11 w-11 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden"
+      >
+        <svg class="apne-ikon h-6 w-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <svg class="lukk-ikon hidden h-6 w-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </summary>
+      <!-- Panelet har ugjennomsiktig bakgrunn, ikke den gjennomsiktige fra topplinja:
+           backdrop-filter virker ikke inne i et element som allerede er blurret.
+           Kantene følger pilla over, ikke skjermkanten. -->
+      <nav
+        aria-label={ui.hovedmeny}
+        class="hevet absolute left-2 right-2 top-full mt-2 flex flex-col items-start gap-2 rounded-medium border border-border-subtle px-5 py-6 md:left-3 md:right-3"
+      >
+        {
+          menypunkter.map((punkt) => (
+            <a href={punkt.href} aria-current={punkt.aktiv ? 'page' : undefined} class="navlenke">
+              {punkt.tekst}
+            </a>
+          ))
+        }
+
+        <div class="mt-4 flex items-center gap-2 border-t border-border-subtle pt-5">
+          <Sprakbryter sprak={sprak} norskSti={norskSti} />
+          <Temabryter sprak={sprak} />
+        </div>
+      </nav>
+    </details>
+  </div>
+</header>

@@ -1,0 +1,101 @@
+---
+import {tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Reguleringsregler} from '../lib/typer'
+
+/**
+ * Hva du får lov til å bygge, rett fra reguleringsplanen i Sanity.
+ *
+ * Ingen av tallene står i koden. Endres planen, endres dokumentet — og siden
+ * følger etter ved neste bygg. Rader uten verdi faller bort i stedet for å
+ * vise en tom celle, slik at tabellen tåler at feltene fylles ut over tid.
+ *
+ * `ikkeTillatt` er med vilje ikke bare enda en rad i tabellen. At frittliggende
+ * bod, garasje, gjerde og flaggstang er forbudt, er den opplysningen som
+ * overrasker folk mest — og den er langt billigere å oppdage før kjøp enn
+ * etter. Derfor får den egen ramme og egen overskrift.
+ */
+interface Props {
+  regler: Reguleringsregler
+  sprak: Sprak
+}
+
+const {regler, sprak} = Astro.props
+const ui = UI[sprak].tomter
+
+/** Setter sammen «16 m (to etasjer) / 14 m (tre etasjer)» når begge finnes. */
+function lengde(): string | null {
+  const to = regler.maksLengdeToEtasjer
+  const tre = regler.maksLengdeTreEtasjer
+  if (to && tre) return `${to} m (${ui.toEtasjer}) / ${tre} m (${ui.treEtasjer})`
+  if (to) return `${to} m (${ui.toEtasjer})`
+  if (tre) return `${tre} m (${ui.treEtasjer})`
+  return null
+}
+
+const rader = [
+  {etikett: ui.maksByaToEtasjer, verdi: regler.maksByaToEtasjer ? `${regler.maksByaToEtasjer} m²` : null},
+  {etikett: ui.maksByaTreEtasjer, verdi: regler.maksByaTreEtasjer ? `${regler.maksByaTreEtasjer} m²` : null},
+  {
+    etikett: ui.maksGesimshoyde,
+    // Komma som desimalskilletegn på norsk, punktum på engelsk.
+    verdi: regler.maksGesimshoyde
+      ? `${sprak === 'no' ? String(regler.maksGesimshoyde).replace('.', ',') : regler.maksGesimshoyde} m`
+      : null,
+  },
+  {etikett: ui.takform, verdi: tekst(regler.takform, sprak) || null},
+  {etikett: ui.maksBygningsbredde, verdi: tekst(regler.maksBygningsbredde, sprak) || null},
+  {etikett: ui.maksLengde, verdi: lengde()},
+  {etikett: ui.moneretning, verdi: tekst(regler.moneretning, sprak) || null},
+  {etikett: ui.parkering, verdi: tekst(regler.parkeringskrav, sprak) || null},
+  {etikett: ui.levegg, verdi: tekst(regler.levegg, sprak) || null},
+].filter((rad) => rad.verdi)
+
+const ikkeTillatt = (regler.ikkeTillatt ?? []).map((rad) => tekst(rad, sprak)).filter(Boolean)
+---
+
+<div class="flex flex-col gap-8">
+  {
+    rader.length > 0 && (
+      <div class="hevet overflow-hidden rounded-stor">
+        <dl class="m-0 divide-y divide-border-subtle">
+          {rader.map((rad) => (
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-4 md:px-6">
+              <dt class="font-body text-small text-foreground-muted">{rad.etikett}</dt>
+              <dd class="m-0 font-heading text-small font-medium">{rad.verdi}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    )
+  }
+
+  {
+    ikkeTillatt.length > 0 && (
+      <section class="rounded-stor border-2 border-border-inreverse p-6 md:p-8">
+        <h3 class="m-0 font-heading text-large font-semibold">{ui.ikkeTillatt}</h3>
+        <p class="mt-2 max-w-[62ch] font-body text-small text-foreground-muted">{ui.ikkeTillattForklaring}</p>
+
+        <ul class="mt-5 flex list-none flex-wrap gap-3 p-0">
+          {ikkeTillatt.map((rad) => (
+            <li class="rounded-medium border border-border-default px-4 py-2 font-heading text-small font-medium">
+              {rad}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <p class="m-0 font-body text-2xsmall text-foreground-muted">
+    {UI[sprak].tomter.planGrunnlag} {regler.planNavn}, planID {regler.planId}.
+  </p>
+
+  {
+    regler.planDokument?.url && (
+      <a href={regler.planDokument.url} class="knapp knapp--sekundar self-start" rel="noopener" target="_blank">
+        {ui.lastNedPlan}
+      </a>
+    )
+  }
+</div>

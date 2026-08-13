@@ -1,0 +1,112 @@
+---
+import Bildeplassholder from '../Bildeplassholder'
+import Ikon3d from '../Ikon3d.astro'
+import {bildeUrl} from '../../lib/hytter'
+import {stiForSprak, tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkKort, Kort} from '../../lib/typer'
+
+/**
+ * Rad med kort, i to former.
+ *
+ * `tekstUnder` er fotokortet: bilde øverst, en liten etikett som «Sommer», og
+ * tittelen under.
+ *
+ * `tekstOver` er illustrasjonskortet: mønster i bakgrunnen, 3D-ikonet nede til
+ * høyre og teksten oppe til venstre. Den formen finnes fordi vi ikke har
+ * fotografier til alt — et mønster og et ikon bærer kortet like godt, og ser
+ * ut som en bevisst avgjørelse framfor et hull.
+ *
+ * Er kortet lenket, blir hele flaten klikkbar. Uten lenke er det et vanlig
+ * <article>, ikke en <a> som ikke går noe sted.
+ */
+interface Props {
+  blokk: BlokkKort
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+
+const tekstOver = blokk.visning === 'tekstOver'
+
+function lenke(kort: Kort): string | undefined {
+  if (!kort.knapp) return undefined
+  return kort.knapp.sti.startsWith('/') ? stiForSprak(kort.knapp.sti, sprak) : kort.knapp.sti
+}
+---
+
+<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+  {
+    blokk.overskrift && (
+      <h2 class="mb-8 font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>
+    )
+  }
+
+  <ul class="grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2">
+    {
+      blokk.kort.map((kort) => {
+        const href = lenke(kort)
+        const Flate = href ? 'a' : 'article'
+
+        return (
+          <li>
+            <Flate
+              href={href}
+              class:list={[
+                'hevet relative flex h-full flex-col overflow-hidden rounded-stor no-underline transition-colors',
+                href && 'hover:border-border-focus',
+                tekstOver ? 'aspect-square p-6' : 'p-3',
+              ]}
+            >
+              {tekstOver ? (
+                <>
+                  <div class="relative">
+                    {kort.etikett && (
+                      <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
+                        {tekst(kort.etikett, sprak)}
+                      </p>
+                    )}
+                    <h3 class="mt-1 font-heading text-large font-semibold">{tekst(kort.tittel, sprak)}</h3>
+                  </div>
+
+                  {kort.ikon && (
+                    <div class="relative mt-auto flex justify-end">
+                      <Ikon3d
+                        aktivitet={kort.ikon.aktivitet}
+                        illustrasjon={kort.ikon.illustrasjon}
+                        sprak={sprak}
+                        storrelse={72}
+                        dekorativ
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {kort.bilde ? (
+                    <img
+                      src={bildeUrl(kort.bilde.url, 700)}
+                      alt={tekst(kort.bilde.altTekst, sprak)}
+                      loading="lazy"
+                      class="aspect-square w-full rounded-medium object-cover"
+                    />
+                  ) : (
+                    <Bildeplassholder sideforhold="1 / 1" />
+                  )}
+
+                  <div class="px-2 pb-2 pt-4">
+                    {kort.etikett && (
+                      <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
+                        {tekst(kort.etikett, sprak)}
+                      </p>
+                    )}
+                    <h3 class="mt-1 font-heading text-large font-semibold">{tekst(kort.tittel, sprak)}</h3>
+                  </div>
+                </>
+              )}
+            </Flate>
+          </li>
+        )
+      })
+    }
+  </ul>
+</section>

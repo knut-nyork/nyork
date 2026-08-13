@@ -1,0 +1,62 @@
+---
+import Statusmerke from './Statusmerke.tsx'
+import {formaterPris} from '../lib/hytter'
+import {tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Enhet} from '../lib/typer'
+
+/**
+ * Kortet for én tomt.
+ *
+ * Bevisst mye enklere enn hyttekortet: en tomtekjøper har med sin egen
+ * utbygger, så hyttetype, BRA og antall soverom finnes ikke og skal ikke
+ * finnes. Det som avgjør er nummer, størrelse, pris og status.
+ *
+ * Kortet lenker ikke videre. Det finnes ingen tomteside per tomt ennå, og en
+ * lenke som ikke går noe sted er verre enn ingen lenke.
+ */
+interface Props {
+  enhet: Enhet
+  sprak: Sprak
+}
+
+const {enhet, sprak} = Astro.props
+const ui = UI[sprak]
+const solgt = enhet.status === 'solgt'
+
+const rader = [
+  {etikett: ui.tomter.storrelse, verdi: enhet.tomtestorrelse ? `${enhet.tomtestorrelse} m²` : null},
+  {etikett: ui.hytter.delomrade, verdi: enhet.delomrade ?? null},
+  {etikett: ui.hytter.utsikt, verdi: enhet.utsiktsretning ?? null},
+  {etikett: ui.hytter.solforhold, verdi: enhet.solforhold ?? null},
+].filter((rad) => rad.verdi)
+
+const beskrivelse = tekst(enhet.beskrivelse, sprak)
+---
+
+<article
+  data-status={enhet.status}
+  class:list={['hevet flex flex-col gap-4 rounded-stor p-5', solgt && 'opacity-60']}
+>
+  <div class="flex items-start justify-between gap-3">
+    <h3 class="font-heading text-large font-semibold">{enhet.nummer}</h3>
+    <Statusmerke status={enhet.status} sprak={sprak} />
+  </div>
+
+  {rader.length > 0 && (
+    <dl class="m-0 flex flex-col gap-1">
+      {rader.map((rad) => (
+        <div class="flex items-baseline justify-between gap-4 border-b border-border-subtle py-1 last:border-0">
+          <dt class="font-body text-xsmall text-foreground-muted">{rad.etikett}</dt>
+          <dd class="m-0 font-body text-xsmall font-medium">{rad.verdi}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+
+  {beskrivelse && <p class="m-0 font-body text-xsmall text-foreground-muted">{beskrivelse}</p>}
+
+  <p class="mt-auto m-0 font-heading text-medium font-semibold">
+    {enhet.pris ? formaterPris(enhet.pris) : ui.hytter.prisPaForesporsel}
+  </p>
+</article>

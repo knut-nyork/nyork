@@ -1,0 +1,74 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import Brodsmuler from './Brodsmuler.astro'
+import {bildeUrl, formaterDato} from '../lib/hytter'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Artikkel, Side} from '../lib/typer'
+
+/**
+ * Lista over nyhetssaker. Den nyeste først.
+ *
+ * Kortene er hele klikkflaten, ikke bare tittelen — en liten lenke i et stort
+ * kort er lett å bomme på, særlig med tommelen.
+ */
+interface Props {
+  sprak: Sprak
+  side: Side | null
+  artikler: Artikkel[]
+}
+
+const {sprak, side, artikler} = Astro.props
+const ui = UI[sprak].omradet
+
+const tittel = tekst(side?.overskrift, sprak) || ui.alleSaker
+---
+
+<div class="mx-auto flex max-w-[1100px] flex-col gap-12 px-5 py-12 md:px-10">
+  <div class="flex flex-col gap-10">
+    <Brodsmuler sprak={sprak} naa={tittel} />
+
+    <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 text-center">
+      <h1 class="m-0 font-heading text-4xlarge font-semibold">{tittel}</h1>
+      {side?.ingress && <p class="m-0 font-body text-small">{tekst(side.ingress, sprak)}</p>}
+    </header>
+  </div>
+
+  {
+    artikler.length === 0 ? (
+      <p class="mx-auto max-w-[800px] text-center font-body text-small text-foreground-muted">{ui.ingenSaker}</p>
+    ) : (
+      <ul class="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {artikler.map((artikkel) => (
+          <li>
+            <a
+              href={stiForSprak(`/siste-nytt/${artikkel.slug}`, sprak)}
+              class="hevet flex h-full flex-col gap-4 rounded-stor p-4 no-underline transition-colors hover:border-border-focus"
+            >
+              {artikkel.bilde ? (
+                <img
+                  src={bildeUrl(artikkel.bilde.url, 700)}
+                  alt={tekst(artikkel.bilde.altTekst, sprak)}
+                  loading="lazy"
+                  class="aspect-[4/3] w-full rounded-medium object-cover"
+                />
+              ) : (
+                <Bildeplassholder sideforhold="4 / 3" />
+              )}
+
+              <div class="flex flex-col gap-2 px-1 pb-1">
+                <time datetime={artikkel.dato} class="font-detail text-2xsmall text-foreground-muted">
+                  {formaterDato(artikkel.dato, sprak)}
+                </time>
+                <h2 class="m-0 font-heading text-large font-semibold">{tekst(artikkel.tittel, sprak)}</h2>
+                {artikkel.ingress && (
+                  <p class="m-0 font-body text-xsmall text-foreground-muted">{tekst(artikkel.ingress, sprak)}</p>
+                )}
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>

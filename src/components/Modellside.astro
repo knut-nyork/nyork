@@ -1,0 +1,132 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import Brodsmuler from './Brodsmuler.astro'
+import Enhetsliste from './Enhetsliste.tsx'
+import Bildegalleri from './Bildegalleri.astro'
+import {bildeUrl} from '../lib/hytter'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Enhet, Hyttemodell} from '../lib/typer'
+
+/**
+ * Modellsiden — arkitekturen. Den emosjonelle salgssiden: planløsning,
+ * tegninger og materialer. Pris og status hører hjemme på enhetssiden, siden
+ * de gjelder den konkrete hytta og ikke modellen.
+ */
+interface Props {
+  sprak: Sprak
+  modell: Hyttemodell
+  enheter: Enhet[]
+}
+
+const {sprak, modell, enheter} = Astro.props
+const ui = UI[sprak].hytter
+
+const beskrivelse = tekst(modell.beskrivelse, sprak)
+const avsnitt = beskrivelse ? beskrivelse.split(/\n\s*\n/) : []
+const hovedbilde = modell.interiorbilder?.[0]
+
+const fakta = [
+  {etikett: ui.bra, verdi: `${modell.bra} m²`},
+  modell.prom ? {etikett: ui.prom, verdi: `${modell.prom} m²`} : null,
+  {etikett: ui.soverom, verdi: String(modell.antallSoverom)},
+  {etikett: ui.bad, verdi: String(modell.antallBad)},
+  {etikett: ui.etasjer, verdi: String(modell.antallEtasjer)},
+  modell.harBadstue ? {etikett: ui.badstue, verdi: ui.ja} : null,
+  modell.harVaskerom ? {etikett: ui.vaskerom, verdi: ui.ja} : null,
+  modell.antallBod ? {etikett: ui.bod, verdi: String(modell.antallBod)} : null,
+  modell.harTerrasse ? {etikett: ui.terrasse, verdi: ui.ja} : null,
+  modell.harParkering ? {etikett: ui.parkering, verdi: ui.ja} : null,
+].filter((rad) => rad !== null)
+---
+
+<div class="mx-auto flex max-w-[1100px] flex-col gap-14 px-5 py-12 md:px-10">
+  <Brodsmuler sprak={sprak} ledd={[{tekst: ui.alleHytter, sti: '/hytter'}]} naa={modell.navn} />
+
+  <header class="mx-auto flex max-w-[800px] flex-col items-center gap-4 text-center">
+    <h1 class="m-0 font-heading text-4xlarge font-semibold">{modell.navn}</h1>
+    {
+      modell.delomrade && (
+        <p class="m-0 font-detail text-xsmall text-foreground-muted">{modell.delomrade}</p>
+      )
+    }
+  </header>
+
+  {
+    hovedbilde ? (
+      <img
+        src={bildeUrl(hovedbilde.url, 1000)}
+        alt={tekst(hovedbilde.altTekst, sprak)}
+        class="w-full rounded-medium"
+      />
+    ) : (
+      <Bildeplassholder sideforhold="16 / 9" className="w-full" />
+    )
+  }
+
+  <dl class="grid grid-cols-2 gap-6 rounded-medium bg-background-surface-1 p-6 sm:grid-cols-4">
+    {
+      fakta.map((rad) => (
+        <div class="flex flex-col gap-1">
+          <dt class="font-body text-2xsmall text-foreground-muted">{rad.etikett}</dt>
+          <dd class="font-body text-xsmall font-semibold">{rad.verdi}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  {
+    avsnitt.length > 0 && (
+      <section class="flex flex-col gap-5">
+        {avsnitt.map((tekstavsnitt) => (
+          <p class="max-w-[62ch] font-body text-small">{tekstavsnitt}</p>
+        ))}
+      </section>
+    )
+  }
+
+  <Bildegalleri
+    tittel={ui.plantegninger}
+    bilder={modell.plantegninger}
+    sprak={sprak}
+    sideforhold="4 / 3"
+    antallPlassholdere={modell.antallEtasjer}
+  />
+
+  <Bildegalleri
+    tittel={ui.fasadetegninger}
+    bilder={modell.fasadetegninger}
+    sprak={sprak}
+    sideforhold="16 / 9"
+    antallPlassholdere={2}
+  />
+
+  <Bildegalleri
+    tittel={ui.interior}
+    bilder={modell.interiorbilder}
+    sprak={sprak}
+    sideforhold="4 / 3"
+    antallPlassholdere={3}
+  />
+
+  {
+    tekst(modell.materialer, sprak) && (
+      <section class="flex flex-col gap-5">
+        <p class="max-w-[62ch] font-body text-small">{tekst(modell.materialer, sprak)}</p>
+      </section>
+    )
+  }
+
+  <section class="flex flex-col gap-6">
+    <h2 class="font-heading text-2xlarge font-semibold">{ui.hytterAvDenneTypen}</h2>
+    <Enhetsliste enheter={enheter} sprak={sprak} />
+  </section>
+
+  {
+    tekst(modell.illustrasjonsforbehold, sprak) && (
+      <p class="max-w-[62ch] font-body text-2xsmall text-foreground-muted">
+        {tekst(modell.illustrasjonsforbehold, sprak)}
+      </p>
+    )
+  }
+</div>

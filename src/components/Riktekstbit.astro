@@ -1,0 +1,51 @@
+---
+import {stiForSprak, type Sprak} from '../lib/sprak'
+
+/**
+ * Ett tekstfragment fra riktekst, med merkene sine.
+ *
+ * Merker kan ligge oppå hverandre — fet inni en lenke, for eksempel. Derfor
+ * pakkes de rekursivt: ett merke av gangen, og resten sendes videre innover.
+ */
+interface Props {
+  tekst: string
+  merker: string[]
+  markDefs: {_key: string; _type: string; href?: string}[]
+  sprak: Sprak
+}
+
+const {tekst, merker, markDefs, sprak} = Astro.props
+
+const [forste, ...resten] = merker
+const definisjon = forste ? markDefs.find((m) => m._key === forste) : undefined
+const erLenke = definisjon?._type === 'link' && definisjon.href
+
+const href = erLenke ? (definisjon!.href!.startsWith('/') ? stiForSprak(definisjon!.href!, sprak) : definisjon!.href!) : ''
+const ekstern = erLenke && !definisjon!.href!.startsWith('/') && !definisjon!.href!.startsWith('#')
+---
+
+{
+  !forste ? (
+    <Fragment>{tekst}</Fragment>
+  ) : erLenke ? (
+    <a
+      href={href}
+      class="text-link-default underline underline-offset-2 hover:text-link-hover"
+      rel={ekstern ? 'noopener' : undefined}
+      target={ekstern ? '_blank' : undefined}
+    >
+      <Astro.self tekst={tekst} merker={resten} markDefs={markDefs} sprak={sprak} />
+    </a>
+  ) : forste === 'strong' ? (
+    <strong class="font-semibold">
+      <Astro.self tekst={tekst} merker={resten} markDefs={markDefs} sprak={sprak} />
+    </strong>
+  ) : forste === 'em' ? (
+    <em>
+      <Astro.self tekst={tekst} merker={resten} markDefs={markDefs} sprak={sprak} />
+    </em>
+  ) : (
+    /* Ukjent merke — teksten skal fram uansett. */
+    <Astro.self tekst={tekst} merker={resten} markDefs={markDefs} sprak={sprak} />
+  )
+}

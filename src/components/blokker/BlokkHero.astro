@@ -1,0 +1,124 @@
+---
+import Blokkknapp from './Blokkknapp.astro'
+import {bildeUrl} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkHero} from '../../lib/typer'
+
+/**
+ * Toppblokken. Bildet ligger alltid der og er det eneste mobilen laster.
+ * Videoen legges oppå på store skjermer, og kilden settes først av skriptet
+ * nederst — et `src` i HTML-en ville lastet ned filen på mobil også, uansett
+ * hva CSS sier.
+ *
+ * Sløret bak teksten er svart med gjennomsiktighet, ikke et fargetoken. Det er
+ * med vilje, og det eneste stedet på siden vi gjør det: de semantiske tokenene
+ * snur i mørk modus, mens fotografiet under er like lyst uansett. Brukte vi
+ * `background-surface-inreverse` her, ville sløret blitt lyst i mørk modus og
+ * den hvite teksten forsvunnet i snøen.
+ *
+ * Sløret går fra venstre på store skjermer, der teksten står i venstre halvdel.
+ * På mobil står teksten i full bredde nederst, og da må sløret komme nedenfra —
+ * ellers slipper det opp mot høyre kant og teksten havner oppå snøen.
+ */
+interface Props {
+  blokk: BlokkHero
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+
+const overskrift = tekst(blokk.overskrift, sprak)
+const ingress = tekst(blokk.ingress, sprak)
+const bilde = blokk.bilde
+
+/**
+ * Med bilde legges teksten rett på et mørkt slør. Uten bilde finnes det
+ * ingenting å legge sløret på, og da må teksten stå på sidens egen flate med
+ * vanlig tekstfarge — ellers blir hvit tekst stående på hvit bakgrunn den
+ * dagen noen lager en hero uten bilde.
+ */
+const harBilde = Boolean(bilde)
+---
+
+<section class="relative mx-auto min-h-[70vh] max-w-[1600px] overflow-hidden px-5 md:px-10">
+  <div class="relative min-h-[70vh] overflow-hidden rounded-stor bg-background-surface-3">
+    {
+      bilde && (
+        <img
+          src={bildeUrl(bilde.url, 2000)}
+          alt={tekst(bilde.altTekst, sprak)}
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+      )
+    }
+
+    {
+      blokk.videoUrl && (
+        <video
+          data-videokilde={blokk.videoUrl}
+          poster={bilde ? bildeUrl(bilde.url, 2000) : undefined}
+          muted
+          loop
+          playsinline
+          preload="none"
+          aria-hidden="true"
+          class="absolute inset-0 hidden h-full w-full object-cover md:block"
+        />
+      )
+    }
+
+    {
+      harBilde && (
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/35 md:to-transparent"
+          aria-hidden="true"
+        />
+      )
+    }
+
+    <div class="relative flex min-h-[70vh] items-end p-5 md:p-12">
+      <div
+        class:list={[
+          'max-w-[46ch]',
+          harBilde ? 'text-white' : 'rounded-medium bg-background-surface-1/90 p-6 backdrop-blur-sm md:p-8',
+        ]}
+      >
+        <h1 class="font-heading text-3xlarge font-semibold md:text-4xlarge">{overskrift}</h1>
+        {ingress && <p class="mt-4 font-body text-small">{ingress}</p>}
+        {
+          blokk.knapper && blokk.knapper.length > 0 && (
+            <div class="mt-6 flex flex-wrap gap-3">
+              {blokk.knapper.map((knapp, i) => (
+                <Blokkknapp
+                  knapp={knapp}
+                  sprak={sprak}
+                  variant={harBilde ? (i === 0 ? 'lys' : 'lys-omriss') : i === 0 ? 'primar' : 'sekundar'}
+                />
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  {
+    bilde?.fotokreditt && (
+      <p class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</p>
+    )
+  }
+</section>
+
+<script>
+  // Videoen lastes bare når skjermen er stor nok. Kilden settes her, ikke i
+  // HTML-en, slik at mobilen aldri henter filen.
+  const video = document.querySelector<HTMLVideoElement>('video[data-videokilde]')
+  const kilde = video?.dataset.videokilde
+
+  if (video && kilde && window.matchMedia('(min-width: 768px)').matches) {
+    video.src = kilde
+    video.play().catch(() => {
+      // Nettleseren nektet å spille av. Stillbildet ligger under og holder.
+    })
+  }
+</script>

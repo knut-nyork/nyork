@@ -1,0 +1,36 @@
+---
+import {Icon} from 'astro-icon/components'
+
+import {AKTIVITETER, type Aktivitet} from '../lib/ikoner'
+import {type Sprak} from '../lib/sprak'
+
+/**
+ * Strekikonet for en aktivitet.
+ *
+ * Ikonet er pynt ved siden av en etikett, og skal ikke leses opp to ganger av
+ * en skjermleser. Står det tekst ved siden av, sender du `dekorativ`. Står
+ * ikonet alene, får det navnet sitt som tilgjengelig tekst.
+ */
+interface Props {
+  aktivitet: Aktivitet
+  sprak: Sprak
+  /** Sett når det allerede står en synlig etikett ved siden av ikonet. */
+  dekorativ?: boolean
+  storrelse?: number
+  class?: string
+}
+
+const {aktivitet, sprak, dekorativ = false, storrelse = 28, class: klasse = ''} = Astro.props
+
+const oppslag = AKTIVITETER[aktivitet]
+const navn = sprak === 'en' ? oppslag.en : oppslag.no
+---
+
+<Icon
+  name={oppslag.ikon}
+  size={storrelse}
+  class={klasse}
+  aria-hidden={dekorativ ? 'true' : undefined}
+  aria-label={dekorativ ? undefined : navn}
+  role={dekorativ ? undefined : 'img'}
+/>

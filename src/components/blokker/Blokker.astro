@@ -1,0 +1,75 @@
+---
+import BlokkArtikkel from './BlokkArtikkel.astro'
+import BlokkBudskap from './BlokkBudskap.astro'
+import BlokkFremhevet from './BlokkFremhevet.astro'
+import BlokkHero from './BlokkHero.astro'
+import BlokkKort from './BlokkKort.astro'
+import BlokkNyheter from './BlokkNyheter.astro'
+import BlokkSitat from './BlokkSitat.astro'
+import BlokkStatus from './BlokkStatus.astro'
+import BlokkUtvalgteHytter from './BlokkUtvalgteHytter.astro'
+import type {Sprak} from '../../lib/sprak'
+import type {Blokk, Statustall} from '../../lib/typer'
+
+/**
+ * Fordeler blokkene fra Sanity til hver sin komponent, i den rekkefølgen
+ * redaktøren har lagt dem. Blokker som er skrudd av er allerede filtrert bort
+ * i spørringen, så alt som kommer hit skal vises.
+ */
+interface Props {
+  blokker: Blokk[]
+  sprak: Sprak
+  statustall: Statustall
+}
+
+const {blokker, sprak, statustall} = Astro.props
+
+/**
+ * Annenhver blokk får et svakt bånd bak seg, så siden får rytme i stedet for
+ * å være ett langt ark.
+ *
+ * Hero og fremhevet teller ikke med: de er allerede egne flater i full bredde,
+ * og et bånd bak dem ville verken syntes eller hjulpet. Vekslingen telles
+ * derfor bare over blokkene som faktisk står på sideflaten — ellers ville et
+ * hero øverst snudd rekkefølgen på alt under.
+ */
+const UTEN_BAND = new Set(['blokkHero', 'blokkFremhevet'])
+
+let teller = 0
+const harBand = blokker.map((blokk) => {
+  if (UTEN_BAND.has(blokk._type)) return false
+  return teller++ % 2 === 1
+})
+---
+
+{
+  blokker.map((blokk, i) => {
+    const innhold = (() => {
+    switch (blokk._type) {
+      case 'blokkHero':
+        return <BlokkHero blokk={blokk} sprak={sprak} />
+      case 'blokkBudskap':
+        return <BlokkBudskap blokk={blokk} sprak={sprak} />
+      case 'blokkArtikkel':
+        return <BlokkArtikkel blokk={blokk} sprak={sprak} />
+      case 'blokkStatus':
+        return <BlokkStatus blokk={blokk} sprak={sprak} statustall={statustall} />
+      case 'blokkUtvalgteHytter':
+        return <BlokkUtvalgteHytter blokk={blokk} sprak={sprak} />
+      case 'blokkSitat':
+        return <BlokkSitat blokk={blokk} sprak={sprak} />
+      case 'blokkKort':
+        return <BlokkKort blokk={blokk} sprak={sprak} />
+      case 'blokkNyheter':
+        return <BlokkNyheter blokk={blokk} sprak={sprak} />
+      case 'blokkFremhevet':
+        return <BlokkFremhevet blokk={blokk} sprak={sprak} />
+      default:
+        return null
+    }
+    })()
+
+    if (!innhold) return null
+    return harBand[i] ? <div class="bg-flate-vekslende">{innhold}</div> : innhold
+  })
+}

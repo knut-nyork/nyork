@@ -1,0 +1,45 @@
+---
+import Sidemal from '../../layouts/Sidemal.astro'
+import Artikkelmal from '../../components/Artikkelmal.astro'
+import Riktekst from '../../components/Riktekst.astro'
+import {forstAvsnitt} from '../../lib/hytter'
+import {hentArtikkel, hentArtikler} from '../../lib/sporringer'
+import {tekst} from '../../lib/sprak'
+import {UI} from '../../lib/tekster'
+
+/**
+ * Én side per sak. Slugen er den samme på begge språk, som stedsnavn.
+ *
+ * `getStaticPaths` gir bare slugene. Selve saken hentes her, med sin egen
+ * spørring — listespørringen henter med vilje ikke brødteksten, og bruker vi
+ * den til å sende med saken, kommer artikkelen fram uten kropp.
+ */
+export async function getStaticPaths() {
+  const artikler = await hentArtikler()
+  return artikler.map((artikkel) => ({params: {slug: artikkel.slug}}))
+}
+
+const artikkel = await hentArtikkel(Astro.params.slug!)
+if (!artikkel) return Astro.redirect('/404')
+
+const ui = UI['no']
+const tittel = tekst(artikkel.tittel, 'no')
+const ingress = tekst(artikkel.ingress, 'no')
+---
+
+<Sidemal
+  norskSti={`/siste-nytt/${artikkel.slug}`}
+  tittel={`${tittel} · ${ui.tittelSuffiks}`}
+  metaBeskrivelse={ingress ? forstAvsnitt(ingress) : undefined}
+>
+  <Artikkelmal
+    sprak="no"
+    brodsmuleledd={[{tekst: ui.omradet.alleSaker, sti: '/siste-nytt'}]}
+    tittel={tittel}
+    ingress={ingress}
+    bilde={artikkel.bilde}
+    dato={artikkel.dato}
+  >
+    <Riktekst blokker={artikkel.brodtekst?.['no'] ?? artikkel.brodtekst?.no ?? []} sprak="no" />
+  </Artikkelmal>
+</Sidemal>

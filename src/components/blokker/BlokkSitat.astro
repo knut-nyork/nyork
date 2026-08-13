@@ -1,0 +1,32 @@
+---
+import type {Sprak} from '../../lib/sprak'
+import type {BlokkSitat} from '../../lib/typer'
+
+/**
+ * Sitat fra familien bak Nyørk.
+ *
+ * Sitatet står på norsk uansett hvilket språk siden vises på, og på dialekt
+ * der det er sagt på dialekt — det skal aldri normaliseres til bokmål eller
+ * byttes ut med oversettelsen. På engelsk side legges oversettelsen under, i
+ * mindre skrift, slik at leseren skjønner meningen uten at stemmen forsvinner.
+ */
+interface Props {
+  blokk: BlokkSitat
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+const visOversettelse = sprak === 'en' && Boolean(blokk.oversettelse)
+---
+
+<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+  <figure class="m-0 flex max-w-[46ch] flex-col gap-5">
+    <blockquote class="m-0 font-heading text-2xlarge font-medium md:text-3xlarge">
+      {blokk.sitat}
+    </blockquote>
+
+    {visOversettelse && <p class="m-0 max-w-[62ch] font-body text-small text-foreground-muted">{blokk.oversettelse}</p>}
+
+    <figcaption class="font-detail text-small text-foreground-muted">{blokk.navn}</figcaption>
+  </figure>
+</section>

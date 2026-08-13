@@ -18,6 +18,10 @@ dist/
 media/foto/
 media/video/
 
+# Salgsoppgaven er 23 MB og hører hjemme i Sanity som nedlastbart dokument,
+# ikke i git-historikken. Ligger her som kildefil.
+media/salgsoppgave/
+
 # Merkevare og tegninger brukes i kode og skal med
 !media/merkevare/
 !media/tegninger/
@@ -37,3 +41,6 @@ npm-debug.log*
 .vscode/
 .idea/
 *.swp
+
+# lokal utviklingsoppsett — peker på Node 22 med maskinspesifikk sti
+.claude/launch.json

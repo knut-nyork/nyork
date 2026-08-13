@@ -1,0 +1,39 @@
+---
+import Blokker from './blokker/Blokker.astro'
+import {tekst, type Sprak} from '../lib/sprak'
+import type {Side, Statustall} from '../lib/typer'
+
+/**
+ * Forsiden bygges av blokker fra Sanity — hero, budskap, bilde og tekst,
+ * status, utvalgte hytter, sitat, nyheter og fremhevet. Rekkefølgen, og
+ * hvilke blokker som vises, styres av redaktøren og ikke her.
+ *
+ * Overskrift og ingress på side-dokumentet brukes bare når ingen blokker er
+ * lagt inn ennå, så forsiden ikke står helt tom i mellomtiden.
+ *
+ * Interesseskjemaet ligger i Sidemal og gjelder alle sider — det skal ikke
+ * legges inn her også.
+ */
+interface Props {
+  sprak: Sprak
+  side: Side | null
+  statustall: Statustall
+}
+
+const {sprak, side, statustall} = Astro.props
+
+const blokker = side?.blokker ?? []
+const overskrift = tekst(side?.overskrift, sprak)
+const ingress = tekst(side?.ingress, sprak)
+---
+
+{
+  blokker.length > 0 ? (
+    <Blokker blokker={blokker} sprak={sprak} statustall={statustall} />
+  ) : (
+    <section class="mx-auto max-w-[1600px] px-5 py-24 md:px-10">
+      {overskrift && <h1 class="font-heading text-4xlarge font-semibold">{overskrift}</h1>}
+      {ingress && <p class="mt-6 max-w-[52ch] font-body text-small">{ingress}</p>}
+    </section>
+  )
+}

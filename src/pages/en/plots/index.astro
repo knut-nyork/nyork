@@ -1,0 +1,17 @@
+---
+import Sidemal from '../../../layouts/Sidemal.astro'
+import Tomteside from '../../../components/Tomteside.astro'
+import {hentReguleringsregler, hentSide, hentTomter} from '../../../lib/sporringer'
+import {tekst} from '../../../lib/sprak'
+
+/** Engelsk motpart til /tomter. Stien slås opp i rutekartet i lib/sprak.ts. */
+const [side, tomter, regler] = await Promise.all([hentSide('tomter'), hentTomter(), hentReguleringsregler()])
+---
+
+<Sidemal
+  norskSti="/tomter"
+  tittel={tekst(side?.tittel, 'en')}
+  metaBeskrivelse={tekst(side?.metaBeskrivelse, 'en')}
+>
+  <Tomteside sprak="en" side={side} tomter={tomter} regler={regler} />
+</Sidemal>

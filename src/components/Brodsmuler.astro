@@ -1,0 +1,45 @@
+---
+import {stiForSprak, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+
+/**
+ * Brødsti øverst på alle sider unntatt forsiden.
+ *
+ * «Hjem» legges på her og skal ikke sendes inn — den er alltid første ledd, og
+ * å gjenta den på hvert kallsted er bare en måte å glemme den på.
+ *
+ * Siste ledd er ikke en lenke. Å lenke til siden du allerede står på gir
+ * skjermlesere en lenke som ikke fører noe sted; `aria-current` sier i stedet
+ * hvor du er.
+ */
+interface Props {
+  sprak: Sprak
+  /** Leddene mellom «Hjem» og siden du står på. Norske stier — oversettes her. */
+  ledd?: {tekst: string; sti: string}[]
+  /** Navnet på siden du står på. */
+  naa: string
+}
+
+const {sprak, ledd = [], naa} = Astro.props
+
+const lenker = [{tekst: UI[sprak].hjem, sti: '/'}, ...ledd]
+---
+
+<nav aria-label={UI[sprak].hovedmeny} class="flex flex-wrap items-center justify-center gap-2 font-detail text-2xsmall">
+  {
+    lenker.map((lenke) => (
+      <>
+        <a
+          href={stiForSprak(lenke.sti, sprak)}
+          class="text-foreground-muted transition-colors hover:text-foreground-default hover:underline"
+        >
+          {lenke.tekst}
+        </a>
+        <span class="text-foreground-muted" aria-hidden="true">
+          /
+        </span>
+      </>
+    ))
+  }
+  <span aria-current="page" class="font-medium">{naa}</span>
+</nav>

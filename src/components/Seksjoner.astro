@@ -1,0 +1,42 @@
+---
+import {tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Sideseksjon} from '../lib/typer'
+
+/**
+ * Tekstseksjonene på en side. Anker-ID-en gjør dem lenkbare — «finansiering»
+ * og «megler» er lenket til fra gamle URL-er i netlify.toml.
+ *
+ * En seksjon uten tekst rendres likevel, med overskrift og anker, slik at
+ * redirecten lander riktig sted mens innholdet ennå ikke er avklart.
+ */
+interface Props {
+  seksjoner: Sideseksjon[]
+  sprak: Sprak
+}
+
+const {seksjoner, sprak} = Astro.props
+const ui = UI[sprak].hytter
+---
+
+{
+  seksjoner.map((seksjon) => {
+    const brodtekst = tekst(seksjon.tekst, sprak)
+    const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
+
+    return (
+      <section id={seksjon.ankerId || undefined} class="flex flex-col gap-5 scroll-mt-24">
+        <h2 class="font-heading text-2xlarge font-semibold">{tekst(seksjon.overskrift, sprak)}</h2>
+        {
+          avsnitt.length > 0 ? (
+            avsnitt.map((tekstavsnitt) => (
+              <p class="max-w-[62ch] font-body text-small">{tekstavsnitt}</p>
+            ))
+          ) : (
+            <p class="font-body text-small text-foreground-muted">{ui.innholdKommer}</p>
+          )
+        }
+      </section>
+    )
+  })
+}

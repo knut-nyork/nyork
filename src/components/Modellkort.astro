@@ -1,0 +1,59 @@
+---
+import Bildeplassholder from './Bildeplassholder.tsx'
+import {bildeUrl} from '../lib/hytter'
+import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+import type {Hyttemodell} from '../lib/typer'
+
+/** Kortet for en hyttemodell — arkitekturen, ikke en konkret hytte. */
+interface Props {
+  modell: Hyttemodell
+  sprak: Sprak
+}
+
+const {modell, sprak} = Astro.props
+const ui = UI[sprak].hytter
+const bilde = modell.interiorbilder?.[0]
+const href = stiForSprak(`/hytter/${modell.slug}`, sprak)
+---
+
+<a
+  href={href}
+  class="group flex flex-col gap-4 rounded-medium border border-border-default bg-card-background p-4 no-underline hover:border-border-focus"
+>
+  {
+    bilde ? (
+      <img
+        src={bildeUrl(bilde.url, 600)}
+        alt={tekst(bilde.altTekst, sprak)}
+        loading="lazy"
+        class="aspect-[4/3] w-full rounded-medium object-cover"
+      />
+    ) : (
+      <Bildeplassholder sideforhold="4 / 3" />
+    )
+  }
+
+  <h3 class="font-heading text-large font-semibold text-card-text group-hover:underline">
+    {modell.navn}
+  </h3>
+
+  <dl class="flex flex-col gap-1 font-body text-xsmall text-card-text">
+    <div class="flex justify-between gap-3">
+      <dt class="text-card-text-lighter">{ui.bra}</dt>
+      <dd>{modell.bra} m²</dd>
+    </div>
+    <div class="flex justify-between gap-3">
+      <dt class="text-card-text-lighter">{ui.soverom}</dt>
+      <dd>{modell.antallSoverom}</dd>
+    </div>
+    <div class="flex justify-between gap-3">
+      <dt class="text-card-text-lighter">{ui.bad}</dt>
+      <dd>{modell.antallBad}</dd>
+    </div>
+    <div class="flex justify-between gap-3">
+      <dt class="text-card-text-lighter">{ui.etasjer}</dt>
+      <dd>{modell.antallEtasjer}</dd>
+    </div>
+  </dl>
+</a>

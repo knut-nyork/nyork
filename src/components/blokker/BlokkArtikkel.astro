@@ -1,0 +1,56 @@
+---
+import Blokkknapp from './Blokkknapp.astro'
+import Bildeplassholder from '../Bildeplassholder'
+import {bildeUrl} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkArtikkel} from '../../lib/typer'
+
+/**
+ * Bilde på den ene siden, tekst på den andre. Redaktøren velger hvilken side
+ * bildet ligger på, slik at de kan veksle nedover siden.
+ *
+ * På mobil ligger bildet alltid øverst — da leses siden i én kolonne, og
+ * tekst før bilde ville skjøvet bildet langt ned.
+ */
+interface Props {
+  blokk: BlokkArtikkel
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+
+const brodtekst = tekst(blokk.tekst, sprak)
+const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
+const bilde = blokk.bilde
+const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
+---
+
+<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+  <div class="grid items-center gap-8 md:grid-cols-2 md:gap-16">
+    <div class:list={['flex flex-col gap-3', bildeTilHoyre ? 'md:order-1' : 'md:order-2']}>
+      <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>
+      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-small">{tekstavsnitt}</p>)}
+      {blokk.knapp && <div class="mt-3"><Blokkknapp knapp={blokk.knapp} sprak={sprak} /></div>}
+    </div>
+
+    <figure class:list={['m-0', bildeTilHoyre ? 'md:order-2' : 'md:order-1']}>
+      {
+        bilde ? (
+          <img
+            src={bildeUrl(bilde.url, 1200)}
+            alt={tekst(bilde.altTekst, sprak)}
+            loading="lazy"
+            class="aspect-[4/3] w-full rounded-stor object-cover"
+          />
+        ) : (
+          <Bildeplassholder sideforhold="4 / 3" />
+        )
+      }
+      {
+        bilde?.fotokreditt && (
+          <figcaption class="mt-2 font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</figcaption>
+        )
+      }
+    </figure>
+  </div>
+</section>

@@ -1,14 +1,23 @@
 ---
-import type {Sprak} from '../../lib/sprak'
+import Bildeplassholder from '../Bildeplassholder'
+import {bildeUrl} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
 import type {BlokkSitat} from '../../lib/typer'
 
 /**
- * Sitat fra familien bak Nyørk.
+ * Sitat fra familien bak Nyørk, med portrett ved siden av.
  *
  * Sitatet står på norsk uansett hvilket språk siden vises på, og på dialekt
  * der det er sagt på dialekt — det skal aldri normaliseres til bokmål eller
  * byttes ut med oversettelsen. På engelsk side legges oversettelsen under, i
  * mindre skrift, slik at leseren skjønner meningen uten at stemmen forsvinner.
+ *
+ * Teksten er satt i vanlig lesestørrelse og ikke som display. Et sitat på
+ * fire linjer i 36 px blir en plakat; poenget her er at noen sier noe, ikke
+ * at det ropes. Anførselstegnet bærer det visuelle i stedet.
+ *
+ * Portrettet vises i gråtoner. Det holder ansiktet rolig ved siden av en side
+ * full av farge, og gjør at bilder tatt i ulikt lys ser ut som ett sett.
  */
 interface Props {
   blokk: BlokkSitat
@@ -17,16 +26,54 @@ interface Props {
 
 const {blokk, sprak} = Astro.props
 const visOversettelse = sprak === 'en' && Boolean(blokk.oversettelse)
+const portrett = blokk.portrett
 ---
 
 <section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
-  <figure class="m-0 flex max-w-[46ch] flex-col gap-5">
-    <blockquote class="m-0 font-heading text-2xlarge font-medium md:text-3xlarge">
-      {blokk.sitat}
-    </blockquote>
+  <figure class="m-0 grid items-stretch gap-5 md:grid-cols-[minmax(0,0.8fr)_1.2fr]">
+    <div class="overflow-hidden rounded-stor">
+      {
+        portrett ? (
+          <img
+            src={bildeUrl(portrett.url, 800)}
+            alt={tekst(portrett.altTekst, sprak)}
+            loading="lazy"
+            class="h-full w-full object-cover grayscale"
+            style="min-height: 260px;"
+          />
+        ) : (
+          <Bildeplassholder sideforhold="3 / 4" className="h-full w-full" />
+        )
+      }
+    </div>
 
-    {visOversettelse && <p class="m-0 max-w-[62ch] font-body text-small text-foreground-muted">{blokk.oversettelse}</p>}
+    <div class="flex flex-col justify-center gap-6 rounded-stor bg-background-surface-4 p-7 md:p-9">
+      <!-- Anførselstegnet er dekor, ikke tekst. Skjermlesere skal lese sitatet,
+           ikke to tegn foran det. -->
+      <svg
+        width="44"
+        height="32"
+        viewBox="0 0 44 32"
+        fill="none"
+        aria-hidden="true"
+        class="shrink-0 text-foreground-brand"
+      >
+        <path
+          d="M0 32V18.6C0 13.2 1.2 8.8 3.7 5.4 6.2 2 9.9 0.2 14.8 0v6.6c-2.5 0.3-4.3 1.3-5.5 3-1.1 1.7-1.6 3.7-1.5 6h6.6V32H0Zm24.4 0V18.6c0-5.4 1.2-9.8 3.7-13.2C30.6 2 34.3 0.2 39.2 0v6.6c-2.5 0.3-4.3 1.3-5.5 3-1.1 1.7-1.6 3.7-1.5 6H38.8V32H24.4Z"
+          fill="currentColor"></path>
+      </svg>
 
-    <figcaption class="font-detail text-small text-foreground-muted">{blokk.navn}</figcaption>
+      <blockquote class="m-0 font-body text-small">{blokk.sitat}</blockquote>
+
+      {visOversettelse && <p class="m-0 font-body text-xsmall text-foreground-muted">{blokk.oversettelse}</p>}
+
+      <figcaption class="font-heading text-small font-semibold">{blokk.navn}</figcaption>
+    </div>
   </figure>
+
+  {
+    portrett?.fotokreditt && (
+      <p class="mt-2 font-detail text-2xsmall text-foreground-muted">{portrett.fotokreditt}</p>
+    )
+  }
 </section>

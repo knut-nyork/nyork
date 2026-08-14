@@ -137,6 +137,7 @@ export interface BlokkSitat extends Blokkbase {
   navn: string
   /** Vises under sitatet på engelsk side, aldri i stedet for det. */
   oversettelse?: string
+  portrett?: Bilde
 }
 
 export interface BlokkNyheter extends Blokkbase {

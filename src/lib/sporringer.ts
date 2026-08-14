@@ -113,7 +113,8 @@ const BLOKKER = `blokker[aktiv != false]{
   _type == "blokkSitat" => {
     sitat,
     navn,
-    oversettelse
+    oversettelse,
+    "portrett": portrett${BILDE}
   },
   _type == "blokkNyheter" => {
     overskrift,

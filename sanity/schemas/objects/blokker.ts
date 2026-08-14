@@ -390,6 +390,13 @@ export const blokkSitat = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'portrett',
+      title: 'Portrett',
+      type: 'bildeMedKreditering',
+      description:
+        'Bilde av den som er sitert. Vises ved siden av sitatet. Uten bilde står sitatet alene i full bredde.',
+    }),
+    defineField({
       name: 'oversettelse',
       title: 'Engelsk oversettelse',
       type: 'text',

@@ -128,7 +128,6 @@ export interface BlokkUtvalgteHytter extends Blokkbase {
   _type: 'blokkUtvalgteHytter'
   overskrift: LokalTekst
   enheter: Enhet[]
-  knapp?: Knapp
 }
 
 export interface BlokkSitat extends Blokkbase {

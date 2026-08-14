@@ -104,7 +104,6 @@ const BLOKKER = `blokker[aktiv != false]{
     overskrift,
     utvalg,
     antall,
-    knapp${KNAPP},
     "valgte": enheter[]->{${ENHET_FELT}, "modell": hyttemodell->${MODELL_KORT}},
     "automatiske": *[_type == "enhet" && enhetstype == "hytte" && status == "ledig"] | order(nummer asc)[0...9]{
       ${ENHET_FELT},

@@ -22,7 +22,7 @@ export default function Hyttekort({enhet, sprak}: {enhet: Enhet; sprak: Sprak}) 
     <a
       href={href}
       data-status={enhet.status}
-      className={`hevet group flex flex-col gap-4 rounded-stor p-4 no-underline transition-colors hover:border-border-focus ${
+      className={`hevet group flex h-full flex-col gap-3 rounded-stor p-3 no-underline transition-colors hover:border-border-focus ${
         solgt ? 'opacity-60' : ''
       }`}
     >
@@ -31,20 +31,20 @@ export default function Hyttekort({enhet, sprak}: {enhet: Enhet; sprak: Sprak}) 
           src={bildeUrl(bilde.url, 600)}
           alt={tekst(bilde.altTekst, sprak)}
           loading="lazy"
-          className="aspect-[4/3] w-full rounded-medium object-cover"
+          className="aspect-[3/2] w-full rounded-medium object-cover"
         />
       ) : (
-        <Bildeplassholder sideforhold="4 / 3" />
+        <Bildeplassholder sideforhold="3 / 2" />
       )}
 
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="font-heading text-large font-semibold text-card-text group-hover:underline">
+      <div className="flex items-start justify-between gap-2 px-1">
+        <h3 className="font-heading text-medium font-semibold text-card-text group-hover:underline">
           {enhet.nummer}
         </h3>
         <Statusmerke status={enhet.status} sprak={sprak} />
       </div>
 
-      <dl className="flex flex-col gap-1 font-body text-xsmall text-card-text">
+      <dl className="flex flex-col gap-1 px-1 pb-1 font-body text-2xsmall text-card-text">
         {enhet.modell && (
           <div className="flex justify-between gap-3">
             <dt className="text-card-text-lighter">{ui.hyttetype}</dt>

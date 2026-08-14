@@ -1,16 +1,22 @@
 ---
-import Blokkknapp from './Blokkknapp.astro'
 import Hyttekort from '../Hyttekort'
 import {tekst, type Sprak} from '../../lib/sprak'
 import {UI} from '../../lib/tekster'
 import type {BlokkUtvalgteHytter} from '../../lib/typer'
 
 /**
- * Noen få hyttekort på forsiden, med lenke videre til hyttesiden. Bruker
- * samme Hyttekort som hyttelista, så et kort ser likt ut overalt.
+ * Noen få hyttekort på forsiden. Bruker samme Hyttekort som hyttelista, så et
+ * kort ser likt ut overalt.
  *
- * Utvalget er allerede avgjort i sporringer.ts — enten de ledige automatisk
- * eller hytter redaktøren har pekt ut.
+ * Kortene ligger i en vannrett rulle framfor et rutenett. Med to eller tre
+ * hytter fyller de bredden og ser ut som en rad; blir de mange, kan du dra
+ * bortover i stedet for at forsiden vokser nedover. Rullen antyder også at
+ * det finnes mer enn det som er synlig — bedre enn en «se alle»-knapp, som
+ * krever et klikk før du vet om det er verdt det.
+ *
+ * Rullen går utenfor lesekolonnen med negativ marg, slik at kortene kan
+ * forsvinne ut mot kanten. Stopper de brått midt på siden, ser det ut som
+ * det er slutt.
  */
 interface Props {
   blokk: BlokkUtvalgteHytter
@@ -28,13 +34,15 @@ const ui = UI[sprak].forside
     blokk.enheter.length === 0 ? (
       <p class="mt-6 font-body text-small text-foreground-muted">{ui.ingenHytter}</p>
     ) : (
-      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+      <ul
+        class="hyttrulle m-0 mt-8 flex list-none snap-x snap-mandatory gap-4 overflow-x-auto p-0 pb-2 -mx-5 px-5 md:-mx-10 md:px-10"
+      >
         {blokk.enheter.map((enhet) => (
-          <Hyttekort enhet={enhet} sprak={sprak} />
+          <li class="w-[240px] shrink-0 snap-start sm:w-[260px]">
+            <Hyttekort enhet={enhet} sprak={sprak} />
+          </li>
         ))}
-      </div>
+      </ul>
     )
   }
-
-  {blokk.knapp && <div class="mt-8"><Blokkknapp knapp={blokk.knapp} sprak={sprak} variant="sekundar" /></div>}
 </section>

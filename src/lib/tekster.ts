@@ -71,7 +71,7 @@ export const UI = {
     send: 'Meld interesse',
     honeypot: 'Ikke fyll ut dette feltet',
     hytter: {
-      status: {ledig: 'Ledig', reservert: 'Reservert', solgt: 'Solgt'},
+      status: {ledig: 'Til salgs', reservert: 'Reservert', solgt: 'Solgt'},
       statusEtikett: 'Status',
       byggetrinn: 'Byggetrinn',
       utenByggetrinn: 'Uten byggetrinn',
@@ -179,7 +179,7 @@ export const UI = {
     send: 'Register interest',
     honeypot: 'Do not fill in this field',
     hytter: {
-      status: {ledig: 'Available', reservert: 'Reserved', solgt: 'Sold'},
+      status: {ledig: 'For sale', reservert: 'Reserved', solgt: 'Sold'},
       statusEtikett: 'Status',
       byggetrinn: 'Phase',
       utenByggetrinn: 'No phase set',

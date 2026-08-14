@@ -205,7 +205,8 @@ export const blokkUtvalgteHytter = defineType({
   title: 'Utvalgte hytter',
   type: 'object',
   icon: HomeIcon,
-  description: 'Noen få hyttekort med lenke videre til hyttesiden.',
+  description:
+    'Noen få hyttekort. Kortene ligger i en vannrett rulle — blir de mange, drar du bortover. Blokken har med vilje ingen knapp: rullen viser selv at det finnes mer.',
   fields: [
     aktiv,
     defineField({name: 'overskrift', title: 'Overskrift', type: 'localeString', validation: (Rule) => Rule.required()}),
@@ -238,7 +239,6 @@ export const blokkUtvalgteHytter = defineType({
       of: [defineArrayMember({type: 'reference', to: [{type: 'enhet'}]})],
       hidden: ({parent}) => parent?.utvalg !== 'manuelt',
     }),
-    defineField({name: 'knapp', title: 'Knapp', type: 'blokkKnapp'}),
   ],
   preview: {
     select: {title: 'overskrift.no', aktiv: 'aktiv'},

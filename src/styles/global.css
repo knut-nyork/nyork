@@ -353,6 +353,27 @@
     color: var(--semantic-color-foreground-default);
   }
 
+  /* Den vannrette hytterullen på forsiden. Tynn rullelist som ikke stjeler
+     oppmerksomhet, men som er der — en rulle uten synlig list ser ut som en
+     rad som tilfeldigvis er klippet. */
+  .hyttrulle {
+    scrollbar-width: thin;
+    scrollbar-color: var(--semantic-color-border-default) transparent;
+  }
+
+  .hyttrulle::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .hyttrulle::-webkit-scrollbar-thumb {
+    background-color: var(--semantic-color-border-default);
+    border-radius: var(--radius-pill);
+  }
+
+  .hyttrulle::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
   /* Levende-markøren ved «Status». Sier at tallene er hentet fra Sanity ved
      siste publisering, ikke skrevet inn for hånd.
 

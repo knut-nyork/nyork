@@ -5,7 +5,20 @@ import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
 import {UI} from '../lib/tekster'
 import type {Hyttemodell} from '../lib/typer'
 
-/** Kortet for en hyttemodell — arkitekturen, ikke en konkret hytte. */
+/**
+ * Kortet for en hyttemodell — arkitekturen, ikke en konkret hytte.
+ *
+ * Samme form og størrelse som hyttekortet, så de to korttypene ser ut som
+ * søsken når de står på samme side.
+ *
+ * Fasadetegningen går foran interiørbildet. Kortet handler om typen, og en
+ * tegning viser formen på huset; et interiørbilde viser ett rom og sier lite
+ * om hvilken av de tre typene du ser på.
+ *
+ * Bildet vises med `object-contain` og ikke `cover`. En fasadetegning som
+ * beskjæres mister taket eller grunnmuren, og da er den ikke lenger en
+ * fasadetegning. Tegningene har hvit bakgrunn og flyter sammen med kortet.
+ */
 interface Props {
   modell: Hyttemodell
   sprak: Sprak
@@ -13,13 +26,13 @@ interface Props {
 
 const {modell, sprak} = Astro.props
 const ui = UI[sprak].hytter
-const bilde = modell.interiorbilder?.[0]
+const bilde = modell.fasadetegninger?.[0] ?? modell.interiorbilder?.[0]
 const href = stiForSprak(`/hytter/${modell.slug}`, sprak)
 ---
 
 <a
   href={href}
-  class="group flex flex-col gap-4 rounded-medium border border-border-default bg-card-background p-4 no-underline hover:border-border-focus"
+  class="hevet group flex h-full flex-col gap-3 rounded-stor p-3 no-underline transition-colors hover:border-border-focus"
 >
   {
     bilde ? (
@@ -27,18 +40,18 @@ const href = stiForSprak(`/hytter/${modell.slug}`, sprak)
         src={bildeUrl(bilde.url, 600)}
         alt={tekst(bilde.altTekst, sprak)}
         loading="lazy"
-        class="aspect-[4/3] w-full rounded-medium object-cover"
+        class="aspect-[3/2] w-full rounded-medium object-contain"
       />
     ) : (
-      <Bildeplassholder sideforhold="4 / 3" />
+      <Bildeplassholder sideforhold="3 / 2" />
     )
   }
 
-  <h3 class="font-heading text-large font-semibold text-card-text group-hover:underline">
+  <h3 class="px-1 font-heading text-medium font-semibold text-card-text group-hover:underline">
     {modell.navn}
   </h3>
 
-  <dl class="flex flex-col gap-1 font-body text-xsmall text-card-text">
+  <dl class="flex flex-col gap-1 px-1 pb-1 font-body text-2xsmall text-card-text">
     <div class="flex justify-between gap-3">
       <dt class="text-card-text-lighter">{ui.bra}</dt>
       <dd>{modell.bra} m²</dd>

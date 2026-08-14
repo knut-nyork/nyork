@@ -4,19 +4,23 @@ import {tekst, type Sprak} from '../../lib/sprak'
 import type {BlokkStatus, Statusrad, Statustall} from '../../lib/typer'
 
 /**
- * Noen få nøkkeltall om salget, som hvite kort oppå et bilde.
+ * Noen få nøkkeltall om salget, som et mørkt bånd på tvers av siden.
  *
  * Tall som *kan* telles, telles — ledige og solgte hytter hentes fra enhetene
  * i Sanity og kan derfor aldri bli utdaterte. Tall som ikke finnes i Sanity,
  * som salg fra tidligere byggetrinn eller en status som «Kommer», skrives inn
  * av redaktøren. Hvilken av delene hver rad er, velges i Studio.
  *
- * Den røde prikken ved overskriften er en levende-markør: tallene er hentet
- * ved siste publisering, ikke skrevet inn for hånd. Den er det eneste røde på
- * hele siden, og skal forbli det — rødt betyr «dette er ferskt», ikke pynt.
+ * Båndet er mørkt i begge temaer, som footeren, og bruker samme flate. Det er
+ * det eneste mørke feltet midt på en ellers lys forside, og det er poenget:
+ * tallene er det harde, konkrete på siden, og skal skille seg fra teksten
+ * rundt. Formspråket er hentet fra salgsoppgaven, der de dype flatene bærer.
  *
- * Blokken har ingen mønsterbakgrunn. Treårene brukes én gang per side, og på
- * forsiden er det budskapsblokka som har dem.
+ * Legger redaktøren inn et bakgrunnsbilde, brukes det i stedet — da legges et
+ * mørkt slør over, slik at tallene fortsatt er lesbare.
+ *
+ * Den røde prikken ved overskriften er en levende-markør: tallene er hentet
+ * ved siste publisering, ikke skrevet inn for hånd.
  */
 interface Props {
   blokk: BlokkStatus
@@ -48,45 +52,39 @@ const bilde = blokk.bakgrunnsbilde
 
 {
   rader.length > 0 && (
-    /*
-      Bildet går i full bredde, kant til kant, uten avrundede hjørner — det
-      er et bånd på tvers av siden og ikke et kort. Innholdet holder seg
-      likevel i lesekolonnen på 800 px, som resten av forsiden.
-    */
-    <section class="relative overflow-hidden bg-flate-vekslende">
+    <section class="relative overflow-hidden bg-flate-footer text-tekst-footer">
       {bilde && (
-        <img
-          src={bildeUrl(bilde.url, 2400)}
-          alt={tekst(bilde.altTekst, sprak)}
-          loading="lazy"
-          class="absolute inset-0 h-full w-full object-cover"
-        />
+        <>
+          <img
+            src={bildeUrl(bilde.url, 2400)}
+            alt={tekst(bilde.altTekst, sprak)}
+            loading="lazy"
+            class="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Mørkt slør, ikke lyst: teksten på båndet er lys. */}
+          <div class="absolute inset-0 bg-black/55" aria-hidden="true" />
+        </>
       )}
 
-      {/* Lyst slør. Bildet skal anes, ikke konkurrere med tallene. */}
-      {bilde && <div class="absolute inset-0 bg-white/45" aria-hidden="true" />}
-
-      <div class="relative mx-auto max-w-[800px] px-5 py-14 md:px-10 md:py-20">
+      <div class="relative mx-auto max-w-[800px] px-5 py-16 md:px-10 md:py-24">
         {overskrift && (
-          <h2 class="mb-6 mt-0 flex items-center gap-2.5 font-heading text-xlarge font-semibold">
+          <h2 class="mb-8 mt-0 flex items-center gap-2.5 font-heading text-xlarge font-semibold">
             <span class="prikk-levende" aria-hidden="true" />
             {overskrift}
           </h2>
         )}
 
-        <dl class="m-0 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <dl class="m-0 grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
           {rader.map((rad) => (
-            <div class="flex flex-col gap-2 rounded-stor bg-white p-4 shadow-[0_1px_2px_rgb(0_0_0_/_0.05)]">
-              <dd class="m-0 font-heading text-2xlarge font-semibold leading-none text-foreground-default">
-                {rad.verdi}
-              </dd>
-              <dt class="font-body text-xsmall leading-snug text-foreground-muted">{rad.etikett}</dt>
+            <div class="flex flex-col gap-2 border-t border-white/25 pt-4">
+              <dd class="m-0 font-heading text-3xlarge font-semibold leading-none">{rad.verdi}</dd>
+              <dt class="font-body text-xsmall leading-snug opacity-70">{rad.etikett}</dt>
             </div>
           ))}
         </dl>
 
         {bilde?.fotokreditt && (
-          <p class="mt-4 mb-0 text-right font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</p>
+          <p class="mt-8 mb-0 text-right font-detail text-2xsmall opacity-60">{bilde.fotokreditt}</p>
         )}
       </div>
     </section>

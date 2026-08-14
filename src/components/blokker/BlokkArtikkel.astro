@@ -25,7 +25,7 @@ const bilde = blokk.bilde
 const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
 ---
 
-<section class="mx-auto max-w-[800px] px-5 py-12 md:px-10 md:py-16">
+<section class="mx-auto max-w-[800px] px-5 py-16 md:px-10 md:py-24">
   <div class="grid items-center gap-8 md:grid-cols-2 md:gap-16">
     <div class:list={['flex flex-col gap-3', bildeTilHoyre ? 'md:order-1' : 'md:order-2']}>
       <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>

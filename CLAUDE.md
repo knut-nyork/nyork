@@ -24,7 +24,7 @@ Teamet bak siden er ikke teknisk. Kode skal være lesbar og forutsigbar, ikke sm
 - **React (.tsx)** — alt som er interaktivt
 - **Tailwind CSS** — all styling
 - **Sanity** — CMS. Skjemaer ligger i `/sanity/schemas/` og er en del av repoet
-- **Netlify** — hosting. Push til `main` = live
+- **Netlify** — hosting. **Bygger ikke fra git.** Se «Utgivelse» under
 - **TypeScript** overalt
 
 ## Kommandoer
@@ -36,6 +36,29 @@ npm run preview      # se produksjonsbygget lokalt
 npx sanity dev       # Sanity Studio lokalt (localhost:3333)
 npx sanity deploy    # publiser Studio
 ```
+
+## Utgivelse
+
+**Netlify-prosjektet er ikke koblet til GitHub.** Det har verken repo, gren eller byggkommando satt opp. Push til `main` gjør derfor ingenting med den live siden — den oppdateres bare når noen kjører en deploy manuelt fra maskinen sin:
+
+```bash
+npm run build
+npx netlify-cli deploy --prod --dir=dist
+```
+
+Det betyr to ting. Koden i GitHub og siden som ligger ute kan være ulike, og utgivelse er avhengig av at én person har CLI-en innlogget. Sesjonen ryker med jevne mellomrom, og da må `npx netlify-cli logout && npx netlify-cli login` kjøres først.
+
+**Dette bør fikses.** I Netlify-dashbordet: koble prosjektet til `knut-nyork/nyork`, gren `main`, byggkommando `npm run build`, publiseringsmappe `dist`. Koblingen krever GitHub-autorisasjon og må gjøres av noen med tilgang til begge. Når den er på plass, gjelder «push til main = live», og dette avsnittet kan slettes.
+
+## Passord på siden
+
+Siden er ikke lansert, og ligger bak et passord som sjekkes i `netlify/edge-functions/passord.ts`.
+
+Passordet ligger i miljøvariabelen `SIDE_PASSORD` i Netlify, ikke i repoet. Er variabelen ikke satt, slipper ingen inn — funksjonen feiler lukket med vilje, så en glemt variabel ikke åpner siden for alle.
+
+Sjekken kjører på kanten, før noe innhold sendes ut. Det er ekte sperring, ikke et JavaScript-lag over ferdig levert HTML — priser og planer ligger i sidene, og de skal ikke kunne hentes ut ved å se på kildekoden.
+
+**Skal av før lansering:** slett `[[edge_functions]]`-blokka i `netlify.toml`. Da er siden åpen.
 
 ## Mappestruktur
 

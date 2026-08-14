@@ -39,3 +39,10 @@
   from = "/utbygger"
   to = "/omradet#historia"
   status = 301
+
+# Passordsperre fram til lansering. Kjører på kanten, før innhold sendes ut.
+# Passordet ligger i miljøvariabelen SIDE_PASSORD i Netlify, ikke her.
+# Slett denne blokka for å åpne siden — se «Passord på siden» i CLAUDE.md.
+[[edge_functions]]
+  function = "passord"
+  path = "/*"

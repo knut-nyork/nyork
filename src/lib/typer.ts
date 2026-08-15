@@ -279,6 +279,8 @@ export interface Bilde {
 
 export type Enhetstype = 'hytte' | 'tomt'
 export type Status = 'ledig' | 'reservert' | 'solgt'
+/** Hvor langt bygget er kommet. Valgfri — uten verdi vises ingen merking. */
+export type Byggestatus = 'ferdigbygget' | 'underBygging' | 'ikkePabegynt'
 
 /** Arkitekturen — skrives én gang og gjenbrukes av alle enheter av samme type. */
 export interface Hyttemodell {
@@ -310,9 +312,12 @@ export interface Enhet {
   slug: string
   enhetstype: Enhetstype
   status: Status
+  byggestatus?: Byggestatus
   byggetrinn?: number
   delomrade?: string
   pris?: number
+  /** Satt kun ved prisreduksjon. Vises overstrøket foran prisen. */
+  opprinneligPris?: number
   tomtestorrelse?: number
   utsiktsretning?: LokalTekst
   solforhold?: LokalTekst

@@ -72,6 +72,14 @@ export const UI = {
     honeypot: 'Ikke fyll ut dette feltet',
     hytter: {
       status: {ledig: 'Til salgs', reservert: 'Reservert', solgt: 'Solgt'},
+      byggestatus: {
+        ferdigbygget: 'Ferdigbygget',
+        underBygging: 'Under bygging',
+        ikkePabegynt: 'Ikke påbegynt',
+      },
+      /** Skjult tekst foran den overstrøkne prisen, så den ikke leses som gjeldende. */
+      forPris: 'Tidligere pris',
+      naaPris: 'Pris nå',
       statusEtikett: 'Status',
       byggetrinn: 'Byggetrinn',
       utenByggetrinn: 'Uten byggetrinn',
@@ -180,6 +188,13 @@ export const UI = {
     honeypot: 'Do not fill in this field',
     hytter: {
       status: {ledig: 'For sale', reservert: 'Reserved', solgt: 'Sold'},
+      byggestatus: {
+        ferdigbygget: 'Completed',
+        underBygging: 'Under construction',
+        ikkePabegynt: 'Not started',
+      },
+      forPris: 'Previous price',
+      naaPris: 'Price now',
       statusEtikett: 'Status',
       byggetrinn: 'Phase',
       utenByggetrinn: 'No phase set',

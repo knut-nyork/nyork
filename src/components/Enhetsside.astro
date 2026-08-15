@@ -1,9 +1,11 @@
 ---
 import Bildeplassholder from './Bildeplassholder.tsx'
 import Brodsmuler from './Brodsmuler.astro'
+import Byggestatusmerke from './Byggestatusmerke.tsx'
+import Pris from './Pris.tsx'
 import Statusmerke from './Statusmerke.tsx'
 import Tremonster from './Tremonster.astro'
-import {bildeUrl, formaterPris} from '../lib/hytter'
+import {bildeUrl} from '../lib/hytter'
 import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
 import {UI} from '../lib/tekster'
 import type {Enhet} from '../lib/typer'
@@ -35,8 +37,11 @@ const avsnitt = beskrivelse ? beskrivelse.split(/\n\s*\n/) : []
 const hovedbilde = enhet.bilder?.[0]
 const flerebilder = enhet.bilder?.slice(1) ?? []
 
+/**
+ * Prisen står ikke i denne lista. Den rendres som komponent fordi en
+ * nedsatt pris har to tall og en overstreking, og lista holder bare tekst.
+ */
 const fakta = [
-  {etikett: ui.pris, verdi: enhet.pris ? formaterPris(enhet.pris) : ui.prisPaForesporsel},
   modell ? {etikett: ui.hyttetype, verdi: modell.navn} : null,
   enhet.byggetrinn ? {etikett: ui.byggetrinn, verdi: String(enhet.byggetrinn)} : null,
   modell?.bra ? {etikett: ui.bra, verdi: `${modell.bra} m²`} : null,
@@ -52,7 +57,8 @@ const fakta = [
 
 /** Tre per rad, slik at skillelinjene faller mellom rader og ikke under den siste. */
 const faktarader: (typeof fakta)[] = []
-for (let i = 0; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
+faktarader.push(fakta.slice(0, 2))
+for (let i = 2; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
 
 ---
 
@@ -61,7 +67,10 @@ for (let i = 0; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
 
   <header class="flex flex-col items-center gap-4 py-6 text-center md:py-10">
     <h1 class="m-0 font-heading text-4xlarge font-semibold">{enhet.nummer}</h1>
-    <Statusmerke status={enhet.status} sprak={sprak} />
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      <Statusmerke status={enhet.status} sprak={sprak} />
+      {enhet.byggestatus && <Byggestatusmerke byggestatus={enhet.byggestatus} sprak={sprak} />}
+    </div>
   </header>
 
   {
@@ -90,6 +99,14 @@ for (let i = 0; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
               i < faktarader.length - 1 && 'border-b border-border-subtle',
             ]}
           >
+            {i === 0 && (
+              <div class="flex flex-col gap-1">
+                <dt class="font-heading text-xsmall font-semibold">{ui.pris}</dt>
+                <dd class="m-0 font-body text-xsmall text-foreground-muted">
+                  <Pris pris={enhet.pris} opprinneligPris={enhet.opprinneligPris} sprak={sprak} />
+                </dd>
+              </div>
+            )}
             {rad.map((celle) => (
               <div class="flex flex-col gap-1">
                 <dt class="font-heading text-xsmall font-semibold">{celle.etikett}</dt>

@@ -63,6 +63,22 @@ export const enhet = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'byggestatus',
+      title: 'Byggestatus',
+      type: 'string',
+      description:
+        'Hvor langt bygget er kommet. Vises på hyttesiden, ved siden av salgsstatusen — ikke på hyttekortene. Er den ikke satt, vises ingen merking, og det er bedre enn å gjette.',
+      group: 'fakta',
+      options: {
+        list: [
+          {title: 'Ferdigbygget', value: 'ferdigbygget'},
+          {title: 'Under bygging', value: 'underBygging'},
+          {title: 'Ikke påbegynt', value: 'ikkePabegynt'},
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
       name: 'hyttemodell',
       title: 'Hyttemodell',
       type: 'reference',
@@ -94,6 +110,20 @@ export const enhet = defineType({
       type: 'string',
       description: 'For eksempel «Røvarklanten». Stedsnavn oversettes ikke.',
       group: 'fakta',
+    }),
+    defineField({
+      name: 'opprinneligPris',
+      title: 'Opprinnelig pris (NOK)',
+      type: 'number',
+      description:
+        'Fylles kun ut ved prisreduksjon. Vises overstrøket foran den gjeldende prisen. La stå tom når prisen ikke er satt ned.',
+      group: 'fakta',
+      validation: (Rule) =>
+        Rule.positive().custom((opprinnelig, kontekst) => {
+          const naa = (kontekst.document as {pris?: number} | undefined)?.pris
+          if (!opprinnelig || !naa) return true
+          return opprinnelig > naa || 'Opprinnelig pris må være høyere enn prisen nå — ellers er det ikke en reduksjon.'
+        }),
     }),
     defineField({
       name: 'pris',

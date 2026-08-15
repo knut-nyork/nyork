@@ -1,6 +1,7 @@
 import Bildeplassholder from './Bildeplassholder'
+import Pris from './Pris'
 import Statusmerke from './Statusmerke'
-import {bildeUrl, formaterPris} from '../lib/hytter'
+import {bildeUrl} from '../lib/hytter'
 import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
 import {UI} from '../lib/tekster'
 import type {Enhet} from '../lib/typer'
@@ -65,7 +66,9 @@ export default function Hyttekort({enhet, sprak}: {enhet: Enhet; sprak: Sprak}) 
         )}
         <div className="flex justify-between gap-3">
           <dt className="text-card-text-lighter">{ui.pris}</dt>
-          <dd>{enhet.pris ? formaterPris(enhet.pris) : ui.prisPaForesporsel}</dd>
+          <dd>
+            <Pris pris={enhet.pris} opprinneligPris={enhet.opprinneligPris} sprak={sprak} />
+          </dd>
         </div>
       </dl>
     </a>

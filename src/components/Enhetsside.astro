@@ -4,7 +4,6 @@ import Brodsmuler from './Brodsmuler.astro'
 import Byggestatusmerke from './Byggestatusmerke.tsx'
 import Pris from './Pris.tsx'
 import Statusmerke from './Statusmerke.tsx'
-import Tremonster from './Tremonster.astro'
 import {bildeUrl} from '../lib/hytter'
 import {stiForSprak, tekst, type Sprak} from '../lib/sprak'
 import {UI} from '../lib/tekster'
@@ -85,39 +84,36 @@ for (let i = 2; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
     )
   }
 
-  <!-- Faktapanelet. Mønsteret bak gir det litt tyngde uten å ta oppmerksomhet
-       fra tallene, som er det folk faktisk kom for. -->
-  <div class="hevet relative overflow-hidden rounded-stor">
-    <Tremonster variant="hoydekurver" styrke={0.06} />
-
-    <dl class="relative m-0 flex flex-col">
-      {
-        faktarader.map((rad, i) => (
-          <div
-            class:list={[
-              'grid grid-cols-2 gap-x-6 gap-y-5 px-6 py-5 sm:grid-cols-3 md:px-8',
-              i < faktarader.length - 1 && 'border-b border-border-subtle',
-            ]}
-          >
-            {i === 0 && (
-              <div class="flex flex-col gap-1">
-                <dt class="font-heading text-xsmall font-semibold">{ui.pris}</dt>
-                <dd class="m-0 font-body text-xsmall text-foreground-muted">
-                  <Pris pris={enhet.pris} opprinneligPris={enhet.opprinneligPris} sprak={sprak} />
-                </dd>
-              </div>
-            )}
-            {rad.map((celle) => (
-              <div class="flex flex-col gap-1">
-                <dt class="font-heading text-xsmall font-semibold">{celle.etikett}</dt>
-                <dd class="m-0 font-body text-xsmall text-foreground-muted">{celle.verdi}</dd>
-              </div>
-            ))}
-          </div>
-        ))
-      }
-    </dl>
-  </div>
+  <!-- Faktaene står uten flate bak seg. Skillelinjene mellom radene holder
+       tallene i kolonner, og uten panel ligger de på samme venstrekant som
+       bildet og teksten rundt. -->
+  <dl class="m-0 flex flex-col">
+    {
+      faktarader.map((rad, i) => (
+        <div
+          class:list={[
+            'grid grid-cols-2 gap-x-6 gap-y-5 py-5 sm:grid-cols-3',
+            i < faktarader.length - 1 && 'border-b border-border-subtle',
+          ]}
+        >
+          {i === 0 && (
+            <div class="flex flex-col gap-1">
+              <dt class="font-heading text-xsmall font-semibold">{ui.pris}</dt>
+              <dd class="m-0 font-body text-xsmall text-foreground-muted">
+                <Pris pris={enhet.pris} opprinneligPris={enhet.opprinneligPris} sprak={sprak} />
+              </dd>
+            </div>
+          )}
+          {rad.map((celle) => (
+            <div class="flex flex-col gap-1">
+              <dt class="font-heading text-xsmall font-semibold">{celle.etikett}</dt>
+              <dd class="m-0 font-body text-xsmall text-foreground-muted">{celle.verdi}</dd>
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </dl>
 
   {
     avsnitt.length > 0 && (

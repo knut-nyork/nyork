@@ -66,7 +66,7 @@ export default function Interesseskjema({sprak, innstillinger}: Props) {
     return (
       <section id="meld-interesse" className="bg-background-surface-1">
         <div className="mx-auto max-w-[720px] px-5 py-20 md:px-10">
-          <p role="status" className="font-body text-small whitespace-pre-line">
+          <p role="status" className="font-body text-xsmall whitespace-pre-line">
             {kvittering}
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function Interesseskjema({sprak, innstillinger}: Props) {
       <div className="mx-auto max-w-[720px] px-5 py-20 md:px-10">
         {tittel && <h2 className="font-heading font-semibold text-2xlarge">{tittel}</h2>}
         {ingress && (
-          <p className="mt-4 font-body text-small whitespace-pre-line">{ingress}</p>
+          <p className="mt-4 font-body text-xsmall whitespace-pre-line">{ingress}</p>
         )}
 
         <form

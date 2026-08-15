@@ -29,7 +29,7 @@ const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
   <div class="grid items-center gap-8 md:grid-cols-2 md:gap-16">
     <div class:list={['flex flex-col gap-3', bildeTilHoyre ? 'md:order-1' : 'md:order-2']}>
       <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{tekst(blokk.overskrift, sprak)}</h2>
-      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-small">{tekstavsnitt}</p>)}
+      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-xsmall">{tekstavsnitt}</p>)}
       {blokk.knapp && <div class="mt-3"><Blokkknapp knapp={blokk.knapp} sprak={sprak} /></div>}
     </div>
 

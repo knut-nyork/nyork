@@ -55,7 +55,7 @@ const ovrige = (side?.seksjoner ?? []).filter((s) => !s.ankerId || !PLASSERTE.ha
 
     <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 py-6 text-center md:py-10">
       <h1 class="m-0 font-heading text-4xlarge font-semibold">{tekst(side?.overskrift, sprak)}</h1>
-      <p class="m-0 font-body text-small">{tekst(side?.ingress, sprak)}</p>
+      <p class="m-0 font-body text-xsmall">{tekst(side?.ingress, sprak)}</p>
     </header>
   </div>
 
@@ -78,7 +78,7 @@ const ovrige = (side?.seksjoner ?? []).filter((s) => !s.ankerId || !PLASSERTE.ha
     {
       tomter.length === 0 ? (
         <div class="flex max-w-[62ch] flex-col items-start gap-5">
-          <p class="m-0 font-body text-small text-foreground-muted">{tomTilstand}</p>
+          <p class="m-0 font-body text-xsmall text-foreground-muted">{tomTilstand}</p>
           <a href={`${stiForSprak('/tomter', sprak)}#meld-interesse`} class="knapp knapp--primar">
             {ui.send}
           </a>
@@ -86,7 +86,7 @@ const ovrige = (side?.seksjoner ?? []).filter((s) => !s.ankerId || !PLASSERTE.ha
       ) : (
         <>
           {ledige === 0 && tomTilstand && (
-            <p class="m-0 max-w-[62ch] font-body text-small text-foreground-muted">{tomTilstand}</p>
+            <p class="m-0 max-w-[62ch] font-body text-xsmall text-foreground-muted">{tomTilstand}</p>
           )}
           <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {tomter.map((enhet) => (
@@ -116,7 +116,7 @@ const ovrige = (side?.seksjoner ?? []).filter((s) => !s.ankerId || !PLASSERTE.ha
   {
     kontakt && (
       <section class="hevet flex flex-col items-start gap-4 rounded-stor p-8 md:p-12">
-        {kontakt.tekst && <p class="m-0 max-w-[62ch] font-body text-small">{tekst(kontakt.tekst, sprak)}</p>}
+        {kontakt.tekst && <p class="m-0 max-w-[62ch] font-body text-xsmall">{tekst(kontakt.tekst, sprak)}</p>}
         <p class="m-0 font-heading text-large font-semibold">{kontakt.navn}</p>
 
         <div class="flex flex-wrap gap-3">

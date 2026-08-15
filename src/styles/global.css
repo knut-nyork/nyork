@@ -334,6 +334,32 @@
     mask-repeat: no-repeat;
   }
 
+  /*
+    Loddrett rytme i brødteksten på lesesidene — områdesiden og nyhetssakene.
+
+    Avstandene styres her og ikke med `gap` i komponenten, fordi en `gap` er
+    lik overalt og dette skal ikke være likt. En mellomtittel hører til
+    teksten under seg, ikke til avsnittet over: står den midt mellom to
+    avsnitt, må leseren gjette hvilken vei den peker.
+
+    De tre reglene i rekkefølge er hele oppskriften: luft mellom avsnitt,
+    mer luft før en ny tittel, og nesten ingen etter den.
+
+    Barna i Riktekst.astro har derfor ingen margin-klasser. Legger du en
+    `mt-*` der, vinner den over dette, og rytmen brekker på det ene stedet.
+  */
+  .riktekst > * + * {
+    margin-top: 1.75rem;
+  }
+
+  .riktekst > * + :is(h2, h3, h4) {
+    margin-top: 3.5rem;
+  }
+
+  .riktekst > :is(h2, h3, h4) + * {
+    margin-top: 0.625rem;
+  }
+
   /* Deleknappen i metalinja. Ser ut som tekst, oppfører seg som knapp. */
   .deleknapp {
     display: inline-flex;

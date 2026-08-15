@@ -120,7 +120,7 @@ for (let i = 2; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
       <section class="flex flex-col gap-5">
         <h2 class="m-0 font-heading text-xlarge font-semibold">{ui.seHytta}</h2>
         {avsnitt.map((tekstavsnitt) => (
-          <p class="m-0 max-w-[62ch] font-body text-small">{tekstavsnitt}</p>
+          <p class="m-0 max-w-[62ch] font-body text-xsmall">{tekstavsnitt}</p>
         ))}
       </section>
     )
@@ -157,7 +157,7 @@ for (let i = 2; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
     tekst(enhet.solforhold, sprak) && (
       <section class="flex flex-col gap-3">
         <h2 class="m-0 font-heading text-xlarge font-semibold">{ui.solforhold}</h2>
-        <p class="m-0 max-w-[62ch] font-body text-small">{tekst(enhet.solforhold, sprak)}</p>
+        <p class="m-0 max-w-[62ch] font-body text-xsmall">{tekst(enhet.solforhold, sprak)}</p>
       </section>
     )
   }

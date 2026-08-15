@@ -34,7 +34,7 @@ const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
     </h2>
 
     <div class="relative flex flex-col gap-4">
-      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-small">{tekstavsnitt}</p>)}
+      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-xsmall">{tekstavsnitt}</p>)}
       {blokk.knapp && <div class="mt-2"><Blokkknapp knapp={blokk.knapp} sprak={sprak} variant="sekundar" /></div>}
     </div>
   </div>

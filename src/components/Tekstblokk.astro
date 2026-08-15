@@ -38,13 +38,13 @@ const deler = brodtekst
       d.type === 'liste' ? (
         <ul class="m-0 flex list-none flex-col gap-2 p-0">
           {d.linjer.map((linje) => (
-            <li class="flex gap-3 border-b border-border-subtle pb-2 font-body text-small last:border-0">
+            <li class="flex gap-3 border-b border-border-subtle pb-2 font-body text-xsmall last:border-0">
               <span>{linje}</span>
             </li>
           ))}
         </ul>
       ) : (
-        <p class="m-0 max-w-[62ch] font-body text-small">{d.del}</p>
+        <p class="m-0 max-w-[62ch] font-body text-xsmall">{d.del}</p>
       ),
     )
   }

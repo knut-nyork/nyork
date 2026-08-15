@@ -61,7 +61,7 @@ const ikkeTillatt = (regler.ikkeTillatt ?? []).map((rad) => tekst(rad, sprak)).f
         <dl class="m-0 divide-y divide-border-subtle">
           {rader.map((rad) => (
             <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-4 md:px-6">
-              <dt class="font-body text-small text-foreground-muted">{rad.etikett}</dt>
+              <dt class="font-body text-xsmall text-foreground-muted">{rad.etikett}</dt>
               <dd class="m-0 font-heading text-small font-medium">{rad.verdi}</dd>
             </div>
           ))}
@@ -74,7 +74,7 @@ const ikkeTillatt = (regler.ikkeTillatt ?? []).map((rad) => tekst(rad, sprak)).f
     ikkeTillatt.length > 0 && (
       <section class="rounded-stor border-2 border-border-inreverse p-6 md:p-8">
         <h3 class="m-0 font-heading text-large font-semibold">{ui.ikkeTillatt}</h3>
-        <p class="mt-2 max-w-[62ch] font-body text-small text-foreground-muted">{ui.ikkeTillattForklaring}</p>
+        <p class="mt-2 max-w-[62ch] font-body text-xsmall text-foreground-muted">{ui.ikkeTillattForklaring}</p>
 
         <ul class="mt-5 flex list-none flex-wrap gap-3 p-0">
           {ikkeTillatt.map((rad) => (

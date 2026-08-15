@@ -71,7 +71,7 @@ const SESONGER = [
 
   {
     seksjoner.length === 0 ? (
-      <p class="m-0 font-body text-small text-foreground-muted">{UI[sprak].hytter.innholdKommer}</p>
+      <p class="m-0 font-body text-xsmall text-foreground-muted">{UI[sprak].hytter.innholdKommer}</p>
     ) : (
       SESONGER.map((sesong) => (
         <div data-sesong-innhold={sesong.navn} class="flex flex-col gap-14">
@@ -83,8 +83,10 @@ const SESONGER = [
             const innhold = sesong.navn === 'sommer' ? seksjon.sommerInnhold : seksjon.vinterInnhold
             const blokker = innhold?.[sprak] ?? innhold?.no ?? []
 
+            // Tett mellom tittelen og teksten under, så de leses som ett.
+            // Bildet henter luften tilbake med sin egen marg.
             return (
-              <section id={seksjon.seksjonsId || undefined} class="flex scroll-mt-24 flex-col gap-6">
+              <section id={seksjon.seksjonsId || undefined} class="flex scroll-mt-24 flex-col gap-2.5">
                 <h2 class="m-0 font-heading text-xlarge font-semibold md:text-2xlarge">
                   {tekst(seksjon.tittel, sprak)}
                 </h2>
@@ -92,7 +94,7 @@ const SESONGER = [
                 <Riktekst blokker={blokker} sprak={sprak} />
 
                 {bilde ? (
-                  <figure class="m-0">
+                  <figure class="m-0 mt-12">
                     <img
                       src={bildeUrl(bilde.url, 1400)}
                       alt={tekst(bilde.altTekst, sprak)}
@@ -106,7 +108,7 @@ const SESONGER = [
                     )}
                   </figure>
                 ) : (
-                  <Bildeplassholder sideforhold="16 / 10" className="w-full rounded-stor" />
+                  <Bildeplassholder sideforhold="16 / 10" className="mt-12 w-full rounded-stor" />
                 )}
               </section>
             )

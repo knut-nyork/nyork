@@ -58,13 +58,13 @@ for (const blokk of blokker) {
 }
 ---
 
-<div class="flex flex-col gap-5">
+<div class="riktekst">
   {
     grupper.map((gruppe) =>
       gruppe.type === 'liste' ? (
-        <ul class="m-0 flex list-disc flex-col gap-2 pl-5">
+        <ul class="flex list-disc flex-col gap-2 pl-5">
           {gruppe.punkter.map((punkt) => (
-            <li class="font-body text-small">
+            <li class="font-body text-xsmall">
               {punkt.children?.map((barn) => (
                 <Riktekstbit
                   tekst={barn.text ?? ''}
@@ -77,7 +77,7 @@ for (const blokk of blokker) {
           ))}
         </ul>
       ) : gruppe.blokk.style === 'h2' ? (
-        <h2 class="mt-4 font-heading text-xlarge font-semibold md:text-2xlarge">
+        <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">
           {gruppe.blokk.children?.map((barn) => (
             <Riktekstbit
               tekst={barn.text ?? ''}
@@ -88,7 +88,7 @@ for (const blokk of blokker) {
           ))}
         </h2>
       ) : gruppe.blokk.style === 'h3' ? (
-        <h3 class="mt-3 font-heading text-large font-semibold">
+        <h3 class="font-heading text-large font-semibold">
           {gruppe.blokk.children?.map((barn) => (
             <Riktekstbit
               tekst={barn.text ?? ''}
@@ -99,7 +99,7 @@ for (const blokk of blokker) {
           ))}
         </h3>
       ) : gruppe.blokk.style === 'h4' ? (
-        <h4 class="mt-2 font-heading text-medium font-semibold">
+        <h4 class="font-heading text-medium font-semibold">
           {gruppe.blokk.children?.map((barn) => (
             <Riktekstbit
               tekst={barn.text ?? ''}
@@ -110,7 +110,7 @@ for (const blokk of blokker) {
           ))}
         </h4>
       ) : gruppe.blokk.style === 'blockquote' ? (
-        <blockquote class="m-0 border-l-2 border-border-inreverse pl-5 font-heading text-large font-medium">
+        <blockquote class="border-l-2 border-border-inreverse pl-5 font-heading text-large font-medium">
           {gruppe.blokk.children?.map((barn) => (
             <Riktekstbit
               tekst={barn.text ?? ''}
@@ -121,7 +121,7 @@ for (const blokk of blokker) {
           ))}
         </blockquote>
       ) : (
-        <p class="m-0 font-body text-small">
+        <p class="font-body text-xsmall">
           {gruppe.blokk.children?.map((barn) => (
             <Riktekstbit
               tekst={barn.text ?? ''}

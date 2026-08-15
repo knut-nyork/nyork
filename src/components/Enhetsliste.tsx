@@ -13,7 +13,7 @@ export default function Enhetsliste({enheter, sprak}: {enheter: Enhet[]; sprak: 
   const grupper = grupperPaByggetrinn(enheter)
 
   if (enheter.length === 0) {
-    return <p className="font-body text-small text-foreground-muted">{ui.ingenTreff}</p>
+    return <p className="font-body text-xsmall text-foreground-muted">{ui.ingenTreff}</p>
   }
 
   return (

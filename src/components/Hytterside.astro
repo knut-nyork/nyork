@@ -42,7 +42,7 @@ const situasjonsplan = side?.situasjonsplan
 
     <header class="mx-auto flex max-w-[800px] flex-col items-center gap-5 py-6 text-center md:py-10">
       <h1 class="m-0 font-heading text-4xlarge font-semibold">{tekst(side?.overskrift, sprak)}</h1>
-      <p class="m-0 font-body text-small">{tekst(side?.ingress, sprak)}</p>
+      <p class="m-0 font-body text-xsmall">{tekst(side?.ingress, sprak)}</p>
     </header>
   </div>
 
@@ -68,7 +68,7 @@ const situasjonsplan = side?.situasjonsplan
 
     {
       ingenLedige && tomTilstand && (
-        <p class="max-w-[800px] font-body text-small text-foreground-muted">{tomTilstand}</p>
+        <p class="max-w-[800px] font-body text-xsmall text-foreground-muted">{tomTilstand}</p>
       )
     }
 
@@ -85,7 +85,7 @@ const situasjonsplan = side?.situasjonsplan
     <h2 class="font-heading text-xlarge font-semibold md:text-2xlarge">{ui.hyttetypene}</h2>
     {
       hyttetyperIngress && (
-        <p class="max-w-[800px] font-body text-small">{hyttetyperIngress}</p>
+        <p class="max-w-[800px] font-body text-xsmall">{hyttetyperIngress}</p>
       )
     }
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

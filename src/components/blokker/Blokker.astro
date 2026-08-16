@@ -1,5 +1,6 @@
 ---
 import BlokkArtikkel from './BlokkArtikkel.astro'
+import BlokkBilder from './BlokkBilder.astro'
 import BlokkBudskap from './BlokkBudskap.astro'
 import BlokkFremhevet from './BlokkFremhevet.astro'
 import BlokkHero from './BlokkHero.astro'
@@ -60,6 +61,8 @@ const harBand = blokker.map((blokk) => {
         return <BlokkSitat blokk={blokk} sprak={sprak} />
       case 'blokkKort':
         return <BlokkKort blokk={blokk} sprak={sprak} />
+      case 'blokkBilder':
+        return <BlokkBilder blokk={blokk} sprak={sprak} />
       case 'blokkNyheter':
         return <BlokkNyheter blokk={blokk} sprak={sprak} />
       case 'blokkFremhevet':

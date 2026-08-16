@@ -1,0 +1,32 @@
+---
+import {bildeUrl} from '../../lib/hytter'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {Bilde} from '../../lib/typer'
+
+/**
+ * Ett bilde i bildeblokka. Skilt ut fordi det står tre steder i BlokkBilder,
+ * og fotokreditten skal følge bildet alle tre.
+ */
+interface Props {
+  bilde: Bilde
+  /** Sideforholdet plassen i oppsettet har, for eksempel «aspect-[4/3]». */
+  form: string
+  sprak: Sprak
+}
+
+const {bilde, form, sprak} = Astro.props
+---
+
+<figure class="m-0">
+  <img
+    src={bildeUrl(bilde.url, 900)}
+    alt={tekst(bilde.altTekst, sprak)}
+    loading="lazy"
+    class:list={['w-full rounded-stor object-cover', form]}
+  />
+  {
+    bilde.fotokreditt && (
+      <figcaption class="mt-2 font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</figcaption>
+    )
+  }
+</figure>

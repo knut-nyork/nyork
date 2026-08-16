@@ -2,6 +2,7 @@ import {localeBlockContent, localeString, localeText} from './objects/locale'
 import {bildeMedKreditering} from './objects/bilde'
 import {
   blokkArtikkel,
+  blokkBilder,
   blokkKort,
   blokkBudskap,
   blokkFremhevet,
@@ -40,6 +41,7 @@ export const schemaTypes = [
   blokkUtvalgteHytter,
   blokkSitat,
   blokkKort,
+  blokkBilder,
   blokkNyheter,
   blokkFremhevet,
 

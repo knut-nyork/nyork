@@ -1,0 +1,54 @@
+---
+import Galleribilde from './Galleribilde.astro'
+import {tekst, type Sprak} from '../../lib/sprak'
+import type {BlokkBilder} from '../../lib/typer'
+
+/**
+ * To eller tre bilder som ikke står på like linjer.
+ *
+ * Symmetri er rolig, men også litt kjedelig — like store bilder på rad leses
+ * som et arkivutdrag. Her er venstre spalte bred og høyre smal, og den smale
+ * er dyttet nedover, så øyet får noe å følge.
+ *
+ * To spalter og ikke ett rutenett med tre ruter: i et rutenett havner det
+ * tredje bildet på en ny rad, og siden bildene over er ulike høye, blir det
+ * stående et hull etter det korteste. Med spalter stables de tett.
+ *
+ * Forskyvningen gjelder bare fra `md` og opp. På en mobil er det én spalte,
+ * og da er et bilde som er dyttet nedover ikke asymmetrisk — bare et hull.
+ */
+interface Props {
+  blokk: BlokkBilder
+  sprak: Sprak
+}
+
+const {blokk, sprak} = Astro.props
+
+/** Skjemaet slipper bare gjennom to eller tre. Kuttet her er et sikkerhetsnett. */
+const [forste, andre, tredje] = (blokk.bilder ?? []).slice(0, 3)
+---
+
+{
+  forste && (
+    <section class="mx-auto max-w-[800px] px-5 py-16 md:px-10 md:py-24">
+      {blokk.overskrift && (
+        <h2 class="mb-10 font-heading text-xlarge font-semibold md:text-2xlarge">
+          {tekst(blokk.overskrift, sprak)}
+        </h2>
+      )}
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start md:gap-6">
+        <div class="flex flex-col gap-5 md:col-span-7 md:gap-6">
+          <Galleribilde bilde={forste} form="aspect-[4/3]" sprak={sprak} />
+          {tredje && <Galleribilde bilde={tredje} form="aspect-[3/2]" sprak={sprak} />}
+        </div>
+
+        {andre && (
+          <div class="md:col-span-5 md:mt-16">
+            <Galleribilde bilde={andre} form="aspect-[4/5]" sprak={sprak} />
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}

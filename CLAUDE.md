@@ -128,6 +128,7 @@ Forsiden har ingen fast rekkefølge i koden. Den er en liste med blokker på `si
 | `blokkStatus` | Antall hytter og tomter. **Tallene telles opp i Sanity, aldri skrevet inn** |
 | `blokkUtvalgteHytter` | Hyttekort, enten de ledige automatisk eller håndplukkede |
 | `blokkSitat` | Sitat fra familien. Dialekt urørt, engelsk oversettelse *under* |
+| `blokkBilder` | To eller tre bilder i ulik størrelse, forskjøvet i forhold til hverandre |
 | `blokkNyheter` | Nyhetssaker, enten de nyeste automatisk eller håndplukkede |
 | `blokkFremhevet` | Bilde i full bredde med tekstpanel oppå |
 

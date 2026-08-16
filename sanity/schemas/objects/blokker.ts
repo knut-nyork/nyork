@@ -2,6 +2,7 @@ import {DocumentIcon} from '@sanity/icons/Document'
 import {DocumentTextIcon} from '@sanity/icons/DocumentText'
 import {HomeIcon} from '@sanity/icons/Home'
 import {ImageIcon} from '@sanity/icons/Image'
+import {ImagesIcon} from '@sanity/icons/Images'
 import {LinkIcon} from '@sanity/icons/Link'
 import {TagIcon} from '@sanity/icons/Tag'
 import {UserIcon} from '@sanity/icons/User'
@@ -144,6 +145,40 @@ export const blokkArtikkel = defineType({
     prepare: ({title, aktiv, media}) => ({
       title: title || 'Bilde og tekst',
       subtitle: aktiv ? 'Bilde og tekst' : 'Bilde og tekst — skrudd av',
+      media,
+    }),
+  },
+})
+
+export const blokkBilder = defineType({
+  name: 'blokkBilder',
+  title: 'Bilder',
+  type: 'object',
+  icon: ImagesIcon,
+  description: 'To eller tre bilder i ulik størrelse, forskjøvet i forhold til hverandre.',
+  fields: [
+    aktiv,
+    defineField({
+      name: 'overskrift',
+      title: 'Overskrift',
+      type: 'localeString',
+      description: 'Valgfri. La den stå tom om bildene skal tale for seg.',
+    }),
+    defineField({
+      name: 'bilder',
+      title: 'Bilder',
+      type: 'array',
+      of: [defineArrayMember({type: 'bildeMedKreditering'})],
+      description:
+        'To eller tre bilder. Rekkefølgen bestemmer plassen: det første blir det store til venstre, det andre står mindre og lavere til høyre, det tredje bredt under. Fire bilder har ingen plass i oppsettet.',
+      validation: (Rule) => Rule.required().min(2).max(3),
+    }),
+  ],
+  preview: {
+    select: {title: 'overskrift.no', aktiv: 'aktiv', media: 'bilder.0.bilde', antall: 'bilder'},
+    prepare: ({title, aktiv, media, antall}) => ({
+      title: title || 'Bilder',
+      subtitle: `${aktiv ? 'Bilder' : 'Bilder — skrudd av'} · ${antall?.length ?? 0} stk`,
       media,
     }),
   },
@@ -534,6 +569,7 @@ export const BLOKKTYPER = [
   'blokkUtvalgteHytter',
   'blokkSitat',
   'blokkKort',
+  'blokkBilder',
   'blokkNyheter',
   'blokkFremhevet',
 ] as const

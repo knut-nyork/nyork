@@ -105,6 +105,13 @@ export interface BlokkArtikkel extends Blokkbase {
   knapp?: Knapp
 }
 
+export interface BlokkBilder extends Blokkbase {
+  _type: 'blokkBilder'
+  overskrift?: LokalTekst
+  /** To eller tre. Rekkefølgen bestemmer plassen i oppsettet. */
+  bilder: Bilde[]
+}
+
 export interface Statusrad {
   etikett: LokalTekst
   /** «solgte» og «ledige» telles i Sanity. «manuelt» skrives inn. */
@@ -186,6 +193,7 @@ export type Blokk =
   | BlokkUtvalgteHytter
   | BlokkSitat
   | BlokkKort
+  | BlokkBilder
   | BlokkNyheter
   | BlokkFremhevet
 

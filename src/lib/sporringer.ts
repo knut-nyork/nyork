@@ -118,6 +118,10 @@ const BLOKKER = `blokker[aktiv != false]{
     oversettelse,
     "portrett": portrett${BILDE}
   },
+  _type == "blokkBilder" => {
+    overskrift,
+    "bilder": bilder[]${BILDE}
+  },
   _type == "blokkNyheter" => {
     overskrift,
     utvalg,

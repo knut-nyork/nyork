@@ -279,8 +279,14 @@ const ARTIKLER = `*[_type == "artikkel" && skjulIListe != true] | order(dato des
   forfatter
 }`
 
-/** Uten filter: også skjulte saker skal få sin egen side bygget. */
-const ARTIKKELSTIER = `*[_type == "artikkel"]{"slug": slug.current}`
+/**
+ * Slugene som skal bli sider under /siste-nytt.
+ *
+ * Saker med `skjulIListe` er utelatt. De har fått sin egen adresse i
+ * `src/pages/`, og bygde vi dem her også, ville nøyaktig samme tekst ligget
+ * på to URL-er — og Google måtte gjettet hvilken som gjelder.
+ */
+const ARTIKKELSTIER = `*[_type == "artikkel" && skjulIListe != true]{"slug": slug.current}`
 
 const ARTIKKEL = `*[_type == "artikkel" && slug.current == $slug][0]{
   tittel,
@@ -288,6 +294,7 @@ const ARTIKKEL = `*[_type == "artikkel" && slug.current == $slug][0]{
   dato,
   ingress,
   "bilde": bilde${BILDE},
+  "avslutningsbilde": avslutningsbilde${BILDE},
   brodtekst,
   forfatter
 }`

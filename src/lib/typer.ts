@@ -265,6 +265,8 @@ export interface Artikkel {
   dato: string
   ingress?: LokalTekst
   bilde?: Bilde
+  /** Valgfritt bilde i full bredde etter teksten. */
+  avslutningsbilde?: Bilde
   brodtekst?: LokalRiktekst
   forfatter?: string
 }

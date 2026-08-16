@@ -1,0 +1,48 @@
+---
+import Sidemal from '../../layouts/Sidemal.astro'
+import Artikkelmal from '../../components/Artikkelmal.astro'
+import Riktekst from '../../components/Riktekst.astro'
+import {bildeUrl, forstAvsnitt} from '../../lib/hytter'
+import {hentArtikkel} from '../../lib/sporringer'
+import {tekst} from '../../lib/sprak'
+import {UI} from '../../lib/tekster'
+
+/** Engelsk motpart til /slik-blir-nyork. Se den for hvorfor siden ligger utenfor /siste-nytt. */
+const SLUG = 'slik-blir-nyork'
+
+const artikkel = await hentArtikkel(SLUG)
+if (!artikkel) return Astro.redirect('/404')
+
+const ui = UI['en']
+const tittel = tekst(artikkel.tittel, 'en')
+const ingress = tekst(artikkel.ingress, 'en')
+const avslutningsbilde = artikkel.avslutningsbilde
+---
+
+<Sidemal
+  norskSti="/slik-blir-nyork"
+  tittel={`${tittel} · ${ui.tittelSuffiks}`}
+  metaBeskrivelse={ingress ? forstAvsnitt(ingress) : undefined}
+>
+  <Artikkelmal sprak="en" tittel={tittel} ingress={ingress} bilde={artikkel.bilde}>
+    <Riktekst blokker={artikkel.brodtekst?.en ?? artikkel.brodtekst?.no ?? []} sprak="en" />
+
+    {
+      avslutningsbilde && (
+        <figure class="m-0 mt-4">
+          <img
+            src={bildeUrl(avslutningsbilde.url, 1600)}
+            alt={tekst(avslutningsbilde.altTekst, 'en')}
+            loading="lazy"
+            class="w-full rounded-stor"
+          />
+          {avslutningsbilde.fotokreditt && (
+            <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
+              {avslutningsbilde.fotokreditt}
+            </figcaption>
+          )}
+        </figure>
+      )
+    }
+  </Artikkelmal>
+</Sidemal>

@@ -1,0 +1,60 @@
+---
+import Sidemal from '../layouts/Sidemal.astro'
+import Artikkelmal from '../components/Artikkelmal.astro'
+import Riktekst from '../components/Riktekst.astro'
+import {bildeUrl, forstAvsnitt} from '../lib/hytter'
+import {hentArtikkel} from '../lib/sporringer'
+import {tekst} from '../lib/sprak'
+import {UI} from '../lib/tekster'
+
+/**
+ * «Slik blir Nyørk» — hva feltet blir når alt står ferdig.
+ *
+ * Innholdet er en artikkel i Sanity, men siden er ikke en nyhet, og ligger
+ * derfor ikke under /siste-nytt. Artikkelen har `skjulIListe`, som både
+ * holder den ute av nyhetslista og hindrer at den bygges der også — samme
+ * tekst på to adresser er én for mye.
+ *
+ * Malen er den samme som nyhetssakene bruker. Formen passer: tittel, bilde,
+ * og en smal lesekolonne under.
+ *
+ * Står ikke i hovedmenyen. Veien inn er fremhevet-blokka på forsiden.
+ */
+const SLUG = 'slik-blir-nyork'
+
+const artikkel = await hentArtikkel(SLUG)
+if (!artikkel) return Astro.redirect('/404')
+
+const ui = UI['no']
+const tittel = tekst(artikkel.tittel, 'no')
+const ingress = tekst(artikkel.ingress, 'no')
+const avslutningsbilde = artikkel.avslutningsbilde
+---
+
+<Sidemal
+  norskSti={`/${SLUG}`}
+  tittel={`${tittel} · ${ui.tittelSuffiks}`}
+  metaBeskrivelse={ingress ? forstAvsnitt(ingress) : undefined}
+>
+  <Artikkelmal sprak="no" tittel={tittel} ingress={ingress} bilde={artikkel.bilde}>
+    <Riktekst blokker={artikkel.brodtekst?.no ?? []} sprak="no" />
+
+    {
+      avslutningsbilde && (
+        <figure class="m-0 mt-4">
+          <img
+            src={bildeUrl(avslutningsbilde.url, 1600)}
+            alt={tekst(avslutningsbilde.altTekst, 'no')}
+            loading="lazy"
+            class="w-full rounded-stor"
+          />
+          {avslutningsbilde.fotokreditt && (
+            <figcaption class="mt-2 text-right font-detail text-2xsmall text-foreground-muted">
+              {avslutningsbilde.fotokreditt}
+            </figcaption>
+          )}
+        </figure>
+      )
+    }
+  </Artikkelmal>
+</Sidemal>

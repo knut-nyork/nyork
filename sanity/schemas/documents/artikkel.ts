@@ -55,11 +55,18 @@ export const artikkel = defineType({
       description: 'Valgfritt — navnet som skal stå på artikkelen.',
     }),
     defineField({
+      name: 'avslutningsbilde',
+      title: 'Bilde nederst',
+      type: 'bildeMedKreditering',
+      description:
+        'Valgfritt. Vises i full bredde etter teksten. Bruk det når saken slutter med noe som er verdt å se — et ferdig resultat, en tegning av det som kommer.',
+    }),
+    defineField({
       name: 'skjulIListe',
-      title: 'Skjul i nyhetslista',
+      title: 'Ligger på sin egen adresse',
       type: 'boolean',
       description:
-        'Saken får fortsatt sin egen side og kan lenkes til, men står ikke under Siste nytt. For sider som beskriver prosjektet framfor å fortelle om noe som nettopp har skjedd.',
+        'Saken står ikke under Siste nytt, og får heller ingen side der. Skru dette på bare for sider som har fått sin egen adresse i koden — som «Slik blir Nyørk» på /slik-blir-nyork. Skrur du det på for en vanlig sak, blir den utilgjengelig.',
       initialValue: false,
     }),
   ],

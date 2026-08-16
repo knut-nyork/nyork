@@ -114,6 +114,12 @@ shadcn/ui-komponenter må kalles fra en `.tsx`-fil, aldri direkte i `.astro`. Re
 
 **Navngiving:** komponenter i koden har samme navn som i Figma. Norske navn er greit og foretrukket — teamet snakker norsk om komponentene.
 
+## Artikler som ikke er nyheter
+
+En `artikkel` med `skjulIListe` står ikke under Siste nytt, og bygges heller ikke der. Den må ha sin egen side i `src/pages/`, en for hvert språk, og en linje i `RUTER` i `src/lib/sprak.ts`. `/slik-blir-nyork` er mønsteret — den bruker `Artikkelmal` som nyhetssakene, men ligger utenfor `/siste-nytt` fordi den beskriver prosjektet og ikke noe som nettopp har skjedd.
+
+Skrur noen på flagget uten å lage sida, blir artikkelen utilgjengelig uten at noe feiler.
+
 ## Forsiden bygges av blokker
 
 Forsiden har ingen fast rekkefølge i koden. Den er en liste med blokker på `side`-dokumentet, og redaktøren bestemmer selv hvilke som er med, i hvilken rekkefølge, og om en blokk er synlig akkurat nå.
@@ -226,6 +232,6 @@ PUBLIC_SANITY_DATASET=production
 - Datasettet er offentlig lesbart på gratisplanen. Avklar om utkast med priser er greit
 - Bilderettigheter fra salgsoppgaven må avklares før publisering
 - Tomtesiden er ikke designet i Figma — bygges som variant av hyttelista
-- **Hovedmenyen lenker til `/tomter`, `/omradet` og `/siste-nytt`, som ikke finnes ennå og gir 404.** Samme grunn til at nyhetskortene på forsiden ikke er klikkbare — se kommentaren i `BlokkNyheter.astro` for hvor lenken skal inn når sidene bygges
+- Nyhetskortene på forsiden er ikke klikkbare ennå — se kommentaren i `BlokkNyheter.astro` for hvor lenken skal inn
 - ITC Franklin Gothic LT Pro: webfont-lisens mangler
 - Alle kontoer står på `knut@nyork.no`. Vurder å legge til Gaute som medlem i Sanity-org og Netlify-team, så prosjektet ikke er avhengig av én person

@@ -19,6 +19,8 @@ export const RUTER: readonly {no: string; en: string}[] = [
   {no: '/tomter', en: '/en/plots'},
   {no: '/omradet', en: '/en/area'},
   {no: '/siste-nytt', en: '/en/news'},
+  /* Står ikke i menyen. Den lenkes til fra fremhevet-blokka på forsiden. */
+  {no: '/slik-blir-nyork', en: '/en/how-nyork-grows'},
   {no: '/personvern', en: '/en/privacy'},
 ]
 

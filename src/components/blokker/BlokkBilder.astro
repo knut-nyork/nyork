@@ -24,6 +24,23 @@ interface Props {
 
 const {blokk, sprak} = Astro.props
 
+/**
+ * Hvor mye hvert bilde beveger seg. Tallene er ulike med vilje — beveger alle
+ * tre likt, ser det ut som at hele blokka sklir, og ikke som dybde.
+ *
+ * Det smale bildet driver motsatt vei av de to brede. Det er den motsatte
+ * retningen som gjør at spaltene løsner fra hverandre; drev de samme vei,
+ * ville det bare sett ut som at siden rullet litt tregt.
+ *
+ * Negativ forsinkelse starter pusten midt i syklusen, så de tre ikke er i
+ * takt fra første sekund.
+ */
+const BEVEGELSE = {
+  stor: {parallakse: '22px', tid: '9s', forsinkelse: '0s'},
+  smal: {parallakse: '-30px', tid: '11s', forsinkelse: '-3.5s'},
+  under: {parallakse: '14px', tid: '10s', forsinkelse: '-7s'},
+}
+
 /** Skjemaet slipper bare gjennom to eller tre. Kuttet her er et sikkerhetsnett. */
 const [forste, andre, tredje] = (blokk.bilder ?? []).slice(0, 3)
 ---
@@ -39,13 +56,15 @@ const [forste, andre, tredje] = (blokk.bilder ?? []).slice(0, 3)
 
       <div class="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start md:gap-6">
         <div class="flex flex-col gap-5 md:col-span-7 md:gap-6">
-          <Galleribilde bilde={forste} form="aspect-[4/3]" sprak={sprak} />
-          {tredje && <Galleribilde bilde={tredje} form="aspect-[3/2]" sprak={sprak} />}
+          <Galleribilde bilde={forste} form="aspect-[4/3]" bevegelse={BEVEGELSE.stor} sprak={sprak} />
+          {tredje && (
+            <Galleribilde bilde={tredje} form="aspect-[3/2]" bevegelse={BEVEGELSE.under} sprak={sprak} />
+          )}
         </div>
 
         {andre && (
           <div class="md:col-span-5 md:mt-16">
-            <Galleribilde bilde={andre} form="aspect-[4/5]" sprak={sprak} />
+            <Galleribilde bilde={andre} form="aspect-[4/5]" bevegelse={BEVEGELSE.smal} sprak={sprak} />
           </div>
         )}
       </div>

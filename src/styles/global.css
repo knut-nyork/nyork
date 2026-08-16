@@ -360,6 +360,69 @@
     margin-top: 0.625rem;
   }
 
+  /*
+    Bildene i bildeblokka beveger seg litt.
+
+    To lag som må holdes fra hverandre, ellers overskriver de hverandres
+    `transform`: rammen driver forbi når du ruller, og bildet inni puster
+    sakte opp og ned. Fordi det ene ligger inni det andre, legger nettleseren
+    bevegelsene sammen av seg selv.
+
+    Hvor mye hvert bilde flytter seg settes per bilde i BlokkBilder. Ulike
+    tall er hele poenget — beveger alle tre likt, ser det ut som at blokka
+    sklir, ikke som dybde.
+
+    Alt ligger bak `prefers-reduced-motion`. Bevegelse som ikke lar seg
+    stoppe gjør noen kvalme og andre svimle, og et bilde som driver er ikke
+    verdt det.
+  */
+  @media (prefers-reduced-motion: no-preference) {
+    .kollasjebilde > img {
+      animation: flyt var(--flyt-tid, 10s) ease-in-out infinite alternate;
+      /* Negativ forsinkelse starter midt i syklusen, så de tre aldri er i takt. */
+      animation-delay: var(--flyt-forsinkelse, 0s);
+    }
+
+    /*
+      Parallaksen er rullestyrt CSS, ikke JavaScript. Nettlesere som ikke
+      kan det, viser bildene i ro — det er en helt grei side. Derfor
+      @supports og ingen reservefunksjon.
+
+      Egenskapene står én for én og ikke som `animation:`-snarvei. Det er
+      ikke pedanteri: minifikatoren slår snarveien og `animation-timeline`
+      sammen til `animation: linear both parallakse view()`, og den formen
+      godtar ingen nettleser — navnet blir `none` og tidslinja `auto`.
+      Parallaksen virker da i utviklingsserveren og er død i produksjon,
+      som er den verste sorten feil. Sett den ikke tilbake til snarvei.
+    */
+    @supports (animation-timeline: view()) {
+      .kollasjebilde {
+        animation-name: parallakse;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+      }
+    }
+  }
+
+  @keyframes flyt {
+    from {
+      transform: translateY(-5px);
+    }
+    to {
+      transform: translateY(5px);
+    }
+  }
+
+  @keyframes parallakse {
+    from {
+      transform: translateY(var(--parallakse, 24px));
+    }
+    to {
+      transform: translateY(calc(var(--parallakse, 24px) * -1));
+    }
+  }
+
   /* Deleknappen i metalinja. Ser ut som tekst, oppfører seg som knapp. */
   .deleknapp {
     display: inline-flex;

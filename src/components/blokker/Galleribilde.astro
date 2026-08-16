@@ -6,18 +6,27 @@ import type {Bilde} from '../../lib/typer'
 /**
  * Ett bilde i bildeblokka. Skilt ut fordi det står tre steder i BlokkBilder,
  * og fotokreditten skal følge bildet alle tre.
+ *
+ * Bevegelsen ligger på to nivåer: rammen driver forbi når du ruller, bildet
+ * inni puster sakte. Se `.kollasjebilde` i global.css for hvorfor det må
+ * være to elementer og ikke ett.
  */
 interface Props {
   bilde: Bilde
   /** Sideforholdet plassen i oppsettet har, for eksempel «aspect-[4/3]». */
   form: string
+  /** Hvor langt og hvor fort dette bildet beveger seg. Se BEVEGELSE i BlokkBilder. */
+  bevegelse: {parallakse: string; tid: string; forsinkelse: string}
   sprak: Sprak
 }
 
-const {bilde, form, sprak} = Astro.props
+const {bilde, form, bevegelse, sprak} = Astro.props
 ---
 
-<figure class="m-0">
+<figure
+  class="kollasjebilde m-0"
+  style={`--parallakse: ${bevegelse.parallakse}; --flyt-tid: ${bevegelse.tid}; --flyt-forsinkelse: ${bevegelse.forsinkelse}`}
+>
   <img
     src={bildeUrl(bilde.url, 900)}
     alt={tekst(bilde.altTekst, sprak)}

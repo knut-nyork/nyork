@@ -405,6 +405,57 @@
     }
   }
 
+  /*
+    Kortene stiger fram idet de kommer inn i skjermen, litt forskjøvet i tid
+    så raden ikke slår opp som ett bilde.
+
+    Rullestyrt som parallaksen, og med samme forbehold: egenskapene står én
+    for én, aldri som `animation:`-snarvei — se `.kollasjebilde` for hva
+    minifikatoren gjør med snarveien.
+
+    Bevegelsen skal være ferdig godt før kortet står midt på skjermen. Et kort
+    som fortsatt toner inn mens du leser det, er en feil og ikke en effekt.
+
+    Ligger inne i @supports, så nettlesere uten rullestyrte animasjoner aldri
+    ser `opacity: 0`. Der står kortene bare stille, som de skal.
+  */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .stigfram {
+        animation-name: stigfram;
+        animation-timing-function: ease-out;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range-start: entry 5%;
+        animation-range-end: entry 60%;
+      }
+
+      /* Forskyvningen: hvert kort bruker litt lengre på å komme fram. */
+      .stigfram:nth-child(2) {
+        animation-range-end: entry 72%;
+      }
+
+      .stigfram:nth-child(3) {
+        animation-range-end: entry 84%;
+      }
+
+      .stigfram:nth-child(4) {
+        animation-range-end: entry 96%;
+      }
+    }
+  }
+
+  @keyframes stigfram {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   @keyframes flyt {
     from {
       transform: translateY(-5px);

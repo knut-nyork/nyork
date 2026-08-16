@@ -18,6 +18,14 @@ import type {BlokkKort, Kort} from '../../lib/typer'
  *
  * Er kortet lenket, blir hele flaten klikkbar. Uten lenke er det et vanlig
  * <article>, ikke en <a> som ikke går noe sted.
+ *
+ * Og uten lenke får det heller ingen kortflate. Et bilde i en hevet ramme med
+ * tittel under ser ut som en knapp — og noe som ser klikkbart ut uten å være
+ * det, er en liten skuffelse hver gang noen prøver. Da ligger bildet og
+ * teksten rett på sideflaten i stedet, som innhold og ikke som kontroll.
+ *
+ * `tekstOver` beholder flaten uansett. Der ligger teksten oppå et mønster og
+ * må ha noe å stå på for å være lesbar.
  */
 interface Props {
   blokk: BlokkKort
@@ -46,15 +54,17 @@ function lenke(kort: Kort): string | undefined {
       blokk.kort.map((kort) => {
         const href = lenke(kort)
         const Flate = href ? 'a' : 'article'
+        const harFlate = Boolean(href) || tekstOver
 
         return (
-          <li>
+          <li class="stigfram">
             <Flate
               href={href}
               class:list={[
-                'hevet relative flex h-full flex-col overflow-hidden rounded-stor no-underline transition-colors',
-                href && 'hover:border-border-focus',
-                tekstOver ? 'aspect-square p-6' : 'p-3',
+                'relative flex h-full flex-col',
+                harFlate && 'hevet overflow-hidden rounded-stor',
+                href && 'no-underline transition-colors hover:border-border-focus',
+                tekstOver ? 'aspect-square p-6' : harFlate && 'p-3',
               ]}
             >
               {tekstOver ? (
@@ -93,7 +103,7 @@ function lenke(kort: Kort): string | undefined {
                     <Bildeplassholder sideforhold="1 / 1" />
                   )}
 
-                  <div class="px-2 pb-2 pt-4">
+                  <div class:list={[harFlate ? 'px-2 pb-2 pt-4' : 'pt-4']}>
                     {kort.etikett && (
                       <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
                         {tekst(kort.etikett, sprak)}

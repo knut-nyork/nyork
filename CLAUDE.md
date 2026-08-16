@@ -226,7 +226,7 @@ PUBLIC_SANITY_DATASET=production
 ## Åpne punkter
 
 - Domenet nyørk.no overføres **først når siden er helt ferdig**. Fram til da kjører vi på Netlify-URL
-- **Netlify-teamet krever SSO-innlogging på alle prosjekter.** Siden er derfor usynlig for andre enn teamet. Greit nå, må av før lansering
+- **Netlify SSO står på (`sso_login: true`, kontekst `all`) og svarer før alt annet.** Det betyr at passordsperra i `netlify/edge-functions/passord.ts` aldri blir nådd: en besøkende møter Netlifys egen innlogging, ikke vår. Skal medeiere se siden uten Netlify-konto, må SSO av først — `npx netlify-cli api updateSite --data '{"site_id":"2db966c3-1ef5-4279-af68-7e05e4a21aca","body":{"sso_login":false}}'`. Da er passordet det eneste som står mellom publikum og prisene, og det skal det være fram til lansering
 - **Netlify Forms er ikke aktivert.** Må skrus på før interesseskjemaet virker
 - Netlify Free bruker kredittmodell og stopper trafikk ved ca. 15 GB. **Må oppgraderes før lansering**
 - Datasettet er offentlig lesbart på gratisplanen. Avklar om utkast med priser er greit

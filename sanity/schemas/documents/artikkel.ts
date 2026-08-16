@@ -54,6 +54,14 @@ export const artikkel = defineType({
       type: 'string',
       description: 'Valgfritt — navnet som skal stå på artikkelen.',
     }),
+    defineField({
+      name: 'skjulIListe',
+      title: 'Skjul i nyhetslista',
+      type: 'boolean',
+      description:
+        'Saken får fortsatt sin egen side og kan lenkes til, men står ikke under Siste nytt. For sider som beskriver prosjektet framfor å fortelle om noe som nettopp har skjedd.',
+      initialValue: false,
+    }),
   ],
   preview: {
     select: {title: 'tittel.no', subtitle: 'dato', media: 'bilde.bilde'},

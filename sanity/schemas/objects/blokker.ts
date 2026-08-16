@@ -548,7 +548,13 @@ export const blokkFremhevet = defineType({
     defineField({name: 'overskrift', title: 'Overskrift', type: 'localeString', validation: (Rule) => Rule.required()}),
     defineField({name: 'tekst', title: 'Tekst', type: 'localeText'}),
     defineField({name: 'bilde', title: 'Bakgrunnsbilde', type: 'bildeMedKreditering'}),
-    defineField({name: 'knapp', title: 'Knapp', type: 'blokkKnapp'}),
+    defineField({
+      name: 'knapp',
+      title: 'Lenke',
+      type: 'blokkKnapp',
+      description:
+        'Setter du en lenke her, blir hele blokka klikkbar. Teksten vises som knapp på mobil, der det verken finnes peker eller hover å gå etter.',
+    }),
   ],
   preview: {
     select: {title: 'overskrift.no', aktiv: 'aktiv', media: 'bilde.bilde'},

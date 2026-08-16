@@ -128,7 +128,7 @@ const BLOKKER = `blokker[aktiv != false]{
     antall,
     knapp${KNAPP},
     "valgte": artikler[]->${ARTIKKEL_KORT},
-    "automatiske": *[_type == "artikkel"] | order(dato desc)[0...12]${ARTIKKEL_KORT}
+    "automatiske": *[_type == "artikkel" && skjulIListe != true] | order(dato desc)[0...12]${ARTIKKEL_KORT}
   },
   _type == "blokkKort" => {
     overskrift,
@@ -262,7 +262,15 @@ const OMRADESEKSJONER = `*[_type == "omradeInnhold"] | order(rekkefolge asc){
   vinterInnhold
 }`
 
-const ARTIKLER = `*[_type == "artikkel"] | order(dato desc){
+/**
+ * Sakene som skal stå i lista. `skjulIListe` er for sider som ligger under
+ * /siste-nytt fordi de bruker artikkelmalen, men som ikke er nyheter — de
+ * beskriver prosjektet i stedet for noe som nettopp har skjedd.
+ *
+ * `!= true` og ikke `== false`, så saker skrevet før feltet fantes fortsatt
+ * vises. Samme regel som `aktiv` på blokkene.
+ */
+const ARTIKLER = `*[_type == "artikkel" && skjulIListe != true] | order(dato desc){
   tittel,
   "slug": slug.current,
   dato,
@@ -270,6 +278,9 @@ const ARTIKLER = `*[_type == "artikkel"] | order(dato desc){
   "bilde": bilde${BILDE},
   forfatter
 }`
+
+/** Uten filter: også skjulte saker skal få sin egen side bygget. */
+const ARTIKKELSTIER = `*[_type == "artikkel"]{"slug": slug.current}`
 
 const ARTIKKEL = `*[_type == "artikkel" && slug.current == $slug][0]{
   tittel,
@@ -349,8 +360,21 @@ export function hentOmradeseksjoner(): Promise<Omradeseksjon[]> {
   return sanity.fetch<Omradeseksjon[]>(OMRADESEKSJONER)
 }
 
+/** Sakene som skal stå i lista. Skjulte saker er allerede filtrert bort i GROQ. */
 export function hentArtikler(): Promise<Artikkel[]> {
   return sanity.fetch<Artikkel[]>(ARTIKLER)
+}
+
+/**
+ * Alle artikkelstier, også de skjulte. Brukes bare av `getStaticPaths` — en
+ * skjult sak skal ha sin egen side, den skal bare ikke stå i lista.
+ *
+ * Egen funksjon og ikke et flagg på `hentArtikler()`, fordi den som bygger
+ * ruter og den som bygger lista skal ha åpenbart forskjellige verktøy. Med
+ * ett felles kall ville en skjult sak før eller siden havnet i lista igjen.
+ */
+export function hentArtikkelstier(): Promise<{slug: string}[]> {
+  return sanity.fetch<{slug: string}[]>(ARTIKKELSTIER)
 }
 
 export function hentArtikkel(slug: string): Promise<Artikkel | null> {

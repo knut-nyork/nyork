@@ -116,6 +116,11 @@ const bilde = blokk.bakgrunnsbilde
 
   if (felter.length > 0 && !villeHaRo) {
     const VARIGHET = 900
+    /* Et lite pust før det første tallet begynner, så opptellingen ikke
+       starter i samme øyeblikk som båndet skyves inn i skjermen. */
+    const VENT = 140
+    /* Og litt mellom hvert tall, så de fire ikke løper i takt. */
+    const TRINN = 90
 
     function tellOpp(felt: HTMLElement, mal: number) {
       const start = performance.now()
@@ -142,8 +147,13 @@ const bilde = blokk.bakgrunnsbilde
           const mal = Number(felt.dataset.statustall)
           if (!Number.isFinite(mal)) continue
 
-          felt.textContent = '0'
-          tellOpp(felt, mal)
+          /* Nullstilles først når turen kommer, ikke i det blokka blir synlig.
+             Ellers står de bakerste tallene på null mens de venter. */
+          const plass = Array.prototype.indexOf.call(felter, felt)
+          window.setTimeout(() => {
+            felt.textContent = '0'
+            tellOpp(felt, mal)
+          }, VENT + plass * TRINN)
         }
       },
       // Vent til båndet faktisk er synlig, ikke bare så vidt over kanten.

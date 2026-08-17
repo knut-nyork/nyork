@@ -18,6 +18,14 @@ import type {BlokkSitat} from '../../lib/typer'
  *
  * Portrettet vises i gråtoner. Det holder ansiktet rolig ved siden av en side
  * full av farge, og gjør at bilder tatt i ulikt lys ser ut som ett sett.
+ *
+ * Det er rundt og lite, og ligger halvveis oppå sitatflaten. To rektangler
+ * side ved side leses som to ting; en sirkel som bryter kanten leses som at
+ * ansiktet hører til ordene. Kanten rundt er sideflatens farge, samme grep
+ * som i bildeparet i artikkelblokka — flatene skilles med farge, ikke skygge.
+ *
+ * På mobil er det ikke plass til å stikke utenfor. Der står portrettet over
+ * flaten i stedet, midtstilt, og overlappet blir en bit mindre.
  */
 interface Props {
   blokk: BlokkSitat
@@ -30,24 +38,29 @@ const portrett = blokk.portrett
 ---
 
 <section class="mx-auto max-w-[800px] px-5 py-20 md:px-10 md:py-32">
-  <figure class="m-0 grid items-stretch gap-5 md:grid-cols-[minmax(0,0.8fr)_1.2fr]">
-    <div class="overflow-hidden rounded-stor">
-      {
-        portrett ? (
-          <img
-            src={bildeUrl(portrett.url, 800)}
-            alt={tekst(portrett.altTekst, sprak)}
-            loading="lazy"
-            class="h-full w-full object-cover grayscale"
-            style="min-height: 260px;"
-          />
-        ) : (
-          <Bildeplassholder sideforhold="3 / 4" className="h-full w-full" />
-        )
-      }
-    </div>
+  <figure class="relative m-0 flex flex-col items-center md:block">
+    {
+      portrett ? (
+        <img
+          src={bildeUrl(portrett.url, 400)}
+          alt={tekst(portrett.altTekst, sprak)}
+          loading="lazy"
+          class="relative z-10 size-28 shrink-0 rounded-full border-4 border-flate-side object-cover grayscale md:absolute md:left-0 md:top-1/2 md:size-36 md:-translate-y-1/2"
+        />
+      ) : (
+        <div
+          class="relative z-10 size-28 shrink-0 rounded-full border-4 border-flate-side bg-background-surface-3 md:absolute md:left-0 md:top-1/2 md:size-36 md:-translate-y-1/2"
+          aria-hidden="true"
+        />
+      )
+    }
 
-    <div class="flex flex-col justify-center gap-6 rounded-stor bg-background-surface-4 p-7 md:p-9">
+    <!-- Flaten skyves inn fra venstre og får ekstra polstring der, så teksten
+         aldri havner under portrettet. På mobil ligger portrettet over, og da
+         trengs bare litt negativ marg for at de skal møtes. -->
+    <div
+      class="-mt-12 flex w-full flex-col justify-center gap-6 rounded-stor bg-background-surface-4 p-7 pt-16 md:mt-0 md:ml-16 md:w-auto md:p-9 md:pl-32"
+    >
       <!-- Anførselstegnet er dekor, ikke tekst. Skjermlesere skal lese sitatet,
            ikke to tegn foran det. -->
       <svg

@@ -19,13 +19,13 @@ const brodtekst = tekst(blokk.tekst, sprak)
 const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
 ---
 
-<section class="mx-auto max-w-[1600px] px-5 py-10 md:px-10">
+<section class="mx-auto max-w-[1600px] px-5 py-14 md:px-10 md:py-20">
   <!-- Sandflaten er den varme motvekten til en ellers kjølig side, og det
        ene stedet på forsiden mønsteret brukes. `overflow-hidden` klipper
        treårene etter hjørnene, og innholdet må ligge `relative` for å havne
        over dekoren. -->
   <div
-    class="relative grid gap-6 overflow-hidden rounded-stor bg-flate-sand p-8 md:grid-cols-2 md:items-center md:gap-12 md:p-12"
+    class="relative grid gap-6 overflow-hidden rounded-stor bg-flate-sand p-10 md:min-h-[380px] md:grid-cols-2 md:items-center md:gap-16 md:p-20"
   >
     <Tremonster styrke={0.05} />
 

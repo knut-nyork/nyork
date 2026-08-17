@@ -93,8 +93,13 @@ const kanonisk = sprak === 'no' ? norskUrl : engelskUrl
     <Header sprak={sprak} norskSti={norskSti} innstillinger={innstillinger} />
 
     <!-- Luft under den flytende topplinja, på alle sider. Uten den ligger
-         innholdet — og på forsiden hero-bildet — klistret opp mot pilla. -->
-    <main id="innhold" class="pt-4 md:pt-6">
+         innholdet — og på forsiden hero-bildet — klistret opp mot pilla.
+
+         Tallet er ikke lufta du ser. Topplinja er `sticky` med `top`, og den
+         forskyvningen spiser av padden her: synlig avstand under = denne
+         verdien minus `top` på headeren. Skal de to være like store, må
+         padden være dobbelt så stor som `top`. -->
+    <main id="innhold" class="pt-6 md:pt-10">
       <slot />
       <Interesseskjema client:visible sprak={sprak} innstillinger={innstillinger} />
     </main>

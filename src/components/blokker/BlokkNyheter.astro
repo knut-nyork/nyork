@@ -1,4 +1,5 @@
 ---
+import Bildeplassholder from '../Bildeplassholder'
 import Blokkknapp from './Blokkknapp.astro'
 import {bildeUrl, formaterDato} from '../../lib/hytter'
 import {stiForSprak, tekst, type Sprak} from '../../lib/sprak'
@@ -13,6 +14,10 @@ import type {BlokkNyheter} from '../../lib/typer'
  * Hele kortet er lenka, ikke bare tittelen. Et bilde og en dato som hører til
  * saken skal kunne trykkes de også — særlig på berøringsskjerm, der et
  * lenkeord er et lite mål.
+ *
+ * Kortet har flate og kant fordi det faktisk går et sted. Det er regelen
+ * gjennom hele siden: kortflate betyr klikkbar. Formen er den samme som i
+ * nyhetslista på /siste-nytt, så de to stedene ikke ser ut som to systemer.
  *
  * Saker med `skjulIListe` kan ikke havne her: de er filtrert bort både i det
  * automatiske utvalget og fra lista, så lenken peker alltid på en side som
@@ -36,22 +41,32 @@ const ui = UI[sprak].forside
     ) : (
       <div class="mt-8 grid gap-6 md:grid-cols-2 md:gap-x-12">
         {blokk.artikler.map((sak) => (
-          <a href={stiForSprak(`/siste-nytt/${sak.slug}`, sprak)} class="group flex gap-4 no-underline">
-            {sak.bilde && (
-              /* Bildet zoomer innenfor sin egen ramme. Uten `overflow-hidden`
-                 her ville det vokst ut over naboen i stedet. */
-              <span class="h-20 w-20 flex-none overflow-hidden rounded-medium md:h-24 md:w-24">
+          <a
+            href={stiForSprak(`/siste-nytt/${sak.slug}`, sprak)}
+            class="hevet group flex h-full flex-col gap-4 rounded-stor p-4 no-underline transition-colors hover:border-border-focus"
+          >
+            {/* Bildet zoomer innenfor sin egen ramme. Uten `overflow-hidden`
+                her ville det vokst ut over kortkanten i stedet. */}
+            <span class="overflow-hidden rounded-medium">
+              {sak.bilde ? (
                 <img
-                  src={bildeUrl(sak.bilde.url, 240)}
+                  src={bildeUrl(sak.bilde.url, 700)}
                   alt={tekst(sak.bilde.altTekst, sprak)}
                   loading="lazy"
-                  class="h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.06]"
+                  class="aspect-[4/3] w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.06]"
                 />
-              </span>
-            )}
-            <div class="flex flex-col gap-1">
-              <h3 class="font-heading text-medium font-semibold group-hover:underline">{tekst(sak.tittel, sprak)}</h3>
-              <p class="m-0 font-detail text-xsmall text-foreground-muted">{formaterDato(sak.dato, sprak)}</p>
+              ) : (
+                <Bildeplassholder sideforhold="4 / 3" />
+              )}
+            </span>
+
+            <div class="flex flex-col gap-2 px-1 pb-1">
+              <time datetime={sak.dato} class="font-detail text-2xsmall text-foreground-muted">
+                {formaterDato(sak.dato, sprak)}
+              </time>
+              <h3 class="m-0 font-heading text-large font-semibold group-hover:underline">
+                {tekst(sak.tittel, sprak)}
+              </h3>
             </div>
           </a>
         ))}

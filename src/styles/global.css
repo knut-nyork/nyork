@@ -485,11 +485,32 @@
 
     Ingen `cursor: pointer` av samme grunn.
   */
+  /*
+    Alt her bruker `rotate`, `scale` og `translate` — aldri `transform`.
+
+    Det er ikke stilvalg: står `rotate` og `transform` i samme regel, stryker
+    minifikatoren `rotate`. Effekten virker da i utviklingsserveren og er
+    borte i produksjon. Samme felle som `animation`-snarveien i kollasjen.
+    Blander du dem inn igjen her, forsvinner vridningen uten at noe feiler.
+  */
   .bildepar__stort,
   .bildepar__lite {
     transition:
-      transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+      translate 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+      rotate 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
       scale 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  /*
+    Det lille bildet ligger litt på skrå, som et fotografi lagt løst oppå.
+    Skjevheten er ikke bevegelse, så den står utenfor reduced-motion — samme
+    vurdering som i kollasjen.
+
+    `rotate` og ikke `transform`: hover-effekten under bruker allerede
+    `transform`, og lå vridningen der, ville den ene overskrevet den andre.
+  */
+  .bildepar__lite {
+    rotate: -3.5deg;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -498,8 +519,11 @@
         scale: 0.985;
       }
 
+      /* Retter seg opp og kommer fram idet du peker på paret. */
       .bildepar:hover .bildepar__lite {
-        transform: translateY(6px) scale(1.04);
+        rotate: 0deg;
+        translate: 0 6px;
+        scale: 1.04;
       }
     }
   }

@@ -59,6 +59,25 @@ const faktarader: (typeof fakta)[] = []
 faktarader.push(fakta.slice(0, 2))
 for (let i = 2; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
 
+/**
+ * Rytmen bildene legges i, som gjentar seg nedover. Bredden som hentes fra
+ * Sanity følger plassen — et bilde over hele bredden trenger flere piksler
+ * enn ett som ligger i en tredjedel.
+ *
+ * Tallene er valgt for liggende bilder, som er det de fleste hyttebilder er.
+ * Et stående bilde beskjæres i toppen og bunnen; ligger et slikt feil i
+ * rekkefølgen, er det raskere å flytte det i Sanity enn å lage flere regler
+ * her.
+ */
+const BILDERYTME = [
+  {kolonner: 'md:col-span-12', form: 'aspect-[16/9]', bredde: 1600},
+  {kolonner: 'md:col-span-7', form: 'aspect-[4/3]', bredde: 1000},
+  {kolonner: 'md:col-span-5', form: 'aspect-[4/3]', bredde: 800},
+  {kolonner: 'md:col-span-5', form: 'aspect-square', bredde: 800},
+  {kolonner: 'md:col-span-7', form: 'aspect-[3/2]', bredde: 1000},
+  {kolonner: 'md:col-span-12', form: 'aspect-[21/9]', bredde: 1600},
+]
+
 ---
 
 <div class="mx-auto flex max-w-[1100px] flex-col gap-14 px-5 py-12 md:px-10">
@@ -126,28 +145,47 @@ for (let i = 2; i < fakta.length; i += 3) faktarader.push(fakta.slice(i, i + 3))
     )
   }
 
-  <!-- Bilderad. Uten bilder står to plassholdere med riktig sideforhold, slik
-       at layouten ikke hopper den dagen bildene kommer. -->
-  <div class="grid gap-5 sm:grid-cols-2">
+  <!--
+    Bildene. Ni like ruter leses som et arkiv; her får de ulik størrelse i en
+    rytme som gjentar seg, så siden puster mens du blar nedover.
+
+    Rytmen er bevisst rolig og uten skjeve bilder. Kollasjen på forsiden skal
+    lokke; dette galleriet skal vise rom. En kjøper som prøver å se hvor stor
+    stua er, er ikke tjent med at bildet ligger på skrå.
+
+    Uten bilder står to plassholdere med riktig sideforhold, slik at layouten
+    ikke hopper den dagen bildene kommer.
+  -->
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-12 md:gap-6">
     {
       flerebilder.length > 0 ? (
-        flerebilder.map((bilde) => (
-          <figure class="m-0">
-            <img
-              src={bildeUrl(bilde.url, 900)}
-              alt={tekst(bilde.altTekst, sprak)}
-              loading="lazy"
-              class="aspect-[4/3] w-full rounded-stor object-cover"
-            />
-            {bilde.fotokreditt && (
-              <figcaption class="mt-2 font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</figcaption>
-            )}
-          </figure>
-        ))
+        flerebilder.map((bilde, i) => {
+          const plass = BILDERYTME[i % BILDERYTME.length]
+
+          return (
+            <figure class:list={['stigfram m-0', plass.kolonner]}>
+              {/* Rammen klipper zoomen på hover. Uten den vokser bildet ut over naboen. */}
+              <div class="overflow-hidden rounded-stor">
+                <img
+                  src={bildeUrl(bilde.url, plass.bredde)}
+                  alt={tekst(bilde.altTekst, sprak)}
+                  loading="lazy"
+                  class:list={[
+                    'w-full object-cover transition-transform duration-700 motion-safe:hover:scale-[1.04]',
+                    plass.form,
+                  ]}
+                />
+              </div>
+              {bilde.fotokreditt && (
+                <figcaption class="mt-2 font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</figcaption>
+              )}
+            </figure>
+          )
+        })
       ) : (
         <>
-          <Bildeplassholder sideforhold="4 / 3" className="rounded-stor" />
-          <Bildeplassholder sideforhold="4 / 3" className="rounded-stor" />
+          <Bildeplassholder sideforhold="4 / 3" className="rounded-stor md:col-span-6" />
+          <Bildeplassholder sideforhold="4 / 3" className="rounded-stor md:col-span-6" />
         </>
       )
     }

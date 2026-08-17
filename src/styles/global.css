@@ -533,6 +533,57 @@
     }
   }
 
+  /*
+    Sesongfilteret over aktivitetskortene.
+
+    Rene radioknapper, ingen JavaScript. Alle kortene ligger i HTML-en hele
+    tida — Google ser hele tilbudet uansett hvilket filter som er valgt, og
+    tastaturnavigasjon virker uten at vi gjør noe.
+
+    Filtrert på `value` og ikke på id: to slike blokker på samme side ville
+    ellers trengt hver sine id-er, og CSS-en kunne ikke pekt på begge.
+
+    Kort merket «helear» står igjen uansett valg. Det er hele poenget med
+    den verdien — noe er like aktuelt i februar som i juli.
+  */
+  .aktivitetsfilter:has(input[value='vinter']:checked) [data-kortsesong='sommer'],
+  .aktivitetsfilter:has(input[value='sommer']:checked) [data-kortsesong='vinter'] {
+    display: none;
+  }
+
+  .sesongvalg > span {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding-inline: 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--semantic-color-border-subtle);
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.15s,
+      color 0.15s,
+      border-color 0.15s;
+  }
+
+  .sesongvalg > span:hover {
+    border-color: var(--semantic-color-border-default);
+  }
+
+  .sesongvalg > input:checked + span {
+    background-color: var(--semantic-color-background-surface-inreverse);
+    border-color: transparent;
+    color: var(--semantic-color-foreground-inreverse);
+  }
+
+  /* Fokusmarkeringen må havne på merket, ikke på den skjulte radioknappen. */
+  .sesongvalg > input:focus-visible + span {
+    outline: 2px solid var(--semantic-color-border-focus);
+    outline-offset: 2px;
+  }
+
   /* Deleknappen i metalinja. Ser ut som tekst, oppfører seg som knapp. */
   .deleknapp {
     display: inline-flex;

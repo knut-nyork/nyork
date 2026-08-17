@@ -497,10 +497,19 @@ export const blokkKort = defineType({
       hidden: ({parent}) => parent?.visning !== 'tekstOver',
     }),
     defineField({
+      name: 'visFilter',
+      title: 'Vis sesongfilter',
+      type: 'boolean',
+      description:
+        'Setter tre knapper over kortene — Alle, Vinter, Sommer — så leseren kan se hva som er mulig i den sesongen hen kommer. Krever at kortene har sesong satt. Skru av når kortene ikke handler om årstider.',
+      initialValue: false,
+      hidden: ({parent}) => parent?.visning === 'tekstOver',
+    }),
+    defineField({
       name: 'kort',
       title: 'Kortene',
       type: 'array',
-      validation: (Rule) => Rule.min(1).max(8),
+      validation: (Rule) => Rule.min(1).max(12),
       of: [
         defineArrayMember({
           type: 'object',
@@ -518,6 +527,28 @@ export const blokkKort = defineType({
               type: 'localeString',
               validation: (Rule) => Rule.required(),
             }),
+            defineField({
+              name: 'detalj',
+              title: 'Detaljen',
+              type: 'localeString',
+              description:
+                'Én konkret setning som viser at vi vet hva vi snakker om — «100 meter til oppkjørte løyper», «ti kilometer sammenhengende flyt». Ikke skryt, bare et tall eller et navn.',
+            }),
+            defineField({
+              name: 'sesong',
+              title: 'Sesong',
+              type: 'string',
+              description: 'Styrer hvilket filter kortet dukker opp i.',
+              options: {
+                list: [
+                  {title: 'Vinter', value: 'vinter'},
+                  {title: 'Sommer', value: 'sommer'},
+                  {title: 'Hele året', value: 'helear'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'helear',
+            }),
             defineField({name: 'bilde', title: 'Bilde', type: 'bildeMedKreditering'}),
             defineField({
               name: 'ikon',
@@ -529,7 +560,7 @@ export const blokkKort = defineType({
             defineField({name: 'knapp', title: 'Lenke', type: 'blokkKnapp'}),
           ],
           preview: {
-            select: {title: 'tittel.no', subtitle: 'etikett.no', media: 'bilde.bilde'},
+            select: {title: 'tittel.no', subtitle: 'detalj.no', media: 'bilde.bilde'},
           },
         }),
       ],

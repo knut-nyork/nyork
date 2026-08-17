@@ -135,9 +135,12 @@ const BLOKKER = `blokker[aktiv != false]{
     overskrift,
     visning,
     monster,
+    visFilter,
     kort[]{
       etikett,
       tittel,
+      detalj,
+      sesong,
       "bilde": bilde${BILDE},
       "ikon": ikon->{
         aktivitet,

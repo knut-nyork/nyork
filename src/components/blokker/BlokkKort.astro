@@ -3,13 +3,16 @@ import Bildeplassholder from '../Bildeplassholder'
 import Ikon3d from '../Ikon3d.astro'
 import {bildeUrl} from '../../lib/hytter'
 import {stiForSprak, tekst, type Sprak} from '../../lib/sprak'
+import {UI} from '../../lib/tekster'
 import type {BlokkKort, Kort} from '../../lib/typer'
 
 /**
  * Rad med kort, i to former.
  *
- * `tekstUnder` er fotokortet: bilde øverst, en liten etikett som «Sommer», og
- * tittelen under.
+ * `tekstUnder` er aktivitetskortet: bilde øverst, en liten etikett som
+ * «Sommer», tittelen, og én konkret detalj under — et tall eller et navn.
+ * Detaljen er poenget. «Fine turmuligheter» kan hvem som helst skrive;
+ * «100 meter til oppkjørte løyper» kan bare den som bor der.
  *
  * `tekstOver` er illustrasjonskortet: mønster i bakgrunnen, 3D-ikonet nede til
  * høyre og teksten oppe til venstre. Den formen finnes fordi vi ikke har
@@ -21,11 +24,15 @@ import type {BlokkKort, Kort} from '../../lib/typer'
  *
  * Og uten lenke får det heller ingen kortflate. Et bilde i en hevet ramme med
  * tittel under ser ut som en knapp — og noe som ser klikkbart ut uten å være
- * det, er en liten skuffelse hver gang noen prøver. Da ligger bildet og
- * teksten rett på sideflaten i stedet, som innhold og ikke som kontroll.
+ * det, er en liten skuffelse hver gang noen prøver.
  *
- * `tekstOver` beholder flaten uansett. Der ligger teksten oppå et mønster og
- * må ha noe å stå på for å være lesbar.
+ * SESONGFILTERET er rene radioknapper, ingen JavaScript. Alle kortene ligger
+ * i HTML-en hele tida, så Google ser hele tilbudet uansett hvilket filter som
+ * er valgt, og det virker med tastatur uten at vi gjør noe. Se
+ * `.aktivitetsfilter` i global.css.
+ *
+ * Radiogruppa navngis med blokkens `_key`. To slike blokker på samme side
+ * ville ellers delt gruppe, og et klikk i den ene ville filtrert den andre.
  */
 interface Props {
   blokk: BlokkKort
@@ -33,8 +40,18 @@ interface Props {
 }
 
 const {blokk, sprak} = Astro.props
+const ui = UI[sprak].aktiviteter
 
 const tekstOver = blokk.visning === 'tekstOver'
+
+/** Filteret gir bare mening når kortene faktisk er merket med sesong. */
+const visFilter = Boolean(blokk.visFilter) && !tekstOver && blokk.kort.some((k) => k.sesong)
+
+const SESONGER = [
+  {verdi: 'alle', etikett: ui.alle},
+  {verdi: 'vinter', etikett: ui.vinter},
+  {verdi: 'sommer', etikett: ui.sommer},
+]
 
 function lenke(kort: Kort): string | undefined {
   if (!kort.knapp) return undefined
@@ -49,74 +66,102 @@ function lenke(kort: Kort): string | undefined {
     )
   }
 
-  <ul class="grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2">
+  <div class:list={[visFilter && 'aktivitetsfilter']}>
     {
-      blokk.kort.map((kort) => {
-        const href = lenke(kort)
-        const Flate = href ? 'a' : 'article'
-        const harFlate = Boolean(href) || tekstOver
-
-        return (
-          <li class="stigfram">
-            <Flate
-              href={href}
-              class:list={[
-                'relative flex h-full flex-col',
-                harFlate && 'hevet overflow-hidden rounded-stor',
-                href && 'no-underline transition-colors hover:border-border-focus',
-                tekstOver ? 'aspect-square p-6' : harFlate && 'p-3',
-              ]}
-            >
-              {tekstOver ? (
-                <>
-                  <div class="relative">
-                    {kort.etikett && (
-                      <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
-                        {tekst(kort.etikett, sprak)}
-                      </p>
-                    )}
-                    <h3 class="mt-1 font-heading text-large font-semibold">{tekst(kort.tittel, sprak)}</h3>
-                  </div>
-
-                  {kort.ikon && (
-                    <div class="relative mt-auto flex justify-end">
-                      <Ikon3d
-                        aktivitet={kort.ikon.aktivitet}
-                        illustrasjon={kort.ikon.illustrasjon}
-                        sprak={sprak}
-                        storrelse={72}
-                        dekorativ
-                      />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  {kort.bilde ? (
-                    <img
-                      src={bildeUrl(kort.bilde.url, 700)}
-                      alt={tekst(kort.bilde.altTekst, sprak)}
-                      loading="lazy"
-                      class="aspect-square w-full rounded-medium object-cover"
-                    />
-                  ) : (
-                    <Bildeplassholder sideforhold="1 / 1" />
-                  )}
-
-                  <div class:list={[harFlate ? 'px-2 pb-2 pt-4' : 'pt-4']}>
-                    {kort.etikett && (
-                      <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
-                        {tekst(kort.etikett, sprak)}
-                      </p>
-                    )}
-                    <h3 class="mt-1 font-heading text-large font-semibold">{tekst(kort.tittel, sprak)}</h3>
-                  </div>
-                </>
-              )}
-            </Flate>
-          </li>
-        )
-      })
+      visFilter && (
+        <fieldset class="m-0 mb-8 flex flex-wrap items-center gap-2 border-0 p-0">
+          <legend class="sr-only">{ui.velgSesong}</legend>
+          {SESONGER.map((sesong, i) => (
+            <label class="sesongvalg">
+              <input
+                type="radio"
+                name={`sesong-${blokk._key}`}
+                value={sesong.verdi}
+                checked={i === 0}
+                class="sr-only"
+              />
+              <span>{sesong.etikett}</span>
+            </label>
+          ))}
+        </fieldset>
+      )
     }
-  </ul>
+
+    <ul class="grid list-none grid-cols-1 gap-x-5 gap-y-10 p-0 sm:grid-cols-2">
+      {
+        blokk.kort.map((kort) => {
+          const href = lenke(kort)
+          const Flate = href ? 'a' : 'article'
+          const harFlate = Boolean(href) || tekstOver
+          const detalj = tekst(kort.detalj, sprak)
+
+          return (
+            <li class="stigfram" data-kortsesong={kort.sesong ?? 'helear'}>
+              <Flate
+                href={href}
+                class:list={[
+                  'aktivitetskort group relative flex h-full flex-col',
+                  harFlate && 'hevet overflow-hidden rounded-stor',
+                  href && 'no-underline transition-colors hover:border-border-focus',
+                  tekstOver ? 'aspect-square p-6' : harFlate && 'p-3',
+                ]}
+              >
+                {tekstOver ? (
+                  <>
+                    <div class="relative">
+                      {kort.etikett && (
+                        <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
+                          {tekst(kort.etikett, sprak)}
+                        </p>
+                      )}
+                      <h3 class="mt-1 font-heading text-large font-semibold">{tekst(kort.tittel, sprak)}</h3>
+                    </div>
+
+                    {kort.ikon && (
+                      <div class="relative mt-auto flex justify-end">
+                        <Ikon3d
+                          aktivitet={kort.ikon.aktivitet}
+                          illustrasjon={kort.ikon.illustrasjon}
+                          sprak={sprak}
+                          storrelse={72}
+                          dekorativ
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Bildet zoomer innenfor sin egen ramme. Uten `overflow-hidden`
+                        her ville det vokst ut over naboen i stedet. */}
+                    <div class="overflow-hidden rounded-medium">
+                      {kort.bilde ? (
+                        <img
+                          src={bildeUrl(kort.bilde.url, 700)}
+                          alt={tekst(kort.bilde.altTekst, sprak)}
+                          loading="lazy"
+                          class="aspect-square w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.06]"
+                        />
+                      ) : (
+                        <Bildeplassholder sideforhold="1 / 1" />
+                      )}
+                    </div>
+
+                    <div class:list={[harFlate ? 'px-2 pb-2 pt-4' : 'pt-4']}>
+                      {kort.etikett && (
+                        <p class="m-0 font-detail text-2xsmall uppercase tracking-wider text-foreground-brand">
+                          {tekst(kort.etikett, sprak)}
+                        </p>
+                      )}
+                      <h3 class="mt-1 font-heading text-large font-semibold">{tekst(kort.tittel, sprak)}</h3>
+                      {detalj && <p class="mt-2 font-body text-xsmall text-foreground-muted">{detalj}</p>}
+                    </div>
+                  </>
+                )}
+              </Flate>
+            </li>
+          )
+        })
+      }
+    </ul>
+  </div>
 </section>

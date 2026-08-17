@@ -36,6 +36,12 @@ export const UI = {
       ringer: 'Ring',
       sendEpost: 'Send e-post',
     },
+    aktiviteter: {
+      alle: 'Alle',
+      vinter: 'Vinter',
+      sommer: 'Sommer',
+      velgSesong: 'Vis aktiviteter for',
+    },
     omradet: {
       sommer: 'Sommer',
       vinter: 'Vinter',
@@ -152,6 +158,12 @@ export const UI = {
       planGrunnlag: 'Figures are taken from',
       ringer: 'Call',
       sendEpost: 'Send email',
+    },
+    aktiviteter: {
+      alle: 'All',
+      vinter: 'Winter',
+      sommer: 'Summer',
+      velgSesong: 'Show activities for',
     },
     omradet: {
       sommer: 'Summer',

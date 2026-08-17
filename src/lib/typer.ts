@@ -163,9 +163,15 @@ export interface Kortikon {
   illustrasjon?: Bilde
 }
 
+/** Hvilket filter kortet dukker opp i. */
+export type Kortsesong = 'vinter' | 'sommer' | 'helear'
+
 export interface Kort {
   etikett?: LokalTekst
   tittel: LokalTekst
+  /** Én konkret setning — et tall eller et navn, ikke skryt. */
+  detalj?: LokalTekst
+  sesong?: Kortsesong
   bilde?: Bilde
   ikon?: Kortikon
   knapp?: Knapp
@@ -176,6 +182,7 @@ export interface BlokkKort extends Blokkbase {
   overskrift?: LokalTekst
   visning: 'tekstUnder' | 'tekstOver'
   monster?: 'trearer' | 'hoydekurver' | 'ingen'
+  visFilter?: boolean
   kort: Kort[]
 }
 

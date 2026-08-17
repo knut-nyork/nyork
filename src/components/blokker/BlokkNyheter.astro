@@ -1,7 +1,7 @@
 ---
 import Blokkknapp from './Blokkknapp.astro'
 import {bildeUrl, formaterDato} from '../../lib/hytter'
-import {tekst, type Sprak} from '../../lib/sprak'
+import {stiForSprak, tekst, type Sprak} from '../../lib/sprak'
 import {UI} from '../../lib/tekster'
 import type {BlokkNyheter} from '../../lib/typer'
 
@@ -10,9 +10,13 @@ import type {BlokkNyheter} from '../../lib/typer'
  * være de nyeste automatisk eller saker de peker ut selv — valget er allerede
  * gjort når blokken kommer hit, se velgUtvalg() i sporringer.ts.
  *
- * Kortene er foreløpig ikke lenket. Nyhetssidene under /siste-nytt finnes
- * ennå ikke, og en lenke dit ville gitt 404. Når sidene bygges, pakkes
- * <article> inn i en <a href={stiForSprak(`/siste-nytt/${sak.slug}`, sprak)}>.
+ * Hele kortet er lenka, ikke bare tittelen. Et bilde og en dato som hører til
+ * saken skal kunne trykkes de også — særlig på berøringsskjerm, der et
+ * lenkeord er et lite mål.
+ *
+ * Saker med `skjulIListe` kan ikke havne her: de er filtrert bort både i det
+ * automatiske utvalget og fra lista, så lenken peker alltid på en side som
+ * finnes.
  */
 interface Props {
   blokk: BlokkNyheter
@@ -32,20 +36,24 @@ const ui = UI[sprak].forside
     ) : (
       <div class="mt-8 grid gap-6 md:grid-cols-2 md:gap-x-12">
         {blokk.artikler.map((sak) => (
-          <article class="flex gap-4">
+          <a href={stiForSprak(`/siste-nytt/${sak.slug}`, sprak)} class="group flex gap-4 no-underline">
             {sak.bilde && (
-              <img
-                src={bildeUrl(sak.bilde.url, 240)}
-                alt={tekst(sak.bilde.altTekst, sprak)}
-                loading="lazy"
-                class="h-20 w-20 flex-none rounded-medium object-cover md:h-24 md:w-24"
-              />
+              /* Bildet zoomer innenfor sin egen ramme. Uten `overflow-hidden`
+                 her ville det vokst ut over naboen i stedet. */
+              <span class="h-20 w-20 flex-none overflow-hidden rounded-medium md:h-24 md:w-24">
+                <img
+                  src={bildeUrl(sak.bilde.url, 240)}
+                  alt={tekst(sak.bilde.altTekst, sprak)}
+                  loading="lazy"
+                  class="h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.06]"
+                />
+              </span>
             )}
             <div class="flex flex-col gap-1">
-              <h3 class="font-heading text-medium font-semibold">{tekst(sak.tittel, sprak)}</h3>
+              <h3 class="font-heading text-medium font-semibold group-hover:underline">{tekst(sak.tittel, sprak)}</h3>
               <p class="m-0 font-detail text-xsmall text-foreground-muted">{formaterDato(sak.dato, sprak)}</p>
             </div>
-          </article>
+          </a>
         ))}
       </div>
     )

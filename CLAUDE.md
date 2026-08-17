@@ -232,6 +232,5 @@ PUBLIC_SANITY_DATASET=production
 - Datasettet er offentlig lesbart på gratisplanen. Avklar om utkast med priser er greit
 - Bilderettigheter fra salgsoppgaven må avklares før publisering
 - Tomtesiden er ikke designet i Figma — bygges som variant av hyttelista
-- Nyhetskortene på forsiden er ikke klikkbare ennå — se kommentaren i `BlokkNyheter.astro` for hvor lenken skal inn
 - ITC Franklin Gothic LT Pro: webfont-lisens mangler
 - Alle kontoer står på `knut@nyork.no`. Vurder å legge til Gaute som medlem i Sanity-org og Netlify-team, så prosjektet ikke er avhengig av én person

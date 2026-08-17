@@ -177,8 +177,8 @@ export const blokkBilder = defineType({
       type: 'array',
       of: [defineArrayMember({type: 'bildeMedKreditering'})],
       description:
-        'To eller tre bilder. Rekkefølgen bestemmer plassen: det første blir det store til venstre, det andre står mindre og lavere til høyre, det tredje bredt under. Fire bilder har ingen plass i oppsettet.',
-      validation: (Rule) => Rule.required().min(2).max(3),
+        'To til seks bilder. Rekkefølgen bestemmer plassen: første, tredje og femte havner i venstre spalte, resten i høyre. Høyre spalte ligger lavere enn venstre, og bildene beveger seg i ulik takt når du ruller.',
+      validation: (Rule) => Rule.required().min(2).max(6),
     }),
   ],
   preview: {

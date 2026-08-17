@@ -94,6 +94,7 @@ const BLOKKER = `blokker[aktiv != false]{
     overskrift,
     tekst,
     "bilde": bilde${BILDE},
+    "ekstrabilde": ekstrabilde${BILDE},
     bildeplassering,
     knapp${KNAPP}
   },

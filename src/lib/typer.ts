@@ -101,6 +101,8 @@ export interface BlokkArtikkel extends Blokkbase {
   overskrift: LokalTekst
   tekst?: LokalTekst
   bilde?: Bilde
+  /** Valgfritt. Legges mindre og forskjøvet oppå hovedbildet. */
+  ekstrabilde?: Bilde
   bildeplassering?: 'venstre' | 'hoyre'
   knapp?: Knapp
 }

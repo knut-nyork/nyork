@@ -445,6 +445,36 @@
     }
   }
 
+  /*
+    Bildeparet i artikkelblokka. Det lille bildet ligger oppå det store, og
+    på hover glir de fra hverandre — det store trekker seg litt tilbake, det
+    lille kommer litt fram.
+
+    Bevegelsen ligger på bildene og ikke på en flate rundt dem, med vilje.
+    Blokka er ikke en lenke, og en hevet ramme som reagerer på musepekeren
+    ville sagt «trykk her» om noe som ikke går noe sted.
+
+    Ingen `cursor: pointer` av samme grunn.
+  */
+  .bildepar__stort,
+  .bildepar__lite {
+    transition:
+      transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+      scale 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @media (hover: hover) {
+      .bildepar:hover .bildepar__stort {
+        scale: 0.985;
+      }
+
+      .bildepar:hover .bildepar__lite {
+        transform: translateY(6px) scale(1.04);
+      }
+    }
+  }
+
   @keyframes stigfram {
     from {
       opacity: 0;

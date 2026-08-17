@@ -125,6 +125,13 @@ export const blokkArtikkel = defineType({
     defineField({name: 'tekst', title: 'Tekst', type: 'localeText'}),
     defineField({name: 'bilde', title: 'Bilde', type: 'bildeMedKreditering'}),
     defineField({
+      name: 'ekstrabilde',
+      title: 'Ekstra bilde',
+      type: 'bildeMedKreditering',
+      description:
+        'Valgfritt. Legges mindre og forskjøvet oppå hovedbildet, med et hjørne inn mot teksten. La det stå tomt, så vises bare hovedbildet.',
+    }),
+    defineField({
       name: 'bildeplassering',
       title: 'Bildet ligger',
       type: 'string',

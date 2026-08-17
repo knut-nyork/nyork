@@ -9,6 +9,17 @@ import type {BlokkArtikkel} from '../../lib/typer'
  * Bilde på den ene siden, tekst på den andre. Redaktøren velger hvilken side
  * bildet ligger på, slik at de kan veksle nedover siden.
  *
+ * Legges det inn et ekstra bilde, står det mindre og forskjøvet oppå det
+ * store, med hjørnet inn mot teksten. Det er retningen som gjør det: et
+ * bilde som stikker utover mot skjermkanten ser ut som en feil, ett som
+ * lener seg mot teksten binder de to spaltene sammen.
+ *
+ * Skillet mellom de to bildene er en kant i sideflatens farge, ikke en
+ * skygge. Resten av siden løfter med farge; skygge er forbeholdt topplinja.
+ *
+ * Uten ekstra bilde er det bare det store. Ingen tom plass, ingen
+ * plassholder — én god ting slår to der den ene mangler.
+ *
  * På mobil ligger bildet alltid øverst — da leses siden i én kolonne, og
  * tekst før bilde ville skjøvet bildet langt ned.
  */
@@ -22,6 +33,7 @@ const {blokk, sprak} = Astro.props
 const brodtekst = tekst(blokk.tekst, sprak)
 const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
 const bilde = blokk.bilde
+const ekstra = blokk.ekstrabilde
 const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
 ---
 
@@ -33,22 +45,47 @@ const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
       {blokk.knapp && <div class="mt-3"><Blokkknapp knapp={blokk.knapp} sprak={sprak} /></div>}
     </div>
 
-    <figure class:list={['m-0', bildeTilHoyre ? 'md:order-2' : 'md:order-1']}>
+    <figure
+      class:list={[
+        'bildepar group relative m-0',
+        bildeTilHoyre ? 'md:order-2' : 'md:order-1',
+        // Plass til hjørnet som stikker ut, så det ikke ligger oppå teksten under.
+        ekstra && 'mb-10 md:mb-0',
+      ]}
+    >
       {
         bilde ? (
           <img
             src={bildeUrl(bilde.url, 1200)}
             alt={tekst(bilde.altTekst, sprak)}
             loading="lazy"
-            class="aspect-[4/3] w-full rounded-stor object-cover"
+            class="bildepar__stort aspect-[4/5] w-full rounded-stor object-cover"
           />
         ) : (
-          <Bildeplassholder sideforhold="4 / 3" />
+          <Bildeplassholder sideforhold="4 / 5" />
         )
       }
+
+      {
+        ekstra && (
+          <img
+            src={bildeUrl(ekstra.url, 700)}
+            alt={tekst(ekstra.altTekst, sprak)}
+            loading="lazy"
+            class:list={[
+              'bildepar__lite absolute -bottom-8 aspect-square w-[46%] rounded-medium border-4 border-flate-side object-cover',
+              // Hjørnet lener seg inn mot teksten, aldri ut mot skjermkanten.
+              bildeTilHoyre ? '-left-6' : 'right-6 md:-right-6',
+            ]}
+          />
+        )
+      }
+
       {
         bilde?.fotokreditt && (
-          <figcaption class="mt-2 font-detail text-2xsmall text-foreground-muted">{bilde.fotokreditt}</figcaption>
+          <figcaption class:list={['font-detail text-2xsmall text-foreground-muted', ekstra ? 'mt-12' : 'mt-2']}>
+            {bilde.fotokreditt}
+          </figcaption>
         )
       }
     </figure>

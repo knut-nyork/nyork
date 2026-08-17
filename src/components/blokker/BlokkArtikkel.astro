@@ -49,8 +49,9 @@ const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
       class:list={[
         'bildepar group relative m-0',
         bildeTilHoyre ? 'md:order-2' : 'md:order-1',
-        // Plass til hjørnet som stikker ut, så det ikke ligger oppå teksten under.
-        ekstra && 'mb-10 md:mb-0',
+        // Plass til hjørnet som stikker ut. Bare på skrivebord — på mobil
+        // ligger det lille bildet innenfor og trenger ingen klaring.
+        ekstra && 'md:mb-8',
       ]}
     >
       {
@@ -59,10 +60,12 @@ const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
             src={bildeUrl(bilde.url, 1200)}
             alt={tekst(bilde.altTekst, sprak)}
             loading="lazy"
-            class="bildepar__stort aspect-[4/5] w-full rounded-stor object-cover"
+            /* Liggende på mobil, stående på skrivebord. Et stående bilde i
+               full skjermbredde blir en vegg på en telefon. */
+            class="bildepar__stort aspect-[4/3] w-full rounded-stor object-cover md:aspect-[4/5]"
           />
         ) : (
-          <Bildeplassholder sideforhold="4 / 5" />
+          <Bildeplassholder sideforhold="4 / 3" className="md:aspect-[4/5]" />
         )
       }
 
@@ -73,9 +76,14 @@ const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
             alt={tekst(ekstra.altTekst, sprak)}
             loading="lazy"
             class:list={[
-              'bildepar__lite absolute -bottom-8 aspect-square w-[46%] rounded-medium border-4 border-flate-side object-cover',
-              // Hjørnet lener seg inn mot teksten, aldri ut mot skjermkanten.
-              bildeTilHoyre ? '-left-6' : 'right-6 md:-right-6',
+              'bildepar__lite absolute aspect-square rounded-medium border-4 border-flate-side object-cover',
+              /* Mobil: lite og trygt innenfor rammen. Skjermen er for smal
+                 til at noe kan stikke utenfor, og et bilde på nesten halve
+                 bredden dekker motivet under i stedet for å utfylle det. */
+              'bottom-4 right-4 w-[34%]',
+              /* Skrivebord: større, og hjørnet lener seg inn mot teksten. */
+              'md:-bottom-8 md:w-[46%]',
+              bildeTilHoyre ? 'md:-left-6 md:right-auto' : 'md:-right-6 md:left-auto',
             ]}
           />
         )

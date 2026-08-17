@@ -40,16 +40,20 @@ const {blokk, sprak} = Astro.props
  * takt fra første sekund.
  */
 const PLASSER = [
-  {form: 'aspect-[4/3]', bevegelse: {parallakse: '44px', tid: '9s', forsinkelse: '0s'}},
-  {form: 'aspect-[4/5]', bevegelse: {parallakse: '-62px', tid: '11s', forsinkelse: '-3.5s'}},
-  {form: 'aspect-[3/2]', bevegelse: {parallakse: '30px', tid: '10s', forsinkelse: '-7s'}},
-  {form: 'aspect-square', bevegelse: {parallakse: '-48px', tid: '12s', forsinkelse: '-5s'}},
-  {form: 'aspect-[3/2]', bevegelse: {parallakse: '52px', tid: '9.5s', forsinkelse: '-2s'}},
-  {form: 'aspect-[4/3]', bevegelse: {parallakse: '-38px', tid: '11.5s', forsinkelse: '-8s'}},
+  {form: 'aspect-[4/3]', vri: '-1.6deg', overlapp: '', bevegelse: {parallakse: '72px', tid: '9s', forsinkelse: '0s'}},
+  {form: 'aspect-[4/5]', vri: '2.2deg', overlapp: '', bevegelse: {parallakse: '-104px', tid: '11s', forsinkelse: '-3.5s'}},
+  {form: 'aspect-[3/2]', vri: '1.4deg', overlapp: 'md:-mt-8', bevegelse: {parallakse: '48px', tid: '10s', forsinkelse: '-7s'}},
+  {form: 'aspect-square', vri: '-2.4deg', overlapp: 'md:-mt-10', bevegelse: {parallakse: '-84px', tid: '12s', forsinkelse: '-5s'}},
+  {form: 'aspect-[3/2]', vri: '-1deg', overlapp: 'md:-mt-6', bevegelse: {parallakse: '92px', tid: '9.5s', forsinkelse: '-2s'}},
+  {form: 'aspect-[4/3]', vri: '1.9deg', overlapp: 'md:-mt-8', bevegelse: {parallakse: '-66px', tid: '11.5s', forsinkelse: '-8s'}},
 ]
 
 /** Skjemaet slipper bare gjennom to til fire. Kuttet her er et sikkerhetsnett. */
 const bilder = (blokk.bilder ?? []).slice(0, PLASSER.length).map((bilde, i) => ({bilde, ...PLASSER[i]}))
+
+/** Vridningen sendes inn som variabel, så CSS-en kan rette den opp på hover. */
+const stil = (b: (typeof bilder)[number]) =>
+  `--vri: ${b.vri}; --parallakse: ${b.bevegelse.parallakse}; --flyt-tid: ${b.bevegelse.tid}; --flyt-forsinkelse: ${b.bevegelse.forsinkelse}`
 
 const venstre = bilder.filter((_, i) => i % 2 === 0)
 const hoyre = bilder.filter((_, i) => i % 2 === 1)
@@ -67,14 +71,14 @@ const hoyre = bilder.filter((_, i) => i % 2 === 1)
       <div class="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start md:gap-6">
         <div class="flex flex-col gap-5 md:col-span-7 md:gap-6">
           {venstre.map((b) => (
-            <Galleribilde bilde={b.bilde} form={b.form} bevegelse={b.bevegelse} sprak={sprak} />
+            <Galleribilde bilde={b.bilde} form={b.form} stil={stil(b)} overlapp={b.overlapp} sprak={sprak} />
           ))}
         </div>
 
         {hoyre.length > 0 && (
           <div class="flex flex-col gap-5 md:col-span-5 md:mt-20 md:gap-6">
             {hoyre.map((b) => (
-              <Galleribilde bilde={b.bilde} form={b.form} bevegelse={b.bevegelse} sprak={sprak} />
+              <Galleribilde bilde={b.bilde} form={b.form} stil={stil(b)} overlapp={b.overlapp} sprak={sprak} />
             ))}
           </div>
         )}

@@ -376,10 +376,39 @@
     stoppe gjør noen kvalme og andre svimle, og et bilde som driver er ikke
     verdt det.
   */
+  /*
+    Vridningen er ikke bevegelse, bare en skjevhet — som fotografier lagt
+    løst oppå hverandre. Den står derfor utenfor `prefers-reduced-motion`;
+    et bilde som ligger litt på skrå gjør ingen svimmel.
+
+    `rotate` og `scale` er egne egenskaper og ikke `transform`. Det er
+    nødvendig: `transform` er allerede opptatt av parallaksen, og hadde
+    vridningen ligget der også, ville den ene overskrevet den andre.
+  */
+  .kollasjebilde {
+    rotate: var(--vri, 0deg);
+    transition:
+      rotate 0.5s cubic-bezier(0.2, 0.7, 0.3, 1),
+      scale 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
+    @media (hover: hover) {
+      /*
+        På hover rettes bildet opp, vokser litt, og legger seg over naboene.
+        Z-en må være der: uten den blir det løftede bildet liggende under det
+        neste i rekka, og effekten ser ut som en feil.
+      */
+      .kollasjebilde:hover {
+        rotate: 0deg;
+        scale: 1.05;
+        z-index: 20;
+      }
+    }
+
     .kollasjebilde > img {
       animation: flyt var(--flyt-tid, 10s) ease-in-out infinite alternate;
-      /* Negativ forsinkelse starter midt i syklusen, så de tre aldri er i takt. */
+      /* Negativ forsinkelse starter midt i syklusen, så de aldri er i takt. */
       animation-delay: var(--flyt-forsinkelse, 0s);
     }
 

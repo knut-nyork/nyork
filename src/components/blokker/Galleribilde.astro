@@ -4,34 +4,36 @@ import {tekst, type Sprak} from '../../lib/sprak'
 import type {Bilde} from '../../lib/typer'
 
 /**
- * Ett bilde i bildeblokka. Skilt ut fordi det står tre steder i BlokkBilder,
- * og fotokreditten skal følge bildet alle tre.
+ * Ett bilde i bildekollasjen. Skilt ut fordi det står flere steder i
+ * BlokkBilder, og fotokreditten skal følge bildet alle sammen.
  *
- * Bevegelsen ligger på to nivåer: rammen driver forbi når du ruller, bildet
- * inni puster sakte. Se `.kollasjebilde` i global.css for hvorfor det må
- * være to elementer og ikke ett.
+ * Bevegelsen ligger på tre nivåer: rammen driver forbi når du ruller, bildet
+ * inni puster sakte, og hele bildet er vridd et par grader som et fotografi
+ * lagt litt skjevt. På hover rettes det opp og løftes over naboene.
+ *
+ * Se `.kollasjebilde` i global.css for hvorfor det må være to elementer og
+ * ikke ett.
  */
 interface Props {
   bilde: Bilde
   /** Sideforholdet plassen i oppsettet har, for eksempel «aspect-[4/3]». */
   form: string
-  /** Hvor langt og hvor fort dette bildet beveger seg. Se BEVEGELSE i BlokkBilder. */
-  bevegelse: {parallakse: string; tid: string; forsinkelse: string}
+  /** Variablene som styrer vridning og bevegelse. Settes i BlokkBilder. */
+  stil: string
+  /** Negativ toppmarg som lar bildet gli inn under det over. Tom for det første. */
+  overlapp?: string
   sprak: Sprak
 }
 
-const {bilde, form, bevegelse, sprak} = Astro.props
+const {bilde, form, stil, overlapp = '', sprak} = Astro.props
 ---
 
-<figure
-  class="kollasjebilde m-0"
-  style={`--parallakse: ${bevegelse.parallakse}; --flyt-tid: ${bevegelse.tid}; --flyt-forsinkelse: ${bevegelse.forsinkelse}`}
->
+<figure class:list={['kollasjebilde relative m-0', overlapp]} style={stil}>
   <img
     src={bildeUrl(bilde.url, 900)}
     alt={tekst(bilde.altTekst, sprak)}
     loading="lazy"
-    class:list={['w-full rounded-stor object-cover', form]}
+    class:list={['w-full rounded-stor border-4 border-flate-side object-cover', form]}
   />
   {
     bilde.fotokreditt && (

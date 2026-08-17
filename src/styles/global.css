@@ -506,11 +506,18 @@
     Skjevheten er ikke bevegelse, så den står utenfor reduced-motion — samme
     vurdering som i kollasjen.
 
-    `rotate` og ikke `transform`: hover-effekten under bruker allerede
-    `transform`, og lå vridningen der, ville den ene overskrevet den andre.
+    Bare fra `md`. På mobil står de to bildene under hverandre, og da gjør
+    vridningen at det nederste blir bredere enn det over — kantene slutter å
+    flukte, og det ser ut som en feil i stedet for et grep. Skråstillingen
+    hører til overlappet, ikke til bildet.
+
+    Grensen er Tailwinds `md`, 48rem. Endrer du bruddpunktet i komponenten,
+    må det endres her også.
   */
-  .bildepar__lite {
-    rotate: -3.5deg;
+  @media (width >= 48rem) {
+    .bildepar__lite {
+      rotate: -3.5deg;
+    }
   }
 
   @media (prefers-reduced-motion: no-preference) {

@@ -76,13 +76,13 @@ const bildeTilHoyre = blokk.bildeplassering === 'hoyre'
             alt={tekst(ekstra.altTekst, sprak)}
             loading="lazy"
             class:list={[
-              'bildepar__lite absolute aspect-square rounded-medium border-4 border-flate-side object-cover',
-              /* Mobil: lite og trygt innenfor rammen. Skjermen er for smal
-                 til at noe kan stikke utenfor, og et bilde på nesten halve
-                 bredden dekker motivet under i stedet for å utfylle det. */
-              'bottom-4 right-4 w-[34%]',
-              /* Skrivebord: større, og hjørnet lener seg inn mot teksten. */
-              'md:-bottom-8 md:w-[46%]',
+              'bildepar__lite rounded-medium border-4 border-flate-side object-cover',
+              /* Mobil: eget bilde under det store, ikke oppå. En skjerm på
+                 375 px har ikke plass til to bilder i lag — det lille dekker
+                 motivet i stedet for å utfylle det, uansett hvor lite det er. */
+              'mt-4 aspect-[4/3] w-full',
+              /* Fra md legger det seg oppå, med hjørnet inn mot teksten. */
+              'md:absolute md:-bottom-8 md:mt-0 md:aspect-square md:w-[46%]',
               bildeTilHoyre ? 'md:-left-6 md:right-auto' : 'md:-right-6 md:left-auto',
             ]}
           />

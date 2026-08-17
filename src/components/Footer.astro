@@ -21,8 +21,13 @@ const footerTekst = tekst(innstillinger?.footerTekst, sprak)
 const personvern = stiForSprak('/personvern', sprak)
 ---
 
-<footer class="bg-flate-footer text-tekst-footer">
-  <div class="mx-auto flex max-w-[1600px] flex-col gap-10 px-5 py-16 md:px-10">
+<!-- Luft rundt footeren, så den leses som et kort på sideflaten og ikke som
+     et bånd sida ender i. Margen er den samme som topplinja ligger inne med,
+     så de to rammer inn siden likt. -->
+<footer class="px-2 pb-2 md:px-3 md:pb-3">
+  <div
+    class="mx-auto flex max-w-[1600px] flex-col gap-10 rounded-stor bg-flate-footer px-5 py-16 text-tekst-footer md:px-10"
+  >
     <Logo tittel="Nyørk" class="h-[26px] w-auto self-start" />
 
     {

@@ -34,8 +34,24 @@ npm run dev          # utviklingsserver (localhost:4321)
 npm run build        # produksjonsbygg — kjør denne før commit
 npm run preview      # se produksjonsbygget lokalt
 npx sanity dev       # Sanity Studio lokalt (localhost:3333)
-npx sanity deploy    # publiser Studio
+npx sanity deploy    # publiser Studio til nyork-hemsedal.sanity.studio
 ```
+
+## Studio for redaktørene
+
+Redigeringsflaten ligger på **https://nyork-hemsedal.sanity.studio** — det er
+der teksten og bildene endres, ikke i koden. Innlogging med Sanity-konto.
+
+Vertsnavn og app-id står i `sanity.cli.ts`, så `npx sanity deploy` treffer
+samme studio hver gang. Uten dem spør CLI-en, og et feilskrevet svar lager et
+nytt studio ved siden av det som finnes.
+
+**Studioet må deployes på nytt når skjemaene endres.** Selve innholdet er live
+med én gang det publiseres, men nye felter dukker ikke opp for redaktørene før
+`npx sanity deploy` er kjørt.
+
+Endringer i innhold blir ikke synlige på nettsiden før noen kjører en
+Netlify-deploy — siden bygges statisk. Se «Utgivelse» over.
 
 ## Utgivelse
 

@@ -56,7 +56,19 @@ export const side = defineType({
       title: 'Meta-beskrivelse',
       type: 'localeText',
       description: 'Teksten under tittelen i Google-treff. Hold den under ca. 160 tegn.',
-      validation: (Rule) => Rule.max(160).warning('Lengre tekst kan bli avkuttet i søkeresultater.'),
+      /*
+       * Lengden må sjekkes per språk, ikke på feltet.
+       *
+       * `localeText` er et objekt med `no` og `en` inni, og `Rule.max()`
+       * finnes ikke for objekter — Studio stopper med «Validator for flag
+       * "max" not found for type "Object"» og lar deg ikke redigere siden.
+       * Samme felle venter på alle localeString- og localeText-felter.
+       */
+      validation: (Rule) =>
+        Rule.custom((felt?: {no?: string; en?: string}) => {
+          const forLangt = [felt?.no, felt?.en].some((tekst) => typeof tekst === 'string' && tekst.length > 160)
+          return forLangt ? 'Lengre enn 160 tegn kan bli avkuttet i søkeresultater.' : true
+        }).warning(),
     }),
     defineField({
       name: 'sommerBilde',

@@ -33,9 +33,31 @@ Teamet bak siden er ikke teknisk. Kode skal være lesbar og forutsigbar, ikke sm
 npm run dev          # utviklingsserver (localhost:4321)
 npm run build        # produksjonsbygg — kjør denne før commit
 npm run preview      # se produksjonsbygget lokalt
+npm run utgi         # bygg + legg ut på nyork-hemsedal.netlify.app
 npx sanity dev       # Sanity Studio lokalt (localhost:3333)
 npx sanity deploy    # publiser Studio til nyork-hemsedal.sanity.studio
 ```
+
+## Hvordan endringer kommer ut
+
+To spor som møtes i ett steg.
+
+**Innhold** — tekst, bilder, priser — endres i Studio og publiseres der.
+Ingen kode involvert.
+
+**Utseende og funksjon** endres i koden, verifiseres med `npm run build` og
+committes.
+
+Ingen av delene vises på nettsiden før noen kjører **`npm run utgi`**. Den
+bygger sidene på nytt — og det er under bygget innholdet hentes fra Sanity —
+og legger resultatet ut. Én kommando dekker begge sporene: har noen endret
+tekst i Studio siden sist, blir den med samme hvilken kode som ligger der.
+
+Krever at Netlify-CLI-en er innlogget. Er sesjonen utløpt:
+`npx netlify-cli logout && npx netlify-cli login`.
+
+**Dette bør automatiseres.** Kobles Netlify til GitHub (se «Utgivelse»), kan
+en byggkrok fyres av fra Sanity ved publisering, og siden oppdaterer seg selv.
 
 ## Studio for redaktørene
 

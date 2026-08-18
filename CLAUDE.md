@@ -77,16 +77,22 @@ Netlify-deploy — siden bygges statisk. Se «Utgivelse» over.
 
 ## Utgivelse
 
-**Netlify-prosjektet er ikke koblet til GitHub.** Det har verken repo, gren eller byggkommando satt opp. Push til `main` gjør derfor ingenting med den live siden — den oppdateres bare når noen kjører en deploy manuelt fra maskinen sin:
+Netlify bygger fra GitHub. **Push til `main` = live**, og et bygg starter
+også av seg selv når noen publiserer i Sanity.
 
-```bash
-npm run build
-npx netlify-cli deploy --prod --dir=dist
-```
+| Utløser | Hva som skjer |
+|---|---|
+| `git push origin main` | Netlify henter koden, bygger, legger ut |
+| Publisering i Studio | Sanity-webhook → byggkrok → samme bygg |
+| `npm run utgi` | Bygger lokalt og laster opp ferdige filer, utenom git |
 
-Det betyr to ting. Koden i GitHub og siden som ligger ute kan være ulike, og utgivelse er avhengig av at én person har CLI-en innlogget. Sesjonen ryker med jevne mellomrom, og da må `npx netlify-cli logout && npx netlify-cli login` kjøres først.
+`npm run utgi` finnes fortsatt som nødutgang, men bør ikke være normalen —
+den legger ut det som ligger på *din* maskin, ikke det som ligger i `main`.
 
-**Dette bør fikses.** I Netlify-dashbordet: koble prosjektet til `knut-nyork/nyork`, gren `main`, byggkommando `npm run build`, publiseringsmappe `dist`. Koblingen krever GitHub-autorisasjon og må gjøres av noen med tilgang til begge. Når den er på plass, gjelder «push til main = live», og dette avsnittet kan slettes.
+**Push før du deployer.** Byggkroken bygger alltid fra `main`. Ligger det
+ucommittede eller upushede endringer lokalt, blir de ikke med — og verre:
+fyrer noen av kroken mens `main` er bakpå, rulles siden tilbake til det
+GitHub har. Det skjedde én gang under oppsettet, med 29 upushede commits.
 
 ## Passord på siden
 

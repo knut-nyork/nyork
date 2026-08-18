@@ -40,14 +40,16 @@ const bilde = blokk.bilde
 const harBilde = Boolean(bilde)
 ---
 
-<section class="relative mx-auto min-h-[70vh] max-w-[1600px] overflow-hidden px-5 md:px-10">
-  <div class="relative min-h-[70vh] overflow-hidden rounded-stor bg-background-surface-3">
+<section class="relative mx-auto min-h-[70vh] max-w-[1600px] px-5 md:px-10">
+  <div class="klippramme relative min-h-[70vh] rounded-stor bg-background-surface-3">
     {
       bilde && (
         <img
           src={bildeUrl(bilde.url, 2000)}
           alt={tekst(bilde.altTekst, sprak)}
-          class="absolute inset-0 h-full w-full object-cover"
+          /* Høyere enn rammen og forskjøvet opp, så drifta har rom å gå i
+             uten at det blir en stripe i over- eller underkant. */
+          class="parallaksefoto absolute inset-x-0 top-[-7%] h-[114%] w-full object-cover"
         />
       )
     }

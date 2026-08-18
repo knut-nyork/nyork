@@ -36,7 +36,7 @@ const bilde = blokk.bakgrunnsbilde
 <section class="mx-auto max-w-[1600px] px-5 py-14 md:px-10 md:py-20">
   <div
     class:list={[
-      'relative grid gap-6 overflow-hidden rounded-stor p-10 md:grid-cols-2 md:items-center md:gap-16 md:p-20',
+      'klippramme relative grid gap-6 rounded-stor p-10 md:grid-cols-2 md:items-center md:gap-16 md:p-20',
       bilde ? 'min-h-[440px] text-tekst-pa-lyst-foto md:min-h-[520px]' : 'bg-flate-sand md:min-h-[380px]',
     ]}
   >
@@ -47,7 +47,7 @@ const bilde = blokk.bakgrunnsbilde
             src={bildeUrl(bilde.url, 2000)}
             alt={tekst(bilde.altTekst, sprak)}
             loading="lazy"
-            class="absolute inset-0 h-full w-full object-cover"
+            class="parallaksefoto absolute inset-x-0 top-[-7%] h-[114%] w-full object-cover"
           />
           {/* Lyst slør, ikke mørkt: teksten på dette bildet er mørk. Tettest
               der teksten står, og borte der bildet skal få være bilde. */}

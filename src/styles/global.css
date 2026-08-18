@@ -330,6 +330,55 @@
     border: 1px solid var(--semantic-color-border-subtle);
   }
 
+  /*
+    Klipper innholdet til de avrundede hjørnene, som `overflow: hidden` — men
+    uten å lage en rullebeholder.
+
+    Det er hele poenget. `overflow: hidden` gjør elementet til en scroller,
+    og da måler `animation-timeline: view()` bevegelsen mot *den* boksen i
+    stedet for mot sida. Bildet inni står jo stille der, så parallaksen frøs
+    på samme verdi uansett hvor langt du rullet. `clip-path` klipper uten
+    den bivirkningen.
+  */
+  .klippramme {
+    clip-path: inset(0 round var(--radius-stor));
+  }
+
+  /*
+    Bakgrunnsfoto som driver saktere enn siden — heroen og budskapsblokka.
+
+    Geometrien ligger i klassene på selve bildet, ikke her: bildet er høyere
+    enn rammen og forskjøvet oppover, så det har noe å bevege seg innenfor
+    uten at det blir en stripe i kanten. Ligger det i CSS-en her, vinner
+    Tailwinds `inset-0` over det uansett.
+
+    Denne klassen setter bare bevegelsen. Rullestyrt, som resten av
+    parallaksene på siden, og bak `prefers-reduced-motion` — et bilde som
+    seiler forbi er nettopp det som gjør folk uvel.
+
+    `translate` og aldri `transform`: se `.bildepar` for hva minifikatoren
+    gjør når de to blandes i samme regel.
+  */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .parallaksefoto {
+        animation-name: fotodrift;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+      }
+    }
+  }
+
+  @keyframes fotodrift {
+    from {
+      translate: 0 -6%;
+    }
+    to {
+      translate: 0 6%;
+    }
+  }
+
   /* Treårene som dekor. Bildet kommer inn som maske, så flaten under kan
      males i én farge. `cover` fyller flaten uten å strekke mønsteret, og
      `no-repeat` hindrer at skjøtene mellom gjentakelser blir synlige.

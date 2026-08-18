@@ -72,6 +72,16 @@
   */
   --flate-footer: var(--semantic-color-background-surface-inreverse);
   --tekst-footer: var(--semantic-color-foreground-inreverse);
+
+  /*
+    Tekst som skal stå mørk oppå et lyst fotografi, uansett tema.
+
+    Motsatt problem av footeren: der skal teksten alltid være lys. Her ligger
+    den på et bilde som er like lyst i mørk modus som i lys — et snødekt
+    fjell blir ikke mørkt av at siden gjør det. Ville vi brukt
+    `foreground-default`, hadde teksten blitt hvit på hvit snø i mørk modus.
+  */
+  --tekst-pa-lyst-foto: var(--semantic-color-foreground-default);
 }
 
 :root[data-theme='dark'] {
@@ -86,6 +96,8 @@
   --flate-footer: var(--semantic-color-background-surface-1);
   --tekst-footer: var(--semantic-color-foreground-default);
   --flate-sand: var(--semantic-color-background-surface-3);
+  /* Se kommentaren i :root — i mørk modus er det `inreverse` som er mørk. */
+  --tekst-pa-lyst-foto: var(--semantic-color-foreground-inreverse);
 }
 
 @theme inline {
@@ -96,6 +108,7 @@
   --color-flate-sand: var(--flate-sand);
   --color-flate-footer: var(--flate-footer);
   --color-tekst-footer: var(--tekst-footer);
+  --color-tekst-pa-lyst-foto: var(--tekst-pa-lyst-foto);
   --color-background-nav: var(--semantic-color-background-nav);
   --color-background-surface-1: var(--semantic-color-background-surface-1);
   --color-background-surface-2: var(--semantic-color-background-surface-2);
@@ -317,12 +330,16 @@
     border: 1px solid var(--semantic-color-border-subtle);
   }
 
-  /* Treårene som dekor. Se Tremonster.astro — bildet kommer inn som maske,
-     så flaten under kan males med et token og følge tema. `cover` fyller
-     flaten uten å strekke mønsteret, og `no-repeat` hindrer at skjøtene
-     mellom gjentakelser blir synlige. */
+  /* Treårene som dekor. Bildet kommer inn som maske, så flaten under kan
+     males i én farge. `cover` fyller flaten uten å strekke mønsteret, og
+     `no-repeat` hindrer at skjøtene mellom gjentakelser blir synlige.
+
+     Fargen er `currentColor` og ikke et fast token. Mønsteret ligger både på
+     lyse flater med mørk tekst og på det mørke statusbåndet med lys tekst —
+     med en fast mørk farge forsvant det helt på båndet. Nå arver det
+     tekstfargen der det står, og er synlig begge steder. */
   .tremonster {
-    background-color: var(--semantic-color-foreground-default);
+    background-color: currentColor;
     opacity: var(--tremonster-styrke, 0.09);
     -webkit-mask-image: var(--tremonster-bilde);
     mask-image: var(--tremonster-bilde);

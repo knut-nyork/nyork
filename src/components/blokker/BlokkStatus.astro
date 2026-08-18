@@ -1,4 +1,5 @@
 ---
+import Tremonster from '../Tremonster.astro'
 import {bildeUrl} from '../../lib/hytter'
 import {tekst, type Sprak} from '../../lib/sprak'
 import type {BlokkStatus, Statusrad, Statustall} from '../../lib/typer'
@@ -55,6 +56,12 @@ const bilde = blokk.bakgrunnsbilde
 {
   rader.length > 0 && (
     <section class="relative overflow-hidden bg-flate-footer text-tekst-footer">
+      {/* Treårene, så vidt synlige mot den mørke flaten. De lå før på
+          sandflaten i budskapsblokka; her har de mer å gjøre, fordi båndet
+          ellers er en helt jevn farge. Sløyfes når redaktøren legger inn et
+          foto — et mønster oppå et bilde blir bare rot. */}
+      {!bilde && <Tremonster styrke={0.07} />}
+
       {bilde && (
         <>
           <img

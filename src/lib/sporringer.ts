@@ -88,6 +88,7 @@ const BLOKKER = `blokker[aktiv != false]{
   _type == "blokkBudskap" => {
     overskrift,
     tekst,
+    "bakgrunnsbilde": bakgrunnsbilde${BILDE},
     knapp${KNAPP}
   },
   _type == "blokkArtikkel" => {

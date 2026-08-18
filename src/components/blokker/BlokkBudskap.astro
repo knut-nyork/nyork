@@ -1,12 +1,25 @@
 ---
 import Blokkknapp from './Blokkknapp.astro'
 import Tremonster from '../Tremonster.astro'
+import {bildeUrl} from '../../lib/hytter'
 import {tekst, type Sprak} from '../../lib/sprak'
 import type {BlokkBudskap} from '../../lib/typer'
 
 /**
- * Kort budskap på farget flate — overskrift til venstre, tekst til høyre.
- * Kolonnene legger seg under hverandre på mobil.
+ * Kort budskap — overskrift til venstre, tekst til høyre. Kolonnene legger seg
+ * under hverandre på mobil.
+ *
+ * Med bakgrunnsbilde blir flaten et fotografi i full bredde. Teksten står
+ * mørk oppå, ikke lys: bildet er et snødekt fjell, og det er lysere enn
+ * nesten alt annet på siden. Det gjør blokka til motstykket til heroen, som
+ * er mørk med lys tekst — to bilder i full bredde på samme forside som ikke
+ * ser like ut.
+ *
+ * Sløret bak teksten er hvitt og går fra tett til gjennomsiktig. Snø har
+ * lite kontrast, og uten det ville overskriften forsvunnet i den.
+ *
+ * Uten bilde ligger budskapet på sandflaten som før, uten mønster —
+ * treårene er flyttet til statusbåndet.
  */
 interface Props {
   blokk: BlokkBudskap
@@ -17,25 +30,60 @@ const {blokk, sprak} = Astro.props
 
 const brodtekst = tekst(blokk.tekst, sprak)
 const avsnitt = brodtekst ? brodtekst.split(/\n\s*\n/) : []
+const bilde = blokk.bakgrunnsbilde
 ---
 
 <section class="mx-auto max-w-[1600px] px-5 py-14 md:px-10 md:py-20">
-  <!-- Sandflaten er den varme motvekten til en ellers kjølig side, og det
-       ene stedet på forsiden mønsteret brukes. `overflow-hidden` klipper
-       treårene etter hjørnene, og innholdet må ligge `relative` for å havne
-       over dekoren. -->
   <div
-    class="relative grid gap-6 overflow-hidden rounded-stor bg-flate-sand p-10 md:min-h-[380px] md:grid-cols-2 md:items-center md:gap-16 md:p-20"
+    class:list={[
+      'relative grid gap-6 overflow-hidden rounded-stor p-10 md:grid-cols-2 md:items-center md:gap-16 md:p-20',
+      bilde ? 'min-h-[440px] text-tekst-pa-lyst-foto md:min-h-[520px]' : 'bg-flate-sand md:min-h-[380px]',
+    ]}
   >
-    <Tremonster styrke={0.05} />
+    {
+      bilde ? (
+        <>
+          <img
+            src={bildeUrl(bilde.url, 2000)}
+            alt={tekst(bilde.altTekst, sprak)}
+            loading="lazy"
+            class="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Lyst slør, ikke mørkt: teksten på dette bildet er mørk. Tettest
+              der teksten står, og borte der bildet skal få være bilde. */}
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/45 to-white/10 md:bg-gradient-to-r md:from-white/80 md:via-white/40 md:to-transparent"
+            aria-hidden="true"
+          />
+        </>
+      ) : (
+        <Tremonster styrke={0.05} />
+      )
+    }
 
-    <h2 class="relative font-heading text-xlarge font-semibold md:text-2xlarge">
+    <h2
+      class:list={[
+        'relative font-heading font-semibold',
+        // På foto tåler overskriften mer vekt — den skal bære flaten.
+        bilde ? 'text-2xlarge md:text-3xlarge' : 'text-xlarge md:text-2xlarge',
+      ]}
+    >
       {tekst(blokk.overskrift, sprak)}
     </h2>
 
     <div class="relative flex flex-col gap-4">
-      {avsnitt.map((tekstavsnitt) => <p class="max-w-[62ch] font-body text-xsmall">{tekstavsnitt}</p>)}
+      {avsnitt.map((tekstavsnitt) => (
+        <p class:list={['max-w-[62ch] font-body', bilde ? 'text-small' : 'text-xsmall']}>{tekstavsnitt}</p>
+      ))}
       {blokk.knapp && <div class="mt-2"><Blokkknapp knapp={blokk.knapp} sprak={sprak} variant="sekundar" /></div>}
     </div>
+
+    {
+      bilde?.fotokreditt && (
+        <p class="relative col-span-full m-0 self-end text-right font-detail text-2xsmall opacity-70">
+          {bilde.fotokreditt}
+        </p>
+      )
+    }
   </div>
 </section>

@@ -93,6 +93,8 @@ export interface BlokkBudskap extends Blokkbase {
   _type: 'blokkBudskap'
   overskrift: LokalTekst
   tekst?: LokalTekst
+  /** Valgfritt. Fyller flaten, og teksten legges mørk oppå med et lyst slør bak. */
+  bakgrunnsbilde?: Bilde
   knapp?: Knapp
 }
 

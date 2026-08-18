@@ -100,11 +100,18 @@ export const blokkBudskap = defineType({
   title: 'Budskap',
   type: 'object',
   icon: DocumentTextIcon,
-  description: 'Kort budskap på farget flate, med overskrift til venstre og tekst til høyre.',
+  description: 'Kort budskap, med overskrift til venstre og tekst til høyre. Kan ligge på et bilde.',
   fields: [
     aktiv,
     defineField({name: 'overskrift', title: 'Overskrift', type: 'localeString', validation: (Rule) => Rule.required()}),
     defineField({name: 'tekst', title: 'Tekst', type: 'localeText'}),
+    defineField({
+      name: 'bakgrunnsbilde',
+      title: 'Bakgrunnsbilde',
+      type: 'bildeMedKreditering',
+      description:
+        'Valgfritt. Fyller hele flaten. Velg et lyst bilde — teksten står mørk oppå, med et lyst slør bak seg. Uten bilde ligger budskapet på sandflaten som før.',
+    }),
     defineField({name: 'knapp', title: 'Knapp', type: 'blokkKnapp'}),
   ],
   preview: {

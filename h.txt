@@ -1,0 +1,9 @@
+HTTP/2 303 
+date: Tue, 18 Aug 2026 19:23:06 GMT
+location: /
+server: Netlify
+set-cookie: nyork-adgang=3d100d8bee1d53ee6e00f4764f852b079823862d1b6ac0c639c7d8bc8c1d9d00; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M0B57M6GVYJ3ZMVG8Z1WC0JE
+content-length: 0
+

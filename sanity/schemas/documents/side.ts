@@ -32,17 +32,32 @@ export const side = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
+    /*
+     * Overskrift og ingress brukes bare på sider uten blokker.
+     *
+     * Bygges siden av blokker — som forsiden gjør — kommer overskriften fra
+     * Hero-blokka i lista lenger ned, og disse to feltene rendres ikke i det
+     * hele tatt. Se Forside.astro: den velger enten blokkene eller disse, aldri
+     * begge.
+     *
+     * Derfor skjules de når det finnes blokker. Et felt som ser ut som
+     * sidens overskrift, men som ikke gjør noe, koster noen minutters
+     * feilsøking hver gang en redaktør prøver seg på det. Fjernes alle
+     * blokkene, dukker feltene opp igjen med teksten sin i behold.
+     */
     defineField({
       name: 'overskrift',
       title: 'Overskrift',
       type: 'localeString',
       description: 'Den store overskriften øverst på siden. Er ofte kortere enn meta-tittelen under.',
+      hidden: ({document}) => Array.isArray(document?.blokker) && document.blokker.length > 0,
     }),
     defineField({
       name: 'ingress',
       title: 'Ingress',
       type: 'localeText',
       description: 'Én til to setninger rett under overskriften.',
+      hidden: ({document}) => Array.isArray(document?.blokker) && document.blokker.length > 0,
     }),
     defineField({
       name: 'tittel',

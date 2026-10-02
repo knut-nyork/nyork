@@ -23,7 +23,7 @@ interface Props {
 
 const {aktivitet, illustrasjon, sprak, storrelse = 64, dekorativ = false} = Astro.props
 
-const navn = sprak === 'en' ? AKTIVITETER[aktivitet].en : AKTIVITETER[aktivitet].no
+const navn = AKTIVITETER[aktivitet][sprak]
 ---
 
 {

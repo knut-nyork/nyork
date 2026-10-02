@@ -4,7 +4,7 @@ import Artikkelmal from '../components/Artikkelmal.astro'
 import Riktekst from '../components/Riktekst.astro'
 import {bildeUrl, forstAvsnitt} from '../lib/hytter'
 import {hentArtikkel} from '../lib/sporringer'
-import {tekst} from '../lib/sprak'
+import {riktekst, tekst} from '../lib/sprak'
 import {UI} from '../lib/tekster'
 
 /**
@@ -37,7 +37,7 @@ const avslutningsbilde = artikkel.avslutningsbilde
   metaBeskrivelse={ingress ? forstAvsnitt(ingress) : undefined}
 >
   <Artikkelmal sprak="no" tittel={tittel} ingress={ingress} bilde={artikkel.bilde}>
-    <Riktekst blokker={artikkel.brodtekst?.no ?? []} sprak="no" />
+    <Riktekst blokker={riktekst(artikkel.brodtekst, 'no')} sprak="no" />
 
     {
       avslutningsbilde && (

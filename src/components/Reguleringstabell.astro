@@ -33,15 +33,18 @@ function lengde(): string | null {
   return null
 }
 
+/** Komma på norsk og tysk, punktum på engelsk. */
+function desimal(tall: number): string {
+  return sprak === 'en' ? String(tall) : String(tall).replace('.', ',')
+}
+
 const rader = [
   {etikett: ui.maksByaToEtasjer, verdi: regler.maksByaToEtasjer ? `${regler.maksByaToEtasjer} m²` : null},
   {etikett: ui.maksByaTreEtasjer, verdi: regler.maksByaTreEtasjer ? `${regler.maksByaTreEtasjer} m²` : null},
   {
     etikett: ui.maksGesimshoyde,
-    // Komma som desimalskilletegn på norsk, punktum på engelsk.
-    verdi: regler.maksGesimshoyde
-      ? `${sprak === 'no' ? String(regler.maksGesimshoyde).replace('.', ',') : regler.maksGesimshoyde} m`
-      : null,
+    // Komma som desimalskilletegn på norsk og tysk, punktum på engelsk.
+    verdi: regler.maksGesimshoyde ? `${desimal(regler.maksGesimshoyde)} m` : null,
   },
   {etikett: ui.takform, verdi: tekst(regler.takform, sprak) || null},
   {etikett: ui.maksBygningsbredde, verdi: tekst(regler.maksBygningsbredde, sprak) || null},

@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro'
 import Interesseskjema from '../components/Interesseskjema.tsx'
 import {hentInnstillinger, hentStatustall} from '../lib/sporringer'
 import {synligNavigasjon} from '../lib/hytter'
-import {sprakFraSti, stiForSprak, type Sprak} from '../lib/sprak'
+import {HOVEDSPRAK, SPRAK, sprakFraSti, stiForSprak, type Sprak} from '../lib/sprak'
 import {UI} from '../lib/tekster'
 
 /**
@@ -35,9 +35,21 @@ const innstillinger = raaInnstillinger && {
   navigasjon: synligNavigasjon(raaInnstillinger.navigasjon ?? [], statustall.tomterLedige),
 }
 
-const norskUrl = new URL(norskSti, Astro.site)
-const engelskUrl = new URL(stiForSprak(norskSti, 'en'), Astro.site)
-const kanonisk = sprak === 'no' ? norskUrl : engelskUrl
+/**
+ * Én absolutt URL per språk for samme side. hreflang skal peke på alle tre,
+ * også fra siden som er en av dem — det er slik Google lærer at de hører
+ * sammen og ikke er duplikater av hverandre.
+ *
+ * `x-default` er den norske: det er siden en søkende uten språkpreferanse
+ * skal havne på.
+ */
+const urlPerSprak = SPRAK.map((kode) => ({
+  kode,
+  url: new URL(stiForSprak(norskSti, kode), Astro.site),
+}))
+
+const norskUrl = urlPerSprak.find((u) => u.kode === HOVEDSPRAK)!.url
+const kanonisk = urlPerSprak.find((u) => u.kode === sprak)!.url
 ---
 
 <!doctype html>
@@ -53,8 +65,7 @@ const kanonisk = sprak === 'no' ? norskUrl : engelskUrl
     {metaBeskrivelse && <meta name="description" content={metaBeskrivelse} />}
 
     <link rel="canonical" href={kanonisk} />
-    <link rel="alternate" hreflang="no" href={norskUrl} />
-    <link rel="alternate" hreflang="en" href={engelskUrl} />
+    {urlPerSprak.map(({kode, url}) => <link rel="alternate" hreflang={kode} href={url} />)}
     <link rel="alternate" hreflang="x-default" href={norskUrl} />
 
     {/*

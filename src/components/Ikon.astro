@@ -23,7 +23,7 @@ interface Props {
 const {aktivitet, sprak, dekorativ = false, storrelse = 28, class: klasse = ''} = Astro.props
 
 const oppslag = AKTIVITETER[aktivitet]
-const navn = sprak === 'en' ? oppslag.en : oppslag.no
+const navn = oppslag[sprak]
 ---
 
 <Icon

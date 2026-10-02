@@ -28,14 +28,21 @@ Vi kutter mye. Innholdet fra sidene som forsvinner flyttes inn i de fem som blir
 
 ## Sidestruktur
 
-| Meny | Norsk URL | Engelsk URL | Merknad |
-|---|---|---|---|
-| Hjem | `/` | `/en/` | Fengende forside |
-| Hytter | `/hytter` | `/en/cabins` | Hyttene til salgs |
-| Tomter | `/tomter` | `/en/plots` | Skjules når ingen er ledige |
-| Området | `/omradet` | `/en/area` | Sommer/vinter-toggle |
-| Nyheter | `/siste-nytt` | `/en/news` | **URL beholdes, menytekst er «Nyheter»** |
-| — | `/personvern` | `/en/privacy` | Utenfor menyen, påkrevd |
+| Meny | Norsk URL | Engelsk URL | Tysk URL | Merknad |
+|---|---|---|---|---|
+| Hjem | `/` | `/en/` | `/de/` | Fengende forside |
+| Hytter | `/hytter` | `/en/cabins` | `/de/huetten` | Hyttene til salgs |
+| Tomter | `/tomter` | `/en/plots` | `/de/grundstuecke` | Skjules når ingen er ledige |
+| Området | `/omradet` | `/en/area` | `/de/umgebung` | Sommer/vinter-toggle |
+| Nyheter | `/siste-nytt` | `/en/news` | `/de/aktuelles` | **URL beholdes, menytekst er «Nyheter»** |
+| — | `/slik-blir-nyork` | `/en/how-nyork-grows` | `/de/so-waechst-nyork` | Utenfor menyen, lenkes fra forsiden |
+| — | `/personvern` | `/en/privacy` | `/de/datenschutz` | Utenfor menyen, påkrevd. **Siden finnes ikke ennå** |
+
+Rutekartet er kodet én gang, i `RUTER` i `src/lib/sprak.ts`. Legges en side til,
+skal alle tre språk inn samtidig.
+
+De tyske stiene er skrevet uten omlyder — `huetten`, ikke `hütten`. En ü må
+prosentkodes i en URL, og lenken blir uleselig overalt den limes inn.
 
 **Merk om nyheter:** menytekst og URL trenger ikke være like. `/siste-nytt` er indeksert av Google siden 2021 og beholdes som URL, mens menyen sier «Nyheter».
 
@@ -251,10 +258,10 @@ Bygg én side helt ferdig før du starter på neste. Halvferdige sider skjuler f
 For hver side:
 
 - [ ] `npm run build` går gjennom
-- [ ] Norsk og engelsk versjon finnes og lenker til hverandre med hreflang
+- [ ] Norsk, engelsk og tysk versjon finnes og lenker til hverandre med hreflang
 - [ ] Ingen hardkodet brukervendt tekst
 - [ ] Ingen hex-koder utenfor `tokens.css`
-- [ ] `<title>` og meta-beskrivelse på begge språk
+- [ ] `<title>` og meta-beskrivelse på alle tre språk
 - [ ] Alle bilder bruker `<Image>` med alt-tekst fra Sanity
 - [ ] Redirects satt opp for gamle URL-er siden erstatter
 - [ ] Testet på mobil

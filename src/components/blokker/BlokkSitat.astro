@@ -9,8 +9,9 @@ import type {BlokkSitat} from '../../lib/typer'
  *
  * Sitatet står på norsk uansett hvilket språk siden vises på, og på dialekt
  * der det er sagt på dialekt — det skal aldri normaliseres til bokmål eller
- * byttes ut med oversettelsen. På engelsk side legges oversettelsen under, i
- * mindre skrift, slik at leseren skjønner meningen uten at stemmen forsvinner.
+ * byttes ut med oversettelsen. På engelsk og tysk side legges oversettelsen
+ * under, i mindre skrift, slik at leseren skjønner meningen uten at stemmen
+ * forsvinner.
  *
  * Teksten er satt i vanlig lesestørrelse og ikke som display. Et sitat på
  * fire linjer i 36 px blir en plakat; poenget her er at noen sier noe, ikke
@@ -33,7 +34,20 @@ interface Props {
 }
 
 const {blokk, sprak} = Astro.props
-const visOversettelse = sprak === 'en' && Boolean(blokk.oversettelse)
+/**
+ * Oversettelsene ligger i hvert sitt felt og ikke i et localeText, fordi en
+ * norsk variant ikke finnes — sitatet *er* den norske teksten.
+ *
+ * Mangler den tyske, vises den engelske. Samme kjede som `tekst()` i
+ * lib/sprak.ts: tyske lesere kommer lenger med engelsk enn med halling.
+ */
+const OVERSETTELSER: Record<Sprak, (string | undefined)[]> = {
+  no: [],
+  en: [blokk.oversettelse],
+  de: [blokk.oversettelseTysk, blokk.oversettelse],
+}
+
+const oversettelse = OVERSETTELSER[sprak].find(Boolean)
 const portrett = blokk.portrett
 ---
 
@@ -78,7 +92,7 @@ const portrett = blokk.portrett
 
       <blockquote class="m-0 font-body text-small">{blokk.sitat}</blockquote>
 
-      {visOversettelse && <p class="m-0 font-body text-xsmall text-foreground-muted">{blokk.oversettelse}</p>}
+      {oversettelse && <p class="m-0 font-body text-xsmall text-foreground-muted">{oversettelse}</p>}
 
       <figcaption class="font-heading text-small font-semibold">{blokk.navn}</figcaption>
     </div>

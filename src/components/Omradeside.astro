@@ -4,7 +4,7 @@ import Bildeplassholder from './Bildeplassholder.tsx'
 import Riktekst from './Riktekst.astro'
 import Sesongveksler from './Sesongveksler.astro'
 import {bildeUrl} from '../lib/hytter'
-import {tekst, type Sprak} from '../lib/sprak'
+import {riktekst, tekst, type Sprak} from '../lib/sprak'
 import {UI} from '../lib/tekster'
 import type {Omradeseksjon, Side} from '../lib/typer'
 
@@ -81,7 +81,7 @@ const SESONGER = [
           {seksjoner.map((seksjon) => {
             const bilde = sesong.navn === 'sommer' ? seksjon.sommerBilde : seksjon.vinterBilde
             const innhold = sesong.navn === 'sommer' ? seksjon.sommerInnhold : seksjon.vinterInnhold
-            const blokker = innhold?.[sprak] ?? innhold?.no ?? []
+            const blokker = riktekst(innhold, sprak)
 
             // Tett mellom tittelen og teksten under, så de leses som ett.
             // Bildet henter luften tilbake med sin egen marg.

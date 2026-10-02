@@ -1,11 +1,16 @@
 /**
  * TypeScript-motparten til skjemaene i sanity/schemas/.
- * Flerspråkfeltene har alltid nøklene `no` og `en` — se objects/locale.ts.
+ * Flerspråkfeltene har nøklene `no`, `en` og `de` — se objects/locale.ts.
  */
 
 export interface LokalTekst {
   no: string
   en: string
+  /**
+   * Tysk kom til etter at innholdet var skrevet, og er valgfritt i Sanity.
+   * Mangler det, henter `tekst()` den engelske teksten — se lib/sprak.ts.
+   */
+  de?: string
 }
 
 export interface Menypunkt {
@@ -148,6 +153,8 @@ export interface BlokkSitat extends Blokkbase {
   navn: string
   /** Vises under sitatet på engelsk side, aldri i stedet for det. */
   oversettelse?: string
+  /** Samme for tysk. Mangler den, brukes den engelske — se BlokkSitat.astro. */
+  oversettelseTysk?: string
   portrett?: Bilde
 }
 
@@ -257,6 +264,7 @@ export type Riktekstblokk = {
 export interface LokalRiktekst {
   no?: Riktekstblokk[]
   en?: Riktekstblokk[]
+  de?: Riktekstblokk[]
 }
 
 /** Én seksjon på områdesiden, med hver sin sommer- og vintervariant. */

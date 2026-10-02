@@ -192,11 +192,36 @@ Forsiden har ingen fast rekkefølge i koden. Den er en liste med blokker på `si
 
 ## Språk — les dette nøye
 
-Siden er **norsk og engelsk**. Norsk er hovedspråket.
+Siden er **norsk, engelsk og tysk**. Norsk er hovedspråket.
 
-- **Hardkod aldri tekst i en komponent.** All brukervendt tekst kommer fra Sanity eller oversettelsesfilene.
-- Norske URL-er er standard (`/om-prosjektet`), engelske ligger under `/en/` (`/en/about`)
-- Legger du til en tekst på norsk, skal engelsk versjon opprettes samtidig — også om den bare er midlertidig
+- **Hardkod aldri tekst i en komponent.** All brukervendt tekst kommer fra Sanity eller `src/lib/tekster.ts`.
+- Norske URL-er er standard (`/hytter`), engelske under `/en/` (`/en/cabins`), tyske under `/de/` (`/de/huetten`)
+- Rutekartet står ett sted: `RUTER` i `src/lib/sprak.ts`. Legges en side til, skal alle tre språk inn samtidig
+- Tyske stier skrives uten omlyder — `huetten`, ikke `hütten`. En ü må prosentkodes, og lenken blir uleselig der den limes inn
+
+**Norsk og engelsk er påkrevd i Sanity. Tysk er det ikke — og skal ikke bli det.**
+
+Tysk kom til lenge etter at innholdet var skrevet. Gjøres feltet påkrevd, blir hvert
+dokument ugyldig i samme øyeblikk skjemaet deployes, og redaktørene kan ikke publisere
+noe før alt er oversatt.
+
+Fallback-kjeden ligger i `tekst()` og `riktekst()` i `src/lib/sprak.ts`:
+
+| Side | Henter | Så | Så |
+|---|---|---|---|
+| Norsk | `no` | — | — |
+| Engelsk | `en` | `no` | — |
+| Tysk | `de` | `en` | `no` |
+
+Tysk faller tilbake til **engelsk** før norsk: en tysk leser kommer lenger med en
+engelsk setning enn med en norsk. Slå aldri opp et språkfelt direkte
+(`felt.de ?? felt.no`) — bruk `tekst()`, ellers er kjeden to steder.
+
+Grensesnittstekst som følger koden ligger i `src/lib/tekster.ts`, med én nøkkel per
+språk. Der finnes ingen fallback: mangler en nøkkel, sier TypeScript fra.
+
+**Tysk tiltaler leseren med «Sie»,** der norsk og engelsk sier «du»/«you». Det er
+konvensjonen i tyske boligannonser, og en kjøper som blir dust leser ikke videre.
 
 ## Tone of voice
 
@@ -205,8 +230,8 @@ Varm, jordnær og stedegen. Nyørk selger ikke luksus — det selger tilhørighe
 - Skriv kort. Unngå eiendomsmegler-superlativer («unik», «eksklusiv», «drømmehytte»)
 - Setningsformat, aldri Store Forbokstaver eller VERSALER
 - Lokale navn beholdes: Øpptown, Røvarklanten, Tøget, Jegerheim, Sentrumsløypa
-- Sitater fra Jegeir Trøim er på hallingdialekt og skal **aldri** normaliseres til bokmål
-- Engelsk versjon oversetter meningen, ikke ordene. Stedsnavn oversettes ikke
+- Sitater fra Jegeir Trøim er på hallingdialekt og skal **aldri** normaliseres til bokmål. Oversettelsen legges *under* sitatet, aldri i stedet for — egne felter for engelsk og tysk
+- Engelsk og tysk versjon oversetter meningen, ikke ordene. Stedsnavn oversettes ikke
 
 ## Bilder og video
 
@@ -232,7 +257,7 @@ Varm, jordnær og stedegen. Nyørk selger ikke luksus — det selger tilhørighe
 1. `npm run build` går gjennom
 2. Ingen hardkodet brukervendt tekst
 3. Ingen hex-koder utenfor tokens
-4. Nye sider har `<title>`, meta-beskrivelse og engelsk motpart
+4. Nye sider har `<title>`, meta-beskrivelse og både engelsk og tysk motpart
 5. Ingen tall om ledige hytter skrevet i koden — de kommer fra Sanity
 
 ## Ting som ikke skal gjøres

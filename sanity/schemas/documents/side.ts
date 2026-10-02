@@ -80,8 +80,10 @@ export const side = defineType({
        * Samme felle venter på alle localeString- og localeText-felter.
        */
       validation: (Rule) =>
-        Rule.custom((felt?: {no?: string; en?: string}) => {
-          const forLangt = [felt?.no, felt?.en].some((tekst) => typeof tekst === 'string' && tekst.length > 160)
+        Rule.custom((felt?: {no?: string; en?: string; de?: string}) => {
+          const forLangt = [felt?.no, felt?.en, felt?.de].some(
+            (tekst) => typeof tekst === 'string' && tekst.length > 160,
+          )
           return forLangt ? 'Lengre enn 160 tegn kan bli avkuttet i søkeresultater.' : true
         }).warning(),
     }),

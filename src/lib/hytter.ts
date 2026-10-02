@@ -1,3 +1,4 @@
+import type {Sprak} from './sprak'
 import type {Enhet, Status} from './typer'
 
 /**
@@ -86,8 +87,11 @@ const MANEDER_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep
  * Dato på nyhetskort. Norsk gir «18.11.2024», engelsk «18 Nov 2024» — den
  * norske rekkefølgen dag-måned leses feil av engelske lesere når begge tall
  * er under 13. Formateres for hånd av samme grunn som prisen, se over.
+ *
+ * Tysk skriver datoen med punktum i samme rekkefølge som norsk, og trenger
+ * derfor ingen egen variant.
  */
-export function formaterDato(dato: string, sprak: 'no' | 'en'): string {
+export function formaterDato(dato: string, sprak: Sprak): string {
   // Artikler lagres som full tidsstempel (2026-02-10T09:00:00Z), enheter som
   // ren dato. Klokkeslettet kuttes her, ellers havner det i datoen.
   const [ar, maned, dag] = dato.slice(0, 10).split('-')

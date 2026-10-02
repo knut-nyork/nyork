@@ -445,6 +445,12 @@ export const blokkSitat = defineType({
       description:
         'Bilde av den som er sitert. Vises ved siden av sitatet. Uten bilde står sitatet alene i full bredde.',
     }),
+    /*
+     * Oversettelsene ligger i hvert sitt felt og ikke i et localeText, fordi
+     * det ikke finnes noen norsk variant å fylle ut — sitatet over *er* den
+     * norske teksten, og et påkrevd «Norsk»-felt ville bedt redaktøren skrive
+     * det samme to ganger.
+     */
     defineField({
       name: 'oversettelse',
       title: 'Engelsk oversettelse',
@@ -452,6 +458,13 @@ export const blokkSitat = defineType({
       rows: 5,
       description:
         'Vises under sitatet på den engelske siden — aldri i stedet for det. Sitatet på norsk blir stående uansett språk.',
+    }),
+    defineField({
+      name: 'oversettelseTysk',
+      title: 'Tysk oversettelse',
+      type: 'text',
+      rows: 5,
+      description: 'Samme for den tyske siden. Står den tom, vises den engelske oversettelsen der.',
     }),
   ],
   preview: {

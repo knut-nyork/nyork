@@ -4,7 +4,7 @@ import Artikkelmal from '../../../components/Artikkelmal.astro'
 import Riktekst from '../../../components/Riktekst.astro'
 import {forstAvsnitt} from '../../../lib/hytter'
 import {hentArtikkel, hentArtikkelstier} from '../../../lib/sporringer'
-import {tekst} from '../../../lib/sprak'
+import {riktekst, tekst} from '../../../lib/sprak'
 import {UI} from '../../../lib/tekster'
 
 /**
@@ -40,6 +40,6 @@ const ingress = tekst(artikkel.ingress, 'en')
     bilde={artikkel.bilde}
     dato={artikkel.dato}
   >
-    <Riktekst blokker={artikkel.brodtekst?.['en'] ?? artikkel.brodtekst?.no ?? []} sprak="en" />
+    <Riktekst blokker={riktekst(artikkel.brodtekst, 'en')} sprak="en" />
   </Artikkelmal>
 </Sidemal>
